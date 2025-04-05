@@ -3,6 +3,7 @@ import React from 'react';
 import Header from '@/components/Header';
 import Logo from '@/components/Logo';
 import ColorBlock from '@/components/ColorBlock';
+import CashRegister from '@/components/CashRegister';
 import { Button } from '@/components/ui/button';
 
 const Index = () => {
@@ -34,14 +35,17 @@ const Index = () => {
               </div>
               
               <div className="flex-1 flex justify-center">
-                <div className="relative w-64 h-64 animate-float">
-                  <div className="absolute top-0 left-0 w-48 h-48 bg-brandBlue rounded-2xl transform rotate-6 z-10"></div>
-                  <div className="absolute top-10 left-10 w-48 h-48 bg-brandRed rounded-2xl transform rotate-12 z-20"></div>
-                  <div className="absolute top-20 left-20 w-48 h-48 bg-brandGreen rounded-2xl transform rotate-18 z-30"></div>
-                  <div className="absolute top-30 left-30 w-48 h-48 bg-white border border-gray-200 rounded-2xl transform rotate-24 z-40 shadow-xl"></div>
-                </div>
+                <Logo className="w-48 h-48 animate-float" />
               </div>
             </div>
+          </div>
+        </section>
+        
+        {/* Cash Register Section */}
+        <section className="py-20 px-6 md:px-12 bg-white">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-12">Cash Register System</h2>
+            <CashRegister />
           </div>
         </section>
         

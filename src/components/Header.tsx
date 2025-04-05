@@ -10,8 +10,8 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ className }) => {
   return (
     <header className={cn('w-full py-4 px-6 flex items-center justify-between bg-white shadow-sm', className)}>
-      <div className="flex items-center gap-2">
-        <Logo />
+      <div className="flex items-center gap-3">
+        <Logo className="w-8 h-8" />
         <span className="font-bold text-lg text-gray-800">RenkDesign</span>
       </div>
       <nav className="hidden md:flex items-center gap-6">
