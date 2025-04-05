@@ -11,12 +11,12 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
     <div className={cn('relative h-16 w-16 transform rotate-45', className)}>
       {/* Main diamond container */}
       <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-1">
-        {/* Left diamond - Blue */}
+        {/* Left diamond - Blue (previously green) */}
         <div className="bg-brandBlue rounded-sm shadow-md" />
-        {/* Top diamond - Red */}
-        <div className="bg-brandRed rounded-sm shadow-md" />
-        {/* Right diamond - Green */}
+        {/* Top diamond - Green (previously red) */}
         <div className="bg-brandGreen rounded-sm shadow-md" />
+        {/* Right diamond - Red (previously blue) */}
+        <div className="bg-brandRed rounded-sm shadow-md" />
         {/* Bottom diamond - White */}
         <div className="bg-brandWhite rounded-sm shadow-md border border-gray-200" />
       </div>
