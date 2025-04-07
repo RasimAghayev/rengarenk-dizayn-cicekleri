@@ -22,10 +22,6 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
           <div 
             className="absolute bottom-0 right-0 w-[2px] h-full bg-black" 
           />
-          {/* Border between red and blue */}
-          <div 
-            className="absolute top-0 left-0 w-full h-[2px] bg-black" 
-          />
         </div>
         
         {/* Top diamond - Yaşıl */}
@@ -41,6 +37,10 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
           {/* Border between blue and white */}
           <div 
             className="absolute top-0 right-0 h-full w-[2px] bg-black" 
+          />
+          {/* Border between blue and red */}
+          <div 
+            className="absolute bottom-0 left-0 h-[2px] w-full bg-black" 
           />
         </div>
         
