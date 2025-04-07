@@ -16,36 +16,30 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
     <div className={cn('relative h-16 w-16 transform rotate-45', className)}>
       {/* Main diamond container */}
       <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-0">
-        {/* Left diamond - Qırmızı */}
+        {/* Top-left diamond - Qırmızı (Red) */}
         <div className="bg-brandRed rounded-sm shadow-md relative">
-          {/* Vertical border between red and green (right side) */}
-          <div 
-            className="absolute bottom-0 right-0 w-[2px] h-full bg-black" 
-          />
+          {/* Horizontal border (bottom of red) */}
+          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-black" />
+          
+          {/* Vertical border (right of red) */}
+          <div className="absolute top-0 right-0 h-full w-[2px] bg-black" />
         </div>
         
-        {/* Top diamond - Yaşıl */}
+        {/* Top-right diamond - Yaşıl (Green) */}
         <div className="bg-brandGreen rounded-sm shadow-md relative">
-          {/* Horizontal border between green and white (bottom) */}
-          <div 
-            className="absolute bottom-0 left-0 h-[2px] w-full bg-black" 
-          />
+          {/* Horizontal border (bottom of green) */}
+          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-black" />
         </div>
         
-        {/* Right diamond - Mavi */}
+        {/* Bottom-left diamond - Mavi (Blue) */}
         <div className="bg-brandBlue rounded-sm shadow-md relative">
-          {/* Horizontal border between blue and red (common border) */}
-          <div 
-            className="absolute top-0 left-0 h-[2px] w-full bg-black" 
-          />
+          {/* Vertical border (right of blue) */}
+          <div className="absolute top-0 right-0 h-full w-[2px] bg-black" />
         </div>
         
-        {/* Bottom diamond - Ağ */}
+        {/* Bottom-right diamond - Ağ (White) */}
         <div className="bg-brandWhite rounded-sm shadow-md relative">
-          {/* Vertical border between white and blue (left side) */}
-          <div 
-            className="absolute top-0 left-0 h-full w-[2px] bg-black" 
-          />
+          {/* No additional borders needed here as they're added to the other diamonds */}
         </div>
       </div>
     </div>
