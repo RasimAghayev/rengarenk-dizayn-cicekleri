@@ -22,6 +22,10 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
           <div 
             className="absolute bottom-0 right-0 w-[2px] h-full bg-black" 
           />
+          {/* Border between red and blue */}
+          <div 
+            className="absolute top-0 left-0 w-full h-[2px] bg-black" 
+          />
         </div>
         
         {/* Top diamond - Yaşıl */}
