@@ -13,7 +13,7 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
   const isDarkMode = resolvedTheme === 'dark';
   
   // Set border color based on theme
-  const borderColor = isDarkMode ? 'bg-white' : 'bg-black';
+  const borderColor = isDarkMode ? 'bg-black' : 'bg-white';
   
   return (
     <div className={cn('relative h-16 w-16 transform rotate-45', className)}>
@@ -42,7 +42,7 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
         
         {/* Bottom-right diamond - Ağ (White) */}
         <div className="bg-brandWhite rounded-sm shadow-md relative">
-          {/* No additional borders needed here as they're added to the other diamonds */}
+          {/* No additional borders needed here */}
         </div>
       </div>
     </div>
@@ -50,3 +50,4 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
 };
 
 export default Logo;
+
