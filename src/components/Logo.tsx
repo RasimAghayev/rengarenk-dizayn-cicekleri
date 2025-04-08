@@ -13,7 +13,7 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
   const isDarkMode = resolvedTheme === 'dark';
   
   // Set border color based on theme
-  const borderColor = isDarkMode ? 'bg-black' : 'bg-white';
+  const borderColor = isDarkMode ? 'bg-white' : 'bg-black';
   
   return (
     <div className={cn('relative h-16 w-16 transform rotate-45', className)}>
@@ -50,4 +50,3 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
 };
 
 export default Logo;
-
