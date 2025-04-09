@@ -1,14 +1,18 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { CirclePlus, CircleMinus } from 'lucide-react';
+import { CirclePlus, CircleMinus, XCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface Product {
   id: number;
   name: string;
   price: number;
   quantity: number;
+  image: string;
+  inStock: boolean;
 }
 
 const CashRegister: React.FC = () => {
@@ -17,13 +21,15 @@ const CashRegister: React.FC = () => {
   const [payment, setPayment] = useState('');
 
   const products = [
-    { id: 1, name: 'Product A', price: 10.99 },
-    { id: 2, name: 'Product B', price: 15.99 },
-    { id: 3, name: 'Product C', price: 5.99 },
-    { id: 4, name: 'Product D', price: 20.99 },
+    { id: 1, name: 'Product A', price: 10.99, image: '/placeholder.svg', inStock: true },
+    { id: 2, name: 'Product B', price: 15.99, image: '/placeholder.svg', inStock: true },
+    { id: 3, name: 'Product C', price: 5.99, image: '/placeholder.svg', inStock: false },
+    { id: 4, name: 'Product D', price: 20.99, image: '/placeholder.svg', inStock: true },
   ];
 
-  const addToCart = (product: { id: number; name: string; price: number }) => {
+  const addToCart = (product: { id: number; name: string; price: number; image: string; inStock: boolean }) => {
+    if (!product.inStock) return;
+    
     const existingProduct = cart.find((item) => item.id === product.id);
     
     if (existingProduct) {
@@ -77,24 +83,32 @@ const CashRegister: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             {products.map((product) => (
-              <div key={product.id} className="flex items-center justify-between border rounded-lg p-2">
-                <div className="flex flex-col">
-                  <span>{product.name}</span>
-                  <span className="text-sm font-bold mt-1">${product.price.toFixed(2)}</span>
+              <div 
+                key={product.id} 
+                className={`border-2 ${product.inStock ? 'border-brandGreen' : 'border-gray-300 opacity-70'} rounded-lg overflow-hidden`}
+              >
+                <div className="relative">
+                  <img src={product.image} alt={product.name} className="w-full h-24 object-cover" />
+                  {!product.inStock && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <Badge variant="destructive" className="absolute top-2 right-2">Out of Stock</Badge>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button 
-                    onClick={() => removeFromCart(product.id, product.price)}
-                    className="text-red-500 hover:bg-red-50 rounded-full p-1"
-                  >
-                    <CircleMinus className="h-6 w-6" />
-                  </button>
-                  <button 
+                <div className="p-3">
+                  <div className="flex justify-between items-center">
+                    <div className="font-semibold">{product.name}</div>
+                    <div className="text-sm font-bold">${product.price.toFixed(2)}</div>
+                  </div>
+                  <Button 
+                    className="w-full mt-2" 
+                    size="sm"
+                    variant={product.inStock ? "default" : "secondary"}
+                    disabled={!product.inStock}
                     onClick={() => addToCart(product)}
-                    className="text-green-500 hover:bg-green-50 rounded-full p-1"
                   >
-                    <CirclePlus className="h-6 w-6" />
-                  </button>
+                    {product.inStock ? "Add to Cart" : "Out of Stock"}
+                  </Button>
                 </div>
               </div>
             ))}
@@ -122,16 +136,20 @@ const CashRegister: React.FC = () => {
                         x{item.quantity}
                       </span>
                     </div>
-                    <div className="flex items-center">
-                      <span className="mr-4">${(item.price * item.quantity).toFixed(2)}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 rounded-full p-0"
+                    <div className="flex items-center space-x-2">
+                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      <button 
                         onClick={() => removeFromCart(item.id, item.price)}
+                        className="text-red-500 hover:bg-red-50 rounded-full p-1"
                       >
-                        −
-                      </Button>
+                        <CircleMinus className="h-6 w-6" />
+                      </button>
+                      <button 
+                        onClick={() => addToCart(item)}
+                        className="text-green-500 hover:bg-green-50 rounded-full p-1"
+                      >
+                        <CirclePlus className="h-6 w-6" />
+                      </button>
                     </div>
                   </div>
                 ))}
