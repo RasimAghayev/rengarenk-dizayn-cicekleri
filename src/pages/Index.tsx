@@ -1,9 +1,7 @@
-
 import React from 'react';
 import Logo from '@/components/Logo';
 import ColorBlock from '@/components/ColorBlock';
 import { Button } from '@/components/ui/button';
-import ThemeToggle from '@/components/ThemeToggle';
 import MainLayout from '@/layouts/MainLayout';
 import { Link } from 'react-router-dom';
 
@@ -31,7 +29,6 @@ const Index = () => {
                 <Button asChild variant="outline" className="border-brandRed text-brandRed hover:bg-brandRed/10">
                   <Link to="/register">Register</Link>
                 </Button>
-                <ThemeToggle />
               </div>
             </div>
             
