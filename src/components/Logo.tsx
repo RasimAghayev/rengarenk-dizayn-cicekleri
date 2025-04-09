@@ -18,8 +18,13 @@ const Logo: React.FC<LogoProps> = ({ className }) => {
   // Only modify the white diamond in dark mode
   const whiteDiamondColor = isDarkMode ? 'bg-black' : 'bg-brandWhite';
   
+  // Set shadow based on theme
+  const shadowClass = isDarkMode 
+    ? 'shadow-[0_0_10px_rgba(255,255,255,0.3)]' 
+    : 'shadow-[0_0_10px_rgba(0,0,0,0.3)]';
+  
   return (
-    <div className={cn('relative h-16 w-16 transform rotate-45', className)}>
+    <div className={cn('relative h-16 w-16 transform rotate-45', shadowClass, className)}>
       {/* Main diamond container */}
       <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-0">
         {/* Top-left diamond - Qırmızı (Red) */}
