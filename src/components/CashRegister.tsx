@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { CirclePlus, CircleMinus } from 'lucide-react';
 
 interface Product {
   id: number;
@@ -16,7 +16,6 @@ const CashRegister: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [payment, setPayment] = useState('');
 
-  // Sample products
   const products = [
     { id: 1, name: 'Product A', price: 10.99 },
     { id: 2, name: 'Product B', price: 15.99 },
@@ -78,15 +77,26 @@ const CashRegister: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             {products.map((product) => (
-              <Button
-                key={product.id}
-                variant="outline"
-                className="h-20 flex flex-col items-center justify-center border-2 hover:border-brandBlue"
-                onClick={() => addToCart(product)}
-              >
-                <span>{product.name}</span>
-                <span className="text-sm font-bold mt-1">${product.price.toFixed(2)}</span>
-              </Button>
+              <div key={product.id} className="flex items-center justify-between border rounded-lg p-2">
+                <div className="flex flex-col">
+                  <span>{product.name}</span>
+                  <span className="text-sm font-bold mt-1">${product.price.toFixed(2)}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button 
+                    onClick={() => removeFromCart(product.id, product.price)}
+                    className="text-red-500 hover:bg-red-50 rounded-full p-1"
+                  >
+                    <CircleMinus className="h-6 w-6" />
+                  </button>
+                  <button 
+                    onClick={() => addToCart(product)}
+                    className="text-green-500 hover:bg-green-50 rounded-full p-1"
+                  >
+                    <CirclePlus className="h-6 w-6" />
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         </CardContent>
