@@ -13,6 +13,7 @@ interface Product {
   quantity: number;
   image: string;
   inStock: boolean;
+  stockQuantity?: number;
 }
 
 const CashRegister: React.FC = () => {
@@ -21,13 +22,13 @@ const CashRegister: React.FC = () => {
   const [payment, setPayment] = useState('');
 
   const products = [
-    { id: 1, name: 'Product A', price: 10.99, image: '/placeholder.svg', inStock: true },
-    { id: 2, name: 'Product B', price: 15.99, image: '/placeholder.svg', inStock: true },
-    { id: 3, name: 'Product C', price: 5.99, image: '/placeholder.svg', inStock: false },
-    { id: 4, name: 'Product D', price: 20.99, image: '/placeholder.svg', inStock: true },
+    { id: 1, name: 'Product A', price: 10.99, image: '/placeholder.svg', inStock: true, stockQuantity: 15 },
+    { id: 2, name: 'Product B', price: 15.99, image: '/placeholder.svg', inStock: true, stockQuantity: 8 },
+    { id: 3, name: 'Product C', price: 5.99, image: '/placeholder.svg', inStock: false, stockQuantity: 0 },
+    { id: 4, name: 'Product D', price: 20.99, image: '/placeholder.svg', inStock: true, stockQuantity: 3 },
   ];
 
-  const addToCart = (product: { id: number; name: string; price: number; image: string; inStock: boolean }) => {
+  const addToCart = (product: { id: number; name: string; price: number; image: string; inStock: boolean; stockQuantity?: number }) => {
     if (!product.inStock) return;
     
     const existingProduct = cart.find((item) => item.id === product.id);
@@ -85,7 +86,8 @@ const CashRegister: React.FC = () => {
             {products.map((product) => (
               <div 
                 key={product.id} 
-                className={`border-2 ${product.inStock ? 'border-brandGreen' : 'border-gray-300 opacity-70'} rounded-lg overflow-hidden`}
+                className={`border-2 ${product.inStock ? 'border-brandGreen' : 'border-red-500 opacity-80'} rounded-lg overflow-hidden cursor-pointer`}
+                onClick={() => product.inStock && addToCart(product)}
               >
                 <div className="relative">
                   <img src={product.image} alt={product.name} className="w-full h-24 object-cover" />
@@ -100,15 +102,17 @@ const CashRegister: React.FC = () => {
                     <div className="font-semibold">{product.name}</div>
                     <div className="text-sm font-bold">${product.price.toFixed(2)}</div>
                   </div>
-                  <Button 
-                    className="w-full mt-2" 
-                    size="sm"
-                    variant={product.inStock ? "default" : "secondary"}
-                    disabled={!product.inStock}
-                    onClick={() => addToCart(product)}
-                  >
-                    {product.inStock ? "Add to Cart" : "Out of Stock"}
-                  </Button>
+                  <div className="flex justify-between items-center mt-2">
+                    {product.inStock ? (
+                      <div className="text-xs text-green-600 font-medium">
+                        Stock: {product.stockQuantity}
+                      </div>
+                    ) : (
+                      <div className="text-xs text-red-500 font-medium">
+                        Out of Stock
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -137,18 +141,20 @@ const CashRegister: React.FC = () => {
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
-                      <button 
-                        onClick={() => removeFromCart(item.id, item.price)}
-                        className="text-red-500 hover:bg-red-50 rounded-full p-1"
-                      >
-                        <CircleMinus className="h-6 w-6" />
-                      </button>
                       <button 
                         onClick={() => addToCart(item)}
                         className="text-green-500 hover:bg-green-50 rounded-full p-1"
                       >
-                        <CirclePlus className="h-6 w-6" />
+                        <CirclePlus className="h-6 w-6 text-brandGreen bg-white rounded-full" />
+                      </button>
+                      
+                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      
+                      <button 
+                        onClick={() => removeFromCart(item.id, item.price)}
+                        className="text-red-500 hover:bg-red-50 rounded-full p-1"
+                      >
+                        <CircleMinus className="h-6 w-6 text-red-500 bg-white rounded-full" />
                       </button>
                     </div>
                   </div>
