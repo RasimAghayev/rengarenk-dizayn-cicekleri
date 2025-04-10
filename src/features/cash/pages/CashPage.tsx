@@ -4,7 +4,7 @@ import MainLayout from '@/layouts/MainLayout';
 import CashRegister from '@/components/CashRegister';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Info } from 'lucide-react';
+import { Info, Grid3X3, Tag, ShoppingCart } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const CashPage = () => {
@@ -19,9 +19,18 @@ const CashPage = () => {
           {isMobile ? (
             <Tabs defaultValue="products" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="categories">Categories</TabsTrigger>
-                <TabsTrigger value="products">Products</TabsTrigger>
-                <TabsTrigger value="cart">Cart</TabsTrigger>
+                <TabsTrigger value="categories" className="flex flex-col items-center gap-1 py-2">
+                  <Grid3X3 size={16} />
+                  <span className="text-xs">Categories</span>
+                </TabsTrigger>
+                <TabsTrigger value="products" className="flex flex-col items-center gap-1 py-2">
+                  <Tag size={16} />
+                  <span className="text-xs">Products</span>
+                </TabsTrigger>
+                <TabsTrigger value="cart" className="flex flex-col items-center gap-1 py-2">
+                  <ShoppingCart size={16} />
+                  <span className="text-xs">Cart</span>
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="categories">
                 <CashRegister viewMode="categories" />

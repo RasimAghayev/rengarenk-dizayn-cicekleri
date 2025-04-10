@@ -240,7 +240,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
               onClick={() => setSelectedCategory(category.name)}
             >
               {category.icon}
-              <span className={isMobile ? "sr-only" : ""}>{category.name}</span>
+              <span>{category.name}</span>
             </Button>
           ))}
         </div>
@@ -269,7 +269,9 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
             {filteredProducts.map((product) => (
               <div 
                 key={product.id} 
-                className={`border-2 ${product.inStock ? 'border-brandGreen' : 'border-red-500'} rounded-lg overflow-hidden cursor-pointer ${!product.inStock ? 'opacity-80' : ''}`}
+                className={`border-2 ${!product.inStock ? 'border-red-500' : product.stockQuantity && isAtStockLimit(product.id) ? 'border-red-500' : 'border-brandGreen'} 
+                  rounded-lg overflow-hidden cursor-pointer ${!product.inStock ? 'opacity-80' : ''}`}
+                onClick={() => product.inStock && addToCart(product)}
               >
                 <div className="relative">
                   <img src={product.image} alt={product.name} className="w-full h-24 object-cover" />
@@ -302,8 +304,8 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
                     )}
                   </div>
                   
-                  {/* Info button (bottom right) */}
-                  <div className="absolute bottom-2 right-2">
+                  {/* Info button (bottom left) */}
+                  <div className="absolute bottom-2 left-2">
                     <Popover>
                       <PopoverTrigger>
                         <Button variant="outline" size="icon" className="h-6 w-6 rounded-full bg-white dark:bg-gray-800">
@@ -330,21 +332,6 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
                       <Badge variant="destructive" className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         Out of Stock
                       </Badge>
-                    </div>
-                  )}
-                  
-                  {/* Add to cart button for in-stock products */}
-                  {product.inStock && (
-                    <div className="absolute bottom-2 left-2">
-                      <Button 
-                        onClick={() => addToCart(product)} 
-                        size="sm" 
-                        className="bg-brandGreen hover:bg-brandGreen/80"
-                        disabled={isAtStockLimit(product.id)}
-                      >
-                        <CirclePlus className="h-4 w-4 mr-1" />
-                        Add
-                      </Button>
                     </div>
                   )}
                 </div>
