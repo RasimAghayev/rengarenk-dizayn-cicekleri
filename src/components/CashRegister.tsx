@@ -3,11 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { CirclePlus, CircleMinus, Search } from 'lucide-react';
+import { CirclePlus, CircleMinus, Search, Info, Grid3X3, Grid, LayoutGrid, Tag, ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Product {
   id: number;
@@ -20,6 +23,7 @@ interface Product {
   inStock: boolean;
   stockQuantity?: number;
   category: string;
+  description?: string;
 }
 
 interface Customer {
@@ -30,9 +34,14 @@ interface Customer {
 interface Category {
   id: number;
   name: string;
+  icon: React.ReactNode;
 }
 
-const CashRegister: React.FC = () => {
+interface CashRegisterProps {
+  viewMode: 'all' | 'categories' | 'products' | 'cart';
+}
+
+const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
   const [cart, setCart] = useState<Product[]>([]);
   const [total, setTotal] = useState(0);
   const [payment, setPayment] = useState('');
@@ -41,7 +50,9 @@ const CashRegister: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-
+  const [productInfo, setProductInfo] = useState<Product | null>(null);
+  const isMobile = useIsMobile();
+  
   const customers: Customer[] = [
     { id: 1, name: 'Customer A' },
     { id: 2, name: 'Customer B' },
@@ -49,10 +60,10 @@ const CashRegister: React.FC = () => {
   ];
 
   const categories: Category[] = [
-    { id: 1, name: 'All Products' },
-    { id: 2, name: 'Electronics' },
-    { id: 3, name: 'Groceries' },
-    { id: 4, name: 'Clothing' },
+    { id: 1, name: 'All Products', icon: <LayoutGrid size={20} /> },
+    { id: 2, name: 'Electronics', icon: <Grid3X3 size={20} /> },
+    { id: 3, name: 'Groceries', icon: <Tag size={20} /> },
+    { id: 4, name: 'Clothing', icon: <ShoppingCart size={20} /> },
   ];
 
   const products: Product[] = [
@@ -66,7 +77,8 @@ const CashRegister: React.FC = () => {
       inStock: true, 
       stockQuantity: 15,
       category: 'Electronics',
-      quantity: 0
+      quantity: 0,
+      description: 'High-quality electronic product with excellent performance and durability.'
     },
     { 
       id: 2, 
@@ -76,7 +88,8 @@ const CashRegister: React.FC = () => {
       inStock: true, 
       stockQuantity: 8,
       category: 'Electronics',
-      quantity: 0
+      quantity: 0,
+      description: 'Premium electronic device with advanced features.'
     },
     { 
       id: 3, 
@@ -86,7 +99,8 @@ const CashRegister: React.FC = () => {
       inStock: false, 
       stockQuantity: 0,
       category: 'Groceries',
-      quantity: 0
+      quantity: 0,
+      description: 'Fresh grocery item with high nutritional value.'
     },
     { 
       id: 4, 
@@ -96,7 +110,8 @@ const CashRegister: React.FC = () => {
       inStock: true, 
       stockQuantity: 3,
       category: 'Clothing',
-      quantity: 0
+      quantity: 0,
+      description: 'Comfortable and stylish clothing item made with premium materials.'
     },
     { 
       id: 5, 
@@ -108,7 +123,8 @@ const CashRegister: React.FC = () => {
       inStock: true, 
       stockQuantity: 7,
       category: 'Groceries',
-      quantity: 0
+      quantity: 0,
+      description: 'Special grocery item currently on discount with excellent quality.'
     },
   ];
 
@@ -208,57 +224,59 @@ const CashRegister: React.FC = () => {
     return cartItem.quantity >= product.stockQuantity;
   };
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {/* Categories Section */}
-      <Card className="md:col-span-1">
-        <CardHeader>
-          <CardTitle className="text-brandBlue">Categories</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {categories.map((category) => (
-              <Button 
-                key={category.id}
-                variant={selectedCategory === category.name ? "default" : "outline"} 
-                className="w-full justify-start"
-                onClick={() => setSelectedCategory(category.name)}
-              >
-                {category.name}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+  // Render categories section
+  const renderCategoriesSection = () => (
+    <Card className={viewMode === 'all' ? "md:col-span-1" : "w-full"}>
+      <CardHeader>
+        <CardTitle className="text-brandBlue">Categories</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {categories.map((category) => (
+            <Button 
+              key={category.id}
+              variant={selectedCategory === category.name ? "default" : "outline"} 
+              className="w-full justify-start gap-2"
+              onClick={() => setSelectedCategory(category.name)}
+            >
+              {category.icon}
+              <span className={isMobile ? "sr-only" : ""}>{category.name}</span>
+            </Button>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
 
-      {/* Products Section */}
-      <Card className="md:col-span-1">
-        <CardHeader>
-          <CardTitle className="text-brandBlue">Products</CardTitle>
-          <div className="relative mt-2">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search products..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </CardHeader>
-        <CardContent>
+  // Render products section
+  const renderProductsSection = () => (
+    <Card className={viewMode === 'all' ? "md:col-span-1" : "w-full"}>
+      <CardHeader>
+        <CardTitle className="text-brandBlue">Products</CardTitle>
+        <div className="relative mt-2">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search products..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <ScrollArea className="h-[400px]">
           <div className="grid grid-cols-2 gap-4">
             {filteredProducts.map((product) => (
               <div 
                 key={product.id} 
-                className={`border-2 ${product.inStock ? 'border-brandGreen' : 'border-red-500'} rounded-lg overflow-hidden cursor-pointer ${!product.inStock ? 'opacity-80 pointer-events-none' : ''}`}
-                onClick={() => product.inStock && addToCart(product)}
+                className={`border-2 ${product.inStock ? 'border-brandGreen' : 'border-red-500'} rounded-lg overflow-hidden cursor-pointer ${!product.inStock ? 'opacity-80' : ''}`}
               >
                 <div className="relative">
                   <img src={product.image} alt={product.name} className="w-full h-24 object-cover" />
                   
                   {/* Stock quantity (top left) */}
                   {product.stockQuantity !== undefined && (
-                    <Badge variant="outline" className="absolute top-2 left-2 bg-white">
+                    <Badge variant="outline" className="absolute top-2 left-2 bg-white dark:bg-gray-800 dark:text-white">
                       Stock: {product.stockQuantity}
                     </Badge>
                   )}
@@ -267,21 +285,43 @@ const CashRegister: React.FC = () => {
                   <div className="absolute top-2 right-2 flex flex-col items-end">
                     {product.discounted ? (
                       <>
-                        <span className="text-xs line-through text-gray-500 bg-white px-1 rounded">
+                        <span className="text-xs line-through text-gray-500 bg-white dark:bg-gray-800 dark:text-gray-400 px-1 rounded">
                           ${product.originalPrice?.toFixed(2)}
                         </span>
-                        <span className="text-xs text-red-500 font-bold bg-white px-1 rounded mt-1">
+                        <span className="text-xs text-red-500 font-bold bg-white dark:bg-gray-800 px-1 rounded mt-1">
                           Discount!
                         </span>
-                        <span className="text-xs font-bold bg-white px-1 rounded mt-1">
+                        <span className="text-xs font-bold bg-white dark:bg-gray-800 dark:text-white px-1 rounded mt-1">
                           ${product.price.toFixed(2)}
                         </span>
                       </>
                     ) : (
-                      <span className="text-xs font-bold bg-white px-1 rounded">
+                      <span className="text-xs font-bold bg-white dark:bg-gray-800 dark:text-white px-1 rounded">
                         ${product.price.toFixed(2)}
                       </span>
                     )}
+                  </div>
+                  
+                  {/* Info button (bottom right) */}
+                  <div className="absolute bottom-2 right-2">
+                    <Popover>
+                      <PopoverTrigger>
+                        <Button variant="outline" size="icon" className="h-6 w-6 rounded-full bg-white dark:bg-gray-800">
+                          <Info className="h-3 w-3" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent>
+                        <div className="space-y-2">
+                          <h3 className="font-medium">{product.name}</h3>
+                          <img src={product.image} alt={product.name} className="w-full h-32 object-cover rounded" />
+                          <p className="text-sm text-muted-foreground">{product.description}</p>
+                          <div className="flex justify-between">
+                            <span>Price: ${product.price.toFixed(2)}</span>
+                            <span>Stock: {product.stockQuantity || 0}</span>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   
                   {/* Out of stock overlay */}
@@ -290,6 +330,21 @@ const CashRegister: React.FC = () => {
                       <Badge variant="destructive" className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         Out of Stock
                       </Badge>
+                    </div>
+                  )}
+                  
+                  {/* Add to cart button for in-stock products */}
+                  {product.inStock && (
+                    <div className="absolute bottom-2 left-2">
+                      <Button 
+                        onClick={() => addToCart(product)} 
+                        size="sm" 
+                        className="bg-brandGreen hover:bg-brandGreen/80"
+                        disabled={isAtStockLimit(product.id)}
+                      >
+                        <CirclePlus className="h-4 w-4 mr-1" />
+                        Add
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -301,20 +356,24 @@ const CashRegister: React.FC = () => {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </ScrollArea>
+      </CardContent>
+    </Card>
+  );
 
-      {/* Cart and Payment Section */}
-      <Card className="md:col-span-1">
-        <CardHeader>
-          <CardTitle className="text-brandRed">Current Sale</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-2">Cart Items</h3>
-            {cart.length === 0 ? (
-              <p className="text-muted-foreground">No items in cart</p>
-            ) : (
+  // Render cart and payment section
+  const renderCartSection = () => (
+    <Card className={viewMode === 'all' ? "md:col-span-1" : "w-full"}>
+      <CardHeader>
+        <CardTitle className="text-brandRed">Current Sale</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-2">Cart Items</h3>
+          {cart.length === 0 ? (
+            <p className="text-muted-foreground">No items in cart</p>
+          ) : (
+            <ScrollArea className="h-[200px]">
               <div className="space-y-2">
                 {cart.map((item) => (
                   <div key={item.id} className="flex justify-between items-center border-b pb-2">
@@ -323,7 +382,7 @@ const CashRegister: React.FC = () => {
                         onClick={() => removeFromCart(item.id, item.price)}
                         className="text-red-500 hover:bg-red-50 rounded-full p-1 mr-2"
                       >
-                        <CircleMinus className="h-6 w-6 text-red-500 bg-white rounded-full" />
+                        <CircleMinus className="h-6 w-6 text-red-500 bg-white dark:bg-gray-800 rounded-full" />
                       </button>
                       <span>{item.name}</span>
                       <span className="text-sm text-muted-foreground ml-2">
@@ -339,7 +398,7 @@ const CashRegister: React.FC = () => {
                         }`}
                         disabled={isAtStockLimit(item.id)}
                       >
-                        <CirclePlus className={`h-6 w-6 bg-white rounded-full ${
+                        <CirclePlus className={`h-6 w-6 bg-white dark:bg-gray-800 rounded-full ${
                           isAtStockLimit(item.id) ? 'text-gray-400' : 'text-brandGreen'
                         }`} />
                       </button>
@@ -347,86 +406,104 @@ const CashRegister: React.FC = () => {
                   </div>
                 ))}
               </div>
-            )}
+            </ScrollArea>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex justify-between font-bold text-lg">
+            <span>Total:</span>
+            <Input 
+              value={`$${total.toFixed(2)}`} 
+              className="w-32 text-right font-bold" 
+              readOnly 
+            />
           </div>
 
-          <div className="space-y-4">
-            <div className="flex justify-between font-bold text-lg">
-              <span>Total:</span>
-              <Input 
-                value={`$${total.toFixed(2)}`} 
-                className="w-32 text-right font-bold" 
-                readOnly 
-              />
-            </div>
+          <div className="space-y-2">
+            <label htmlFor="payment" className="block text-sm font-medium">
+              Payment Amount
+            </label>
+            <Input
+              id="payment"
+              type="number"
+              value={payment}
+              onChange={(e) => setPayment(e.target.value)}
+              placeholder="Enter amount"
+              className="w-full"
+            />
+          </div>
 
-            <div className="space-y-2">
-              <label htmlFor="payment" className="block text-sm font-medium">
-                Payment Amount
-              </label>
-              <Input
-                id="payment"
-                type="number"
-                value={payment}
-                onChange={(e) => setPayment(e.target.value)}
-                placeholder="Enter amount"
-                className="w-full"
-              />
-            </div>
+          <div className="flex justify-between font-bold">
+            <span>Change:</span>
+            <span className={calculateChange() < 0 ? 'text-red-500' : ''}>
+              ${calculateChange().toFixed(2)}
+            </span>
+          </div>
 
-            <div className="flex justify-between font-bold">
-              <span>Change:</span>
-              <span className={calculateChange() < 0 ? 'text-red-500' : ''}>
-                ${calculateChange().toFixed(2)}
-              </span>
-            </div>
-
-            {calculateChange() < 0 && (
-              <div className="flex flex-col space-y-3 border p-3 rounded-md bg-gray-50">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="debt" 
-                    checked={isDebt}
-                    onCheckedChange={(checked) => setIsDebt(checked === true)}
-                  />
-                  <Label htmlFor="debt">Record as customer debt</Label>
-                </div>
-                
-                {isDebt && (
-                  <Select
-                    value={selectedCustomer}
-                    onValueChange={setSelectedCustomer}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select customer" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {customers.map(customer => (
-                        <SelectItem key={customer.id} value={customer.name}>
-                          {customer.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
+          {calculateChange() < 0 && (
+            <div className="flex flex-col space-y-3 border p-3 rounded-md bg-gray-50 dark:bg-gray-800">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="debt" 
+                  checked={isDebt}
+                  onCheckedChange={(checked) => setIsDebt(checked === true)}
+                />
+                <Label htmlFor="debt">Record as customer debt</Label>
               </div>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button
-            onClick={handleCheckout}
-            className="w-full bg-brandGreen hover:bg-brandGreen/90"
-            disabled={
-              cart.length === 0 || 
-              (calculateChange() < 0 && !isDebt) || 
-              (isDebt && !selectedCustomer)
-            }
-          >
-            Complete Sale
-          </Button>
-        </CardFooter>
-      </Card>
+              
+              {isDebt && (
+                <Select
+                  value={selectedCustomer}
+                  onValueChange={setSelectedCustomer}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select customer" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {customers.map(customer => (
+                      <SelectItem key={customer.id} value={customer.name}>
+                        {customer.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )}
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button
+          onClick={handleCheckout}
+          className="w-full bg-brandGreen hover:bg-brandGreen/90"
+          disabled={
+            cart.length === 0 || 
+            (calculateChange() < 0 && !isDebt) || 
+            (isDebt && !selectedCustomer)
+          }
+        >
+          Complete Sale
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+
+  // Render different sections based on viewMode
+  if (viewMode === 'categories') {
+    return renderCategoriesSection();
+  } else if (viewMode === 'products') {
+    return renderProductsSection();
+  } else if (viewMode === 'cart') {
+    return renderCartSection();
+  }
+
+  // All sections for desktop
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {renderCategoriesSection()}
+      {renderProductsSection()}
+      {renderCartSection()}
     </div>
   );
 };
