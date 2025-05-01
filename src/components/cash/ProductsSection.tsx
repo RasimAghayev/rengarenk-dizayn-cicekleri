@@ -84,14 +84,17 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
                   </div>
                   
                   {/* Info button (bottom left) */}
-                  <div className="absolute bottom-2 left-2">
+                  <div className="absolute bottom-2 left-2" onClick={(e) => e.stopPropagation()}>
                     <Popover>
-                      <PopoverTrigger>
+                      <PopoverTrigger asChild>
                         <Button 
                           variant="outline" 
                           size="icon" 
                           className="h-6 w-6 rounded-full bg-white dark:bg-gray-800"
-                          onClick={(e) => handleInfoClick(product, e)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleInfoClick(product, e);
+                          }}
                         >
                           <Info className="h-3 w-3" />
                         </Button>

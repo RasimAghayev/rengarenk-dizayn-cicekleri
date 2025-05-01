@@ -11,15 +11,55 @@ interface CashRegisterProps {
 }
 
 const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
-  const [cart, setCart] = useState<Product[]>([]);
-  const [total, setTotal] = useState(0);
-  const [payment, setPayment] = useState('');
-  const [isDebt, setIsDebt] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  // Use localStorage to persist cart data across view changes
+  const [cart, setCart] = useState<Product[]>(() => {
+    const savedCart = localStorage.getItem('cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+  
+  const [total, setTotal] = useState(() => {
+    const savedTotal = localStorage.getItem('cartTotal');
+    return savedTotal ? parseFloat(savedTotal) : 0;
+  });
+  
+  const [payment, setPayment] = useState(() => {
+    const savedPayment = localStorage.getItem('payment');
+    return savedPayment || '';
+  });
+  
+  const [isDebt, setIsDebt] = useState(() => {
+    const savedIsDebt = localStorage.getItem('isDebt');
+    return savedIsDebt ? JSON.parse(savedIsDebt) : false;
+  });
+  
+  const [selectedCustomer, setSelectedCustomer] = useState(() => {
+    const savedCustomer = localStorage.getItem('selectedCustomer');
+    return savedCustomer || '';
+  });
+  
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(() => {
+    const savedCategory = localStorage.getItem('selectedCategory');
+    return savedCategory || 'All Products';
+  });
+  
+  const [searchQuery, setSearchQuery] = useState(() => {
+    const savedQuery = localStorage.getItem('searchQuery');
+    return savedQuery || '';
+  });
+  
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [productInfo, setProductInfo] = useState<Product | null>(null);
+  
+  // Save cart data to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem('cartTotal', total.toString());
+    localStorage.setItem('payment', payment);
+    localStorage.setItem('isDebt', JSON.stringify(isDebt));
+    localStorage.setItem('selectedCustomer', selectedCustomer);
+    localStorage.setItem('selectedCategory', selectedCategory || '');
+    localStorage.setItem('searchQuery', searchQuery);
+  }, [cart, total, payment, isDebt, selectedCustomer, selectedCategory, searchQuery]);
   
   // Filter products based on category and search query
   useEffect(() => {
@@ -45,7 +85,6 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
   // Initialize filtered products with all products
   useEffect(() => {
     setFilteredProducts(products);
-    setSelectedCategory('All Products');
   }, []);
 
   const addToCart = (product: Product) => {
@@ -61,13 +100,12 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     }
     
     if (existingProduct) {
-      setCart(
-        cart.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
+      const updatedCart = cart.map((item) =>
+        item.id === product.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
       );
+      setCart(updatedCart);
     } else {
       setCart([...cart, { ...product, quantity: 1 }]);
     }
@@ -105,6 +143,13 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     setPayment('');
     setIsDebt(false);
     setSelectedCustomer('');
+    
+    // Clear localStorage on checkout
+    localStorage.removeItem('cart');
+    localStorage.removeItem('cartTotal');
+    localStorage.removeItem('payment');
+    localStorage.removeItem('isDebt');
+    localStorage.removeItem('selectedCustomer');
   };
 
   // Check if a product in cart has reached its stock limit
