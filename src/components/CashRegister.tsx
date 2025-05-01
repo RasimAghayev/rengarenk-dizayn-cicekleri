@@ -224,6 +224,12 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     return cartItem.quantity >= product.stockQuantity;
   };
 
+  // Handle info button click without adding to cart
+  const handleInfoClick = (product: Product, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent product card click from firing
+    setProductInfo(product);
+  };
+
   // Render categories section
   const renderCategoriesSection = () => (
     <Card className={viewMode === 'all' ? "md:col-span-1" : "w-full"}>
@@ -308,7 +314,12 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
                   <div className="absolute bottom-2 left-2">
                     <Popover>
                       <PopoverTrigger>
-                        <Button variant="outline" size="icon" className="h-6 w-6 rounded-full bg-white dark:bg-gray-800">
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          className="h-6 w-6 rounded-full bg-white dark:bg-gray-800"
+                          onClick={(e) => handleInfoClick(product, e)}
+                        >
                           <Info className="h-3 w-3" />
                         </Button>
                       </PopoverTrigger>
@@ -360,7 +371,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
           {cart.length === 0 ? (
             <p className="text-muted-foreground">No items in cart</p>
           ) : (
-            <ScrollArea className="h-[200px]">
+            <ScrollArea className="h-[200px] border rounded-md p-2">
               <div className="space-y-2">
                 {cart.map((item) => (
                   <div key={item.id} className="flex justify-between items-center border-b pb-2">
