@@ -66,6 +66,8 @@ const productSchema = z.object({
   barcode: z.string().min(4, 'Barcode must be at least 4 characters'),
 });
 
+type ProductFormValues = z.infer<typeof productSchema>;
+
 const categories = ['Beverages', 'Bakery', 'Dairy', 'Produce', 'Meat', 'Snacks', 'Other'];
 
 const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => {
@@ -74,7 +76,7 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof productSchema>>({
+  const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: '',
@@ -92,7 +94,7 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
       product.barcode.includes(searchTerm)
   );
 
-  const handleAddProduct = (data: z.infer<typeof productSchema>) => {
+  const handleAddProduct = (data: ProductFormValues) => {
     if (editingProduct) {
       // Update existing product
       setProducts(products.map(p => 
@@ -100,7 +102,7 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
       ));
     } else {
       // Add new product
-      const newProduct = {
+      const newProduct: Product = {
         id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
         ...data
       };

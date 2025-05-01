@@ -45,12 +45,15 @@ interface UserManagementProps {
   onSave: () => void;
 }
 
+type UserRole = 'admin' | 'manager' | 'cashier' | 'inventory' | 'sales';
+type UserStatus = 'active' | 'inactive';
+
 interface User {
   id: number;
   name: string;
   email: string;
-  role: string;
-  status: 'active' | 'inactive';
+  role: UserRole;
+  status: UserStatus;
 }
 
 // Sample initial data
@@ -68,6 +71,8 @@ const userSchema = z.object({
   status: z.enum(['active', 'inactive']),
 });
 
+type UserFormValues = z.infer<typeof userSchema>;
+
 const roles = [
   { value: 'admin', label: 'Administrator' },
   { value: 'manager', label: 'Manager' },
@@ -82,7 +87,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof userSchema>>({
+  const form = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
     defaultValues: {
       name: '',
@@ -100,7 +105,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
       user.role.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddUser = (data: z.infer<typeof userSchema>) => {
+  const handleAddUser = (data: UserFormValues) => {
     if (editingUser) {
       // Update existing user
       setUsers(users.map(u => 
@@ -108,7 +113,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
       ));
     } else {
       // Add new user
-      const newUser = {
+      const newUser: User = {
         id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
         name: data.name,
         email: data.email,

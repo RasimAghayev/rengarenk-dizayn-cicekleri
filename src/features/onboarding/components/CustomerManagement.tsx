@@ -57,13 +57,15 @@ const customerSchema = z.object({
   address: z.string().min(5, 'Address must be at least 5 characters'),
 });
 
+type CustomerFormValues = z.infer<typeof customerSchema>;
+
 const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof customerSchema>>({
+  const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
     defaultValues: {
       name: '',
@@ -80,7 +82,7 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
       customer.phone.includes(searchTerm)
   );
 
-  const handleAddCustomer = (data: z.infer<typeof customerSchema>) => {
+  const handleAddCustomer = (data: CustomerFormValues) => {
     if (editingCustomer) {
       // Update existing customer
       setCustomers(customers.map(c => 
@@ -88,7 +90,7 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
       ));
     } else {
       // Add new customer
-      const newCustomer = {
+      const newCustomer: Customer = {
         id: customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1,
         ...data
       };
