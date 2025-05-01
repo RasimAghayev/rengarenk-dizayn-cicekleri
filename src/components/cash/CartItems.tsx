@@ -30,7 +30,7 @@ const CartItems: React.FC<CartItemsProps> = ({
   }, [cart.length, cart.map(item => item.quantity).join(',')]);
 
   if (cart.length === 0) {
-    return <p className="text-muted-foreground">No items in cart</p>;
+    return <p className="text-muted-foreground text-center py-8">No items in cart</p>;
   }
 
   return (
@@ -42,22 +42,26 @@ const CartItems: React.FC<CartItemsProps> = ({
               <button 
                 onClick={() => removeFromCart(item.id, item.price)}
                 className="text-red-500 hover:bg-red-50 rounded-full p-1 mr-2"
+                aria-label="Remove item"
               >
                 <CircleMinus className="h-6 w-6 text-red-500 bg-white dark:bg-gray-800 rounded-full" />
               </button>
-              <span>{item.name}</span>
-              <span className="text-sm text-muted-foreground ml-2">
-                x{item.quantity}
-              </span>
+              <div className="flex flex-col">
+                <span className="font-medium">{item.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  ${item.price.toFixed(2)} x {item.quantity}
+                </span>
+              </div>
             </div>
             <div className="flex items-center space-x-2">
-              <span>${(item.price * item.quantity).toFixed(2)}</span>
+              <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
               <button 
                 onClick={() => addToCart(item)}
                 className={`text-green-500 hover:bg-green-50 rounded-full p-1 ${
                   isAtStockLimit(item.id) ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
                 disabled={isAtStockLimit(item.id)}
+                aria-label="Add item"
               >
                 <CirclePlus className={`h-6 w-6 bg-white dark:bg-gray-800 rounded-full ${
                   isAtStockLimit(item.id) ? 'text-gray-400' : 'text-brandGreen'

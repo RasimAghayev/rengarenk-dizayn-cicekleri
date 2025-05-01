@@ -4,6 +4,8 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Button } from '@/components/ui/button';
 import CartItems from './CartItems';
 import PaymentSection from './PaymentSection';
+import BarcodeScanner from './BarcodeScanner';
+import ReceiptComponent from './Receipt';
 import { Product, Customer } from '@/types/cash-register';
 
 interface CartSectionProps {
@@ -22,6 +24,7 @@ interface CartSectionProps {
   addToCart: (product: Product) => void;
   isAtStockLimit: (productId: number) => boolean;
   viewMode: 'all' | 'cart';
+  onBarcodeScanned: (barcode: string) => void;
 }
 
 const CartSection: React.FC<CartSectionProps> = ({
@@ -39,8 +42,14 @@ const CartSection: React.FC<CartSectionProps> = ({
   removeFromCart,
   addToCart,
   isAtStockLimit,
-  viewMode
+  viewMode,
+  onBarcodeScanned
 }) => {
+  const isCheckoutDisabled = 
+    cart.length === 0 || 
+    (calculateChange() < 0 && !isDebt) || 
+    (isDebt && !selectedCustomer);
+
   return (
     <Card className={viewMode === 'all' ? "md:col-span-1" : "w-full"}>
       <CardHeader>
@@ -48,7 +57,10 @@ const CartSection: React.FC<CartSectionProps> = ({
       </CardHeader>
       <CardContent>
         <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Cart Items</h3>
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-semibold">Cart Items</h3>
+            <BarcodeScanner onScan={onBarcodeScanned} />
+          </div>
           <CartItems 
             cart={cart}
             removeFromCart={removeFromCart}
@@ -69,18 +81,24 @@ const CartSection: React.FC<CartSectionProps> = ({
           customers={customers}
         />
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col gap-3">
         <Button
           onClick={handleCheckout}
           className="w-full bg-brandGreen hover:bg-brandGreen/90"
-          disabled={
-            cart.length === 0 || 
-            (calculateChange() < 0 && !isDebt) || 
-            (isDebt && !selectedCustomer)
-          }
+          disabled={isCheckoutDisabled}
         >
           Complete Sale
         </Button>
+        
+        {cart.length > 0 && (
+          <ReceiptComponent
+            cart={cart}
+            total={total}
+            payment={payment}
+            change={calculateChange()}
+            customerName={selectedCustomer || undefined}
+          />
+        )}
       </CardFooter>
     </Card>
   );

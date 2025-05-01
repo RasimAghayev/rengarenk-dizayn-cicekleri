@@ -5,6 +5,7 @@ import ProductsSection from './cash/ProductsSection';
 import CartSection from './cash/CartSection';
 import { products, categories, customers } from './cash/mockData';
 import { Product } from '@/types/cash-register';
+import { toast } from '@/hooks/use-toast';
 
 interface CashRegisterProps {
   viewMode: 'all' | 'categories' | 'products' | 'cart';
@@ -95,6 +96,11 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     // Check if adding more would exceed stock quantity
     if (existingProduct && product.stockQuantity !== undefined) {
       if (existingProduct.quantity >= product.stockQuantity) {
+        toast({
+          title: "Stock limit reached",
+          description: `Cannot add more ${product.name} (Stock: ${product.stockQuantity})`,
+          variant: "destructive",
+        });
         return; // Cannot add more than stock
       }
     }
@@ -108,6 +114,10 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
       setCart(updatedCart);
     } else {
       setCart([...cart, { ...product, quantity: 1 }]);
+      toast({
+        title: "Item added",
+        description: `${product.name} added to cart`,
+      });
     }
     
     setTotal((prevTotal) => prevTotal + product.price);
@@ -134,9 +144,15 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
 
   const handleCheckout = () => {
     if (isDebt && calculateChange() < 0) {
-      alert(`Sale completed with debt for customer: ${selectedCustomer}! Debt amount: $${Math.abs(calculateChange()).toFixed(2)}`);
+      toast({
+        title: "Sale completed with debt",
+        description: `Customer: ${selectedCustomer}! Debt amount: $${Math.abs(calculateChange()).toFixed(2)}`,
+      });
     } else {
-      alert(`Sale completed! Change: $${calculateChange().toFixed(2)}`);
+      toast({
+        title: "Sale completed",
+        description: `Change: $${calculateChange().toFixed(2)}`,
+      });
     }
     setCart([]);
     setTotal(0);
@@ -166,6 +182,28 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
   const handleInfoClick = (product: Product, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent product card click from firing
     setProductInfo(product);
+  };
+
+  // Handle barcode scanning
+  const handleBarcodeScanned = (barcode: string) => {
+    // In a real app, you would look up the product by barcode in your database
+    // For this demo, we'll just use the product ID as a barcode stand-in
+    const productId = parseInt(barcode);
+    const product = products.find(p => p.id === productId);
+    
+    if (product) {
+      addToCart(product);
+      toast({
+        title: "Product found",
+        description: `Added ${product.name} to cart`,
+      });
+    } else {
+      toast({
+        title: "Product not found",
+        description: `No product found with barcode ${barcode}`,
+        variant: "destructive",
+      });
+    }
   };
 
   // Render different sections based on viewMode
@@ -203,6 +241,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
       addToCart={addToCart}
       isAtStockLimit={isAtStockLimit}
       viewMode="cart"
+      onBarcodeScanned={handleBarcodeScanned}
     />;
   }
 
@@ -240,6 +279,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
         addToCart={addToCart}
         isAtStockLimit={isAtStockLimit}
         viewMode="all"
+        onBarcodeScanned={handleBarcodeScanned}
       />
     </div>
   );
