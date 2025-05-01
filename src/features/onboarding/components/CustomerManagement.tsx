@@ -89,10 +89,13 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
         c.id === editingCustomer.id ? { ...c, ...data } : c
       ));
     } else {
-      // Add new customer
+      // Add new customer - fix by explicitly defining all required fields
       const newCustomer: Customer = {
         id: customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1,
-        ...data
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        address: data.address
       };
       setCustomers([...customers, newCustomer]);
     }

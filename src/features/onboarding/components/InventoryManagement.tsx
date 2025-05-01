@@ -101,10 +101,14 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
         p.id === editingProduct.id ? { ...p, ...data } : p
       ));
     } else {
-      // Add new product
+      // Add new product - fix by explicitly defining all required fields
       const newProduct: Product = {
         id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
-        ...data
+        name: data.name,
+        category: data.category,
+        price: data.price,
+        stockQuantity: data.stockQuantity,
+        barcode: data.barcode
       };
       setProducts([...products, newProduct]);
     }
