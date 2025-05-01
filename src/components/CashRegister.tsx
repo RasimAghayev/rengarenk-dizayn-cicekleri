@@ -48,6 +48,12 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     return savedQuery || '';
   });
   
+  // Store modified products with updated stock quantities
+  const [modifiedProducts, setModifiedProducts] = useState<Product[]>(() => {
+    const savedProducts = localStorage.getItem('modifiedProducts');
+    return savedProducts ? JSON.parse(savedProducts) : [...products];
+  });
+  
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [productInfo, setProductInfo] = useState<Product | null>(null);
   
@@ -60,11 +66,12 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     localStorage.setItem('selectedCustomer', selectedCustomer);
     localStorage.setItem('selectedCategory', selectedCategory || '');
     localStorage.setItem('searchQuery', searchQuery);
-  }, [cart, total, payment, isDebt, selectedCustomer, selectedCategory, searchQuery]);
+    localStorage.setItem('modifiedProducts', JSON.stringify(modifiedProducts));
+  }, [cart, total, payment, isDebt, selectedCustomer, selectedCategory, searchQuery, modifiedProducts]);
   
   // Filter products based on category and search query
   useEffect(() => {
-    let filtered = products;
+    let filtered = modifiedProducts;
     
     // Apply category filter
     if (selectedCategory && selectedCategory !== 'All Products') {
@@ -81,12 +88,12 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     }
     
     setFilteredProducts(filtered);
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, searchQuery, modifiedProducts]);
 
   // Initialize filtered products with all products
   useEffect(() => {
-    setFilteredProducts(products);
-  }, []);
+    setFilteredProducts(modifiedProducts);
+  }, [modifiedProducts]);
 
   const addToCart = (product: Product) => {
     if (!product.inStock) return;
@@ -121,9 +128,22 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     }
     
     setTotal((prevTotal) => prevTotal + product.price);
+    
+    // Decrease stock quantity in modified products
+    setModifiedProducts(prevProducts => 
+      prevProducts.map(p => 
+        p.id === product.id && p.stockQuantity !== undefined
+          ? { ...p, stockQuantity: p.stockQuantity - 1 }
+          : p
+      )
+    );
   };
 
   const removeFromCart = (productId: number, price: number) => {
+    const productToRemove = cart.find(item => item.id === productId);
+    
+    if (!productToRemove) return;
+    
     const updatedCart = cart
       .map((item) =>
         item.id === productId
@@ -134,6 +154,15 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     
     setCart(updatedCart);
     setTotal((prevTotal) => prevTotal - price);
+    
+    // Increase stock quantity back in modified products
+    setModifiedProducts(prevProducts => 
+      prevProducts.map(p => 
+        p.id === productId && p.stockQuantity !== undefined
+          ? { ...p, stockQuantity: p.stockQuantity + 1 }
+          : p
+      )
+    );
   };
 
   const calculateChange = () => {
@@ -171,7 +200,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
   // Check if a product in cart has reached its stock limit
   const isAtStockLimit = (productId: number) => {
     const cartItem = cart.find(item => item.id === productId);
-    const product = products.find(p => p.id === productId);
+    const product = modifiedProducts.find(p => p.id === productId);
     
     if (!cartItem || !product || product.stockQuantity === undefined) return false;
     
@@ -189,7 +218,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     // In a real app, you would look up the product by barcode in your database
     // For this demo, we'll just use the product ID as a barcode stand-in
     const productId = parseInt(barcode);
-    const product = products.find(p => p.id === productId);
+    const product = modifiedProducts.find(p => p.id === productId);
     
     if (product) {
       addToCart(product);

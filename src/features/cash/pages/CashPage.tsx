@@ -19,17 +19,17 @@ const CashPage = () => {
           {isMobile ? (
             <Tabs defaultValue="products" className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-4">
-                <TabsTrigger value="categories" className="flex flex-col items-center py-2">
+                <TabsTrigger value="categories" className="flex items-center py-2 justify-center">
                   <Grid3X3 size={18} />
-                  <span className="text-xs mt-1">Categories</span>
+                  <span className="text-xs ml-1">Categories</span>
                 </TabsTrigger>
-                <TabsTrigger value="products" className="flex flex-col items-center py-2">
+                <TabsTrigger value="products" className="flex items-center py-2 justify-center">
                   <Tag size={18} />
-                  <span className="text-xs mt-1">Products</span>
+                  <span className="text-xs ml-1">Products</span>
                 </TabsTrigger>
-                <TabsTrigger value="cart" className="flex flex-col items-center py-2">
+                <TabsTrigger value="cart" className="flex items-center py-2 justify-center">
                   <ShoppingCart size={18} />
-                  <span className="text-xs mt-1">Cart</span>
+                  <span className="text-xs ml-1">Cart</span>
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="categories">

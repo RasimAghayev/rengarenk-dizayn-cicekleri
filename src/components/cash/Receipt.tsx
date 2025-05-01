@@ -135,7 +135,7 @@ const ReceiptComponent: React.FC<ReceiptProps> = ({
           <div className="receipt-header text-center mb-4">
             <h3 className="font-bold">STORE RECEIPT</h3>
             <p className="text-xs">{formattedDate}</p>
-            {customerName && <p className="text-xs">Customer: {customerName}</p>}
+            {customerName && <p className="text-xs font-bold">Customer: {customerName}</p>}
           </div>
           
           <div className="receipt-body">
@@ -174,7 +174,7 @@ const ReceiptComponent: React.FC<ReceiptProps> = ({
               </div>
               
               {change < 0 && (
-                <div className="flex justify-between text-red-500">
+                <div className="flex justify-between text-red-500 font-bold">
                   <span>Debt:</span>
                   <span>${Math.abs(change).toFixed(2)}</span>
                 </div>
@@ -183,6 +183,9 @@ const ReceiptComponent: React.FC<ReceiptProps> = ({
           </div>
           
           <div className="receipt-footer text-center text-xs mt-6">
+            {change < 0 && customerName && (
+              <p className="text-red-500 font-bold mb-2">Debt recorded for customer: {customerName}</p>
+            )}
             <p>Thank you for your purchase!</p>
             <p>Please come again</p>
           </div>
