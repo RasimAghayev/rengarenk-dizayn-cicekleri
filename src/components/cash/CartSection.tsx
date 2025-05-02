@@ -7,6 +7,7 @@ import PaymentSection from './PaymentSection';
 import BarcodeScanner from './BarcodeScanner';
 import ReceiptComponent from './Receipt';
 import { Product, Customer } from '@/types/cash-register';
+import { Trash2 } from 'lucide-react';
 
 interface CartSectionProps {
   cart: Product[];
@@ -25,6 +26,7 @@ interface CartSectionProps {
   isAtStockLimit: (productId: number) => boolean;
   viewMode: 'all' | 'cart';
   onBarcodeScanned: (barcode: string) => void;
+  clearCart?: () => void; // Added new prop
 }
 
 const CartSection: React.FC<CartSectionProps> = ({
@@ -43,7 +45,8 @@ const CartSection: React.FC<CartSectionProps> = ({
   addToCart,
   isAtStockLimit,
   viewMode,
-  onBarcodeScanned
+  onBarcodeScanned,
+  clearCart // Add this prop
 }) => {
   const isCheckoutDisabled = 
     cart.length === 0 || 
@@ -59,7 +62,20 @@ const CartSection: React.FC<CartSectionProps> = ({
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-lg font-semibold">Cart Items</h3>
-            <BarcodeScanner onScan={onBarcodeScanned} />
+            <div className="flex items-center gap-2">
+              {cart.length > 0 && (
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  onClick={clearCart}
+                  className="flex items-center gap-1"
+                >
+                  <Trash2 size={16} />
+                  Clear All
+                </Button>
+              )}
+              <BarcodeScanner onScan={onBarcodeScanned} />
+            </div>
           </div>
           <CartItems 
             cart={cart}

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import CategoriesSection from './cash/CategoriesSection';
 import ProductsSection from './cash/ProductsSection';
@@ -235,6 +234,17 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     }
   };
 
+  // Clear all items from cart
+  const clearCart = () => {
+    setCart([]);
+    setTotal(0);
+    setPayment('');
+    toast({
+      title: "Cart cleared",
+      description: "All items have been removed from the cart",
+    });
+  };
+
   // Render different sections based on viewMode
   if (viewMode === 'categories') {
     return <CategoriesSection
@@ -271,6 +281,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
       isAtStockLimit={isAtStockLimit}
       viewMode="cart"
       onBarcodeScanned={handleBarcodeScanned}
+      clearCart={clearCart}
     />;
   }
 
@@ -309,6 +320,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
         isAtStockLimit={isAtStockLimit}
         viewMode="all"
         onBarcodeScanned={handleBarcodeScanned}
+        clearCart={clearCart}
       />
     </div>
   );
