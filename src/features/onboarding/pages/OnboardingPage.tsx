@@ -28,7 +28,7 @@ const OnboardingPage = () => {
         <h1 className="text-3xl font-bold mb-6">Business Setup</h1>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-0.5">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-0">
             <TabsTrigger value="customers" className="flex items-center justify-center">
               <Users size={16} className={isMobile ? "" : "mr-1.5"} />
               {!isMobile && <span>Customer Management</span>}
