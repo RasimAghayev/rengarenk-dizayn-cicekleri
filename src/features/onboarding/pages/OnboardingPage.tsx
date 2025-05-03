@@ -28,21 +28,21 @@ const OnboardingPage = () => {
         <h1 className="text-3xl font-bold mb-6">Business Setup</h1>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-1">
-            <TabsTrigger value="customers" className="flex items-center gap-1">
-              <Users size={isMobile ? 16 : 16} />
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-0.5">
+            <TabsTrigger value="customers" className="flex items-center justify-center">
+              <Users size={16} className={isMobile ? "" : "mr-1.5"} />
               {!isMobile && <span>Customer Management</span>}
             </TabsTrigger>
-            <TabsTrigger value="inventory" className="flex items-center gap-1">
-              <FileText size={isMobile ? 16 : 16} />
+            <TabsTrigger value="inventory" className="flex items-center justify-center">
+              <FileText size={16} className={isMobile ? "" : "mr-1.5"} />
               {!isMobile && <span>Inventory</span>}
             </TabsTrigger>
-            <TabsTrigger value="company" className="flex items-center gap-1">
-              <Building size={isMobile ? 16 : 16} />
+            <TabsTrigger value="company" className="flex items-center justify-center">
+              <Building size={16} className={isMobile ? "" : "mr-1.5"} />
               {!isMobile && <span>Company Details</span>}
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-1">
-              <UserCog size={isMobile ? 16 : 16} />
+            <TabsTrigger value="users" className="flex items-center justify-center">
+              <UserCog size={16} className={isMobile ? "" : "mr-1.5"} />
               {!isMobile && <span>User Management</span>}
             </TabsTrigger>
           </TabsList>
