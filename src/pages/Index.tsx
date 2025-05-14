@@ -1,9 +1,11 @@
+
 import React from 'react';
 import Logo from '@/components/Logo';
 import ColorBlock from '@/components/ColorBlock';
 import { Button } from '@/components/ui/button';
 import MainLayout from '@/layouts/MainLayout';
 import { Link } from 'react-router-dom';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 const Index = () => {
   return (
@@ -43,7 +45,53 @@ const Index = () => {
       <section className="py-20 px-6 md:px-12 bg-card">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">Cash Register System</h2>
-          <div className="text-center mb-8">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+            {/* Cash Register Feature Images */}
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <AspectRatio ratio={16/9}>
+                <img 
+                  src="https://placehold.co/600x400/e2f4ff/0078d7?text=Fast+Checkout" 
+                  alt="Fast Checkout" 
+                  className="object-cover w-full h-full"
+                />
+              </AspectRatio>
+              <div className="p-4">
+                <h3 className="text-xl font-semibold mb-2">Fast Checkout</h3>
+                <p className="text-gray-600">Process transactions quickly with our intuitive interface.</p>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <AspectRatio ratio={16/9}>
+                <img 
+                  src="https://placehold.co/600x400/fff5e2/ffa500?text=Inventory+Management" 
+                  alt="Inventory Management" 
+                  className="object-cover w-full h-full"
+                />
+              </AspectRatio>
+              <div className="p-4">
+                <h3 className="text-xl font-semibold mb-2">Inventory Management</h3>
+                <p className="text-gray-600">Track your stock in real-time with automatic updates.</p>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <AspectRatio ratio={16/9}>
+                <img 
+                  src="https://placehold.co/600x400/e2ffe2/00a650?text=Sales+Reports" 
+                  alt="Sales Reports" 
+                  className="object-cover w-full h-full"
+                />
+              </AspectRatio>
+              <div className="p-4">
+                <h3 className="text-xl font-semibold mb-2">Sales Reports</h3>
+                <p className="text-gray-600">Comprehensive analytics to help grow your business.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-center">
             <Button asChild size="lg">
               <Link to="/cash">Go to Cash Register</Link>
             </Button>

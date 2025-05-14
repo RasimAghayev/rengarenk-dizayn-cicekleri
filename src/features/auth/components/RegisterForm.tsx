@@ -180,6 +180,7 @@ const RegisterForm = () => {
                 <SelectItem value="client">Client</SelectItem>
                 <SelectItem value="staff">Staff Member</SelectItem>
                 <SelectItem value="company">Company Owner</SelectItem>
+                <SelectItem value="admin">Administrator</SelectItem>
               </SelectContent>
             </Select>
           </div>

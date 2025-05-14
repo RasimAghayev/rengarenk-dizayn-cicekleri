@@ -1,61 +1,112 @@
-
-import React, { useState } from 'react';
-import ThemeToggle from '@/components/ThemeToggle';
-import { Button } from '@/components/ui/button';
+import React from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import Logo from './Logo';
-import { Link } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Button } from './ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useUser } from '@/hooks/use-user';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 const CustomHeader = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, session, signOut } = useUser();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
+    navigate('/login');
   };
 
   return (
-    <header className="sticky top-0 bg-background border-b z-10 py-4 px-6 md:px-12">
-      <div className="max-w-6xl mx-auto flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Logo className="h-10 w-10" />
-          <span className="font-bold text-xl">RenkDesign</span>
-        </div>
-        
-        <nav className="hidden md:flex items-center gap-6">
-          <Link to="/" className="hover:text-primary transition-colors">Home</Link>
-          <Link to="#" className="hover:text-primary transition-colors">Features</Link>
-          <Link to="#" className="hover:text-primary transition-colors">Pricing</Link>
-          <Link to="#" className="hover:text-primary transition-colors">Contact</Link>
-        </nav>
-        
-        <div className="flex items-center gap-4">
-          <ThemeToggle />
-          <Button className="hidden md:inline-flex" asChild>
-            <Link to="/login">Get Started</Link>
-          </Button>
-          
-          {/* Mobile menu button */}
-          <button 
-            className="md:hidden text-foreground" 
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-      </div>
+    <header className="bg-background py-4 border-b">
+      <div className="container mx-auto px-4 flex items-center justify-between">
+        <Link to="/" className="flex items-center">
+          <Logo className="h-8 w-8 mr-2" />
+          <span className="font-bold text-xl">Rəngarənk</span>
+        </Link>
 
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-background border-b py-4 px-6">
-          <nav className="flex flex-col gap-4">
-            <Link to="/" className="hover:text-primary transition-colors" onClick={toggleMenu}>Home</Link>
-            <Link to="#" className="hover:text-primary transition-colors" onClick={toggleMenu}>Features</Link>
-            <Link to="#" className="hover:text-primary transition-colors" onClick={toggleMenu}>Pricing</Link>
-            <Link to="#" className="hover:text-primary transition-colors" onClick={toggleMenu}>Contact</Link>
-          </nav>
-        </div>
-      )}
+        <nav className="hidden md:flex items-center space-x-6">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              cn(
+                "text-muted-foreground hover:text-foreground transition-colors duration-200",
+                isActive ? "text-foreground font-semibold" : ""
+              )
+            }
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/cash"
+            className={({ isActive }) =>
+              cn(
+                "text-muted-foreground hover:text-foreground transition-colors duration-200",
+                isActive ? "text-foreground font-semibold" : ""
+              )
+            }
+          >
+            Cash Register
+          </NavLink>
+          <NavLink
+            to="/onboarding"
+            className={({ isActive }) =>
+              cn(
+                "text-muted-foreground hover:text-foreground transition-colors duration-200",
+                isActive ? "text-foreground font-semibold" : ""
+              )
+            }
+          >
+            Onboarding
+          </NavLink>
+        </nav>
+
+        {session ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user?.user_metadata?.avatar_url as string} alt={user?.user_metadata?.name as string} />
+                  <AvatarFallback>{(user?.user_metadata?.name as string)?.charAt(0)}</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem disabled>{user?.email}</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/profile">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut}>Logout</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <div className="hidden md:flex items-center space-x-4">
+            <Button variant="outline" asChild>
+              <Link to="/login">Log In</Link>
+            </Button>
+            <Button asChild>
+              <Link to="/register">Sign Up</Link>
+            </Button>
+          </div>
+        )}
+      </div>
     </header>
   );
 };

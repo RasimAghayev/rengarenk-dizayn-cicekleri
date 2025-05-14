@@ -26,7 +26,7 @@ interface CartSectionProps {
   isAtStockLimit: (productId: number) => boolean;
   viewMode: 'all' | 'cart';
   onBarcodeScanned: (barcode: string) => void;
-  clearCart?: () => void; // Added new prop
+  clearCart: () => void; // Make this required
 }
 
 const CartSection: React.FC<CartSectionProps> = ({
@@ -46,7 +46,7 @@ const CartSection: React.FC<CartSectionProps> = ({
   isAtStockLimit,
   viewMode,
   onBarcodeScanned,
-  clearCart // Add this prop
+  clearCart
 }) => {
   const isCheckoutDisabled = 
     cart.length === 0 || 
