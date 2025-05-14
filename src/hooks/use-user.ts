@@ -3,15 +3,8 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useToast } from './use-toast';
 
-// Initialize the Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-});
+// Import the supabase client directly instead of recreating it
+import { supabase } from '@/integrations/supabase/client';
 
 export type UserRole = 'admin' | 'staff' | 'client' | 'company';
 
