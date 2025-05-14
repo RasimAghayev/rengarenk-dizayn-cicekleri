@@ -6,19 +6,34 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UserRole } from '@/types/auth';
+import { supabase } from '@/integrations/supabase/client';
 
 const RegisterForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    firstName: '',
+    lastName: '',
+    role: 'client' as UserRole,
+  });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleRoleChange = (value: UserRole) => {
+    setFormData({ ...formData, role: value });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Passwords don't match",
         description: "Please make sure your passwords match.",
@@ -30,30 +45,42 @@ const RegisterForm = () => {
     setIsLoading(true);
     
     try {
-      // Simulate registration - replace with actual registration logic
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            role: formData.role,
+          }
+        }
+      });
+
+      if (error) throw error;
+
       toast({
         title: "Registration successful",
         description: "Your account has been created.",
       });
-      // Redirect would happen here
-    } catch (error) {
+      
+      // Redirect will happen automatically if auth state changes
+    } catch (error: any) {
       toast({
         title: "Registration failed",
-        description: "There was a problem creating your account.",
+        description: error.message || "There was a problem creating your account.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   const handleSocialRegister = (provider: string) => {
     toast({
       title: "Social Registration",
       description: `Registering with ${provider}...`,
     });
-    // Implement actual social registration logic here
   };
 
   return (
@@ -106,45 +133,75 @@ const RegisterForm = () => {
         </div>
       
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input 
-              id="name" 
-              type="text" 
-              placeholder="John Doe"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input 
+                id="firstName" 
+                type="text" 
+                placeholder="John"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input 
+                id="lastName" 
+                type="text" 
+                placeholder="Doe"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input 
               id="email" 
               type="email" 
               placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={handleInputChange}
               required
             />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="role">Account Type</Label>
+            <Select value={formData.role} onValueChange={handleRoleChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select your role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="client">Client</SelectItem>
+                <SelectItem value="staff">Staff Member</SelectItem>
+                <SelectItem value="company">Company Owner</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <Input 
               id="password" 
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={handleInputChange}
               required
             />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
             <Input 
               id="confirmPassword" 
               type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
               required
             />
           </div>
@@ -154,6 +211,7 @@ const RegisterForm = () => {
           </Button>
         </form>
       </CardContent>
+      
       <CardFooter className="flex justify-between">
         <Button variant="outline" type="button" onClick={() => window.history.back()} className="w-full mr-2">
           Cancel

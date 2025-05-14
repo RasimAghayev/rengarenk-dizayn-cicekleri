@@ -9,16 +9,107 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      role_permissions: {
+        Row: {
+          id: string
+          permission: Database["public"]["Enums"]["permission_type"]
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          id?: string
+          permission: Database["public"]["Enums"]["permission_type"]
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          id?: string
+          permission?: Database["public"]["Enums"]["permission_type"]
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
+      user_permissions: {
+        Row: {
+          granted: boolean
+          id: string
+          permission: Database["public"]["Enums"]["permission_type"]
+          user_id: string | null
+        }
+        Insert: {
+          granted?: boolean
+          id?: string
+          permission: Database["public"]["Enums"]["permission_type"]
+          user_id?: string | null
+        }
+        Update: {
+          granted?: boolean
+          id?: string
+          permission?: Database["public"]["Enums"]["permission_type"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_permissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_permission: {
+        Args: {
+          _user_id: string
+          _permission: Database["public"]["Enums"]["permission_type"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "staff" | "client" | "company"
+      permission_type:
+        | "view_cash"
+        | "edit_cash"
+        | "view_inventory"
+        | "edit_inventory"
+        | "view_company"
+        | "edit_company"
+        | "view_customers"
+        | "edit_customers"
+        | "view_users"
+        | "edit_users"
+        | "transfer_inventory"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +224,21 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "staff", "client", "company"],
+      permission_type: [
+        "view_cash",
+        "edit_cash",
+        "view_inventory",
+        "edit_inventory",
+        "view_company",
+        "edit_company",
+        "view_customers",
+        "edit_customers",
+        "view_users",
+        "edit_users",
+        "transfer_inventory",
+      ],
+    },
   },
 } as const
