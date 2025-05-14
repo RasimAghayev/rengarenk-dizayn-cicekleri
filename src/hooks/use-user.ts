@@ -2,11 +2,13 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useToast } from './use-toast';
+import { Database } from '@/integrations/supabase/types';
 
 // Import the supabase client directly instead of recreating it
 import { supabase } from '@/integrations/supabase/client';
 
 export type UserRole = 'admin' | 'staff' | 'client' | 'company';
+export type PermissionType = Database['public']['Enums']['permission_type'];
 
 interface UserMetadata {
   name?: string;
@@ -168,7 +170,7 @@ export function useUser() {
   };
 
   // Check if user has a specific permission
-  const hasPermission = async (permission: string): Promise<boolean> => {
+  const hasPermission = async (permission: PermissionType): Promise<boolean> => {
     if (!user) return false;
     
     try {
