@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import CategoriesSection from './cash/CategoriesSection';
 import ProductsSection from './cash/ProductsSection';
 import CartSection from './cash/CartSection';
-import { products, categories, customers } from './cash/mockData';
+import { customers } from './cash/mockData';
 import { Product } from '@/types/cash-register';
 import { toast } from '@/hooks/use-toast';
+import { getCategories, getProducts } from '@/features/cash/services/cashService';
 
 interface CashRegisterProps {
   viewMode: 'all' | 'categories' | 'products' | 'cart';
@@ -47,14 +48,66 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     return savedQuery || '';
   });
   
-  // Store modified products with updated stock quantities
-  const [modifiedProducts, setModifiedProducts] = useState<Product[]>(() => {
-    const savedProducts = localStorage.getItem('modifiedProducts');
-    return savedProducts ? JSON.parse(savedProducts) : [...products];
-  });
-  
+  // Store categories and products from API or mock data
+  const [categories, setCategories] = useState([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [productInfo, setProductInfo] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesData = await getCategories();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load categories. Using default data.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    fetchCategories();
+  }, []);
+  
+  // Fetch products based on selected category
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const productsData = await getProducts(selectedCategory);
+        setAllProducts(productsData);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load products. Using default data.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchProducts();
+  }, [selectedCategory]);
+  
+  // Filter products based on search query
+  useEffect(() => {
+    if (searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase();
+      const filtered = allProducts.filter(product => 
+        product.name.toLowerCase().includes(query) || 
+        product.category.toLowerCase().includes(query)
+      );
+      setFilteredProducts(filtered);
+    } else {
+      setFilteredProducts(allProducts);
+    }
+  }, [searchQuery, allProducts]);
   
   // Save cart data to localStorage whenever it changes
   useEffect(() => {
@@ -65,34 +118,25 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     localStorage.setItem('selectedCustomer', selectedCustomer);
     localStorage.setItem('selectedCategory', selectedCategory || '');
     localStorage.setItem('searchQuery', searchQuery);
-    localStorage.setItem('modifiedProducts', JSON.stringify(modifiedProducts));
-  }, [cart, total, payment, isDebt, selectedCustomer, selectedCategory, searchQuery, modifiedProducts]);
+  }, [cart, total, payment, isDebt, selectedCustomer, selectedCategory, searchQuery]);
   
-  // Filter products based on category and search query
+  // Update cart items with current product stock information
   useEffect(() => {
-    let filtered = modifiedProducts;
-    
-    // Apply category filter
-    if (selectedCategory && selectedCategory !== 'All Products') {
-      filtered = filtered.filter(product => product.category === selectedCategory);
+    if (allProducts.length > 0 && cart.length > 0) {
+      const updatedCart = cart.map(cartItem => {
+        const currentProduct = allProducts.find(p => p.id === cartItem.id);
+        if (currentProduct) {
+          return {
+            ...cartItem,
+            inStock: currentProduct.inStock,
+            stockQuantity: currentProduct.stockQuantity
+          };
+        }
+        return cartItem;
+      });
+      setCart(updatedCart);
     }
-    
-    // Apply search query filter
-    if (searchQuery.trim() !== '') {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(product => 
-        product.name.toLowerCase().includes(query) || 
-        product.category.toLowerCase().includes(query)
-      );
-    }
-    
-    setFilteredProducts(filtered);
-  }, [selectedCategory, searchQuery, modifiedProducts]);
-
-  // Initialize filtered products with all products
-  useEffect(() => {
-    setFilteredProducts(modifiedProducts);
-  }, [modifiedProducts]);
+  }, [allProducts]);
 
   const addToCart = (product: Product) => {
     if (!product.inStock) return;
@@ -128,8 +172,8 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     
     setTotal((prevTotal) => prevTotal + product.price);
     
-    // Decrease stock quantity in modified products
-    setModifiedProducts(prevProducts => 
+    // Update product stock in all products
+    setAllProducts(prevProducts => 
       prevProducts.map(p => 
         p.id === product.id && p.stockQuantity !== undefined
           ? { ...p, stockQuantity: p.stockQuantity - 1 }
@@ -154,8 +198,8 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     setCart(updatedCart);
     setTotal((prevTotal) => prevTotal - price);
     
-    // Increase stock quantity back in modified products
-    setModifiedProducts(prevProducts => 
+    // Update product stock in all products
+    setAllProducts(prevProducts => 
       prevProducts.map(p => 
         p.id === productId && p.stockQuantity !== undefined
           ? { ...p, stockQuantity: p.stockQuantity + 1 }
@@ -199,7 +243,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
   // Check if a product in cart has reached its stock limit
   const isAtStockLimit = (productId: number) => {
     const cartItem = cart.find(item => item.id === productId);
-    const product = modifiedProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => p.id === productId);
     
     if (!cartItem || !product || product.stockQuantity === undefined) return false;
     
@@ -217,7 +261,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     // In a real app, you would look up the product by barcode in your database
     // For this demo, we'll just use the product ID as a barcode stand-in
     const productId = parseInt(barcode);
-    const product = modifiedProducts.find(p => p.id === productId);
+    const product = allProducts.find(p => p.id === productId);
     
     if (product) {
       addToCart(product);
@@ -262,6 +306,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
       handleInfoClick={handleInfoClick}
       isAtStockLimit={isAtStockLimit}
       viewMode="products"
+      isLoading={isLoading}
     />;
   } else if (viewMode === 'cart') {
     return <CartSection
@@ -302,6 +347,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
         handleInfoClick={handleInfoClick}
         isAtStockLimit={isAtStockLimit}
         viewMode="all"
+        isLoading={isLoading}
       />
       <CartSection
         cart={cart}
