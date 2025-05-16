@@ -106,13 +106,18 @@ const UserRoleAssignments = () => {
         if (userError) console.error('Error fetching user:', userError);
         
         // Get user email from auth
-        const { data: { users: authUsers } } = await supabase.auth.admin.listUsers({
-          filters: {
-            id: assignment.user_id
-          }
+        const { data: authData, error: authError } = await supabase.auth.admin.listUsers({
+          page: 1,
+          perPage: 1,
+          query: assignment.user_id
         });
         
-        const authUser = authUsers?.[0];
+        if (authError) console.error('Error fetching auth user:', authError);
+        
+        let email = 'Unknown';
+        if (authData && authData.users && authData.users.length > 0) {
+          email = authData.users[0].email || 'Unknown';
+        }
         
         // Get product details
         const { data: productData, error: productError } = await supabase
@@ -136,13 +141,13 @@ const UserRoleAssignments = () => {
           ...assignment,
           user: {
             id: assignment.user_id,
-            email: authUser?.email || 'Unknown',
+            email: email,
             user_metadata: {
               name: userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Unknown',
             }
           },
-          product: productData,
-          role: roleData,
+          product: productData || { id: assignment.product_id, name: 'Unknown' },
+          role: roleData || { id: assignment.product_role_id, name: 'Unknown' },
         };
       }));
       
@@ -164,27 +169,44 @@ const UserRoleAssignments = () => {
       // First get profiles from public schema
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id');
+        .select('id, first_name, last_name');
       
       if (profilesError) throw profilesError;
       
       if (!profiles || profiles.length === 0) return;
       
-      // Get user details from auth schema
-      const { data: { users: authUsers }, error: authError } = await supabase.auth.admin.listUsers();
-      
-      if (authError) throw authError;
-      
-      // Join data
-      const usersWithProfiles = authUsers.filter(user => 
-        profiles.some(profile => profile.id === user.id)
-      ).map(user => ({
-        id: user.id,
-        email: user.email || 'Unknown',
-        user_metadata: user.user_metadata || {},
+      // Get limited user details for each profile
+      const usersWithProfiles = await Promise.all(profiles.map(async (profile) => {
+        const { data: authData, error: authError } = await supabase.auth.admin.listUsers({
+          page: 1,
+          perPage: 1,
+          query: profile.id
+        });
+        
+        if (authError) {
+          console.error('Error fetching auth user:', authError);
+          return null;
+        }
+        
+        if (!authData || !authData.users || authData.users.length === 0) {
+          return null;
+        }
+        
+        const user = authData.users[0];
+        
+        return {
+          id: profile.id,
+          email: user.email || 'Unknown',
+          user_metadata: {
+            name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
+          },
+        };
       }));
       
-      setUsers(usersWithProfiles);
+      // Filter out any null values from the array
+      const validUsers = usersWithProfiles.filter(user => user !== null) as User[];
+      
+      setUsers(validUsers);
     } catch (error: any) {
       console.error('Error fetching users:', error.message);
       toast({
