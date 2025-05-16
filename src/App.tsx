@@ -11,6 +11,7 @@ import RegisterPage from "./features/auth/pages/RegisterPage";
 import CashPage from "./features/cash/pages/CashPage";
 import OnboardingPage from "./features/onboarding/pages/OnboardingPage";
 import StepByStepOnboarding from "./features/onboarding/pages/StepByStepOnboarding";
+import SuperAdminPage from "./features/permissions/pages/SuperAdminPage";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/cash" element={<CashPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/setup" element={<StepByStepOnboarding />} />
+          <Route path="/admin" element={<SuperAdminPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

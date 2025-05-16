@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import Logo from './Logo';
@@ -15,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { ShieldCheck } from 'lucide-react';
 
 const CustomHeader = () => {
   const { user, session, signOut } = useUser();
@@ -29,6 +31,8 @@ const CustomHeader = () => {
     });
     navigate('/login');
   };
+
+  const isAdmin = user?.user_metadata?.role === 'admin';
 
   return (
     <header className="bg-background py-4 border-b">
@@ -72,6 +76,21 @@ const CustomHeader = () => {
           >
             Onboarding
           </NavLink>
+          
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                cn(
+                  "text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center",
+                  isActive ? "text-foreground font-semibold" : ""
+                )
+              }
+            >
+              <ShieldCheck className="mr-1 h-4 w-4" />
+              Admin
+            </NavLink>
+          )}
         </nav>
 
         {session ? (
@@ -92,6 +111,14 @@ const CustomHeader = () => {
                 <Link to="/profile">Profile</Link>
               </DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem asChild>
+                  <Link to="/admin" className="flex items-center">
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                    Admin Panel
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut}>Logout</DropdownMenuItem>
             </DropdownMenuContent>

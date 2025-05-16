@@ -33,6 +33,123 @@ export type Database = {
         }
         Relationships: []
       }
+      product_permissions: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      product_role_assignments: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: number
+          role_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: number
+          role_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: number
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_role_assignments_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_role_assignments_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "product_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_role_permissions: {
+        Row: {
+          created_at: string
+          id: string
+          permission_id: string
+          role_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          permission_id: string
+          role_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          permission_id?: string
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "product_permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "product_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_roles: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string
@@ -160,6 +277,45 @@ export type Database = {
           },
         ]
       }
+      user_product_roles: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: number
+          product_role_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: number
+          product_role_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: number
+          product_role_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_product_roles_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_product_roles_product_role_id_fkey"
+            columns: ["product_role_id"]
+            isOneToOne: false
+            referencedRelation: "product_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -169,6 +325,14 @@ export type Database = {
         Args: {
           _user_id: string
           _permission: Database["public"]["Enums"]["permission_type"]
+        }
+        Returns: boolean
+      }
+      has_product_permission: {
+        Args: {
+          _user_id: string
+          _product_id: number
+          _permission_name: string
         }
         Returns: boolean
       }
