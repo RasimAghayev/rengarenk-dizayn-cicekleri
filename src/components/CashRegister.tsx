@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import CategoriesSection from './cash/CategoriesSection';
 import ProductsSection from './cash/ProductsSection';
@@ -53,6 +54,9 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // State for product info modal
+  const [productInfoData, setProductInfoData] = useState<Product | null>(null);
   
   // Fetch categories on component mount
   useEffect(() => {
@@ -253,7 +257,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
   // Handle info button click without adding to cart
   const handleInfoClick = (product: Product, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent product card click from firing
-    setProductInfo(product);
+    setProductInfoData(product);
   };
 
   // Handle barcode scanning
