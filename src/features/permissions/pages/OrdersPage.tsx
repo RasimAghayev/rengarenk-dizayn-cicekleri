@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -13,7 +12,7 @@ import {
   CheckCircle,
   Clock,
   Package,
-  TruckDelivery
+  Truck
 } from 'lucide-react';
 import {
   Table,
@@ -125,7 +124,7 @@ const OrdersPage = () => {
       case 'shipped':
         return (
           <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-200">
-            <TruckDelivery className="w-3 h-3 mr-1" /> Shipped
+            <Truck className="w-3 h-3 mr-1" /> Shipped
           </Badge>
         );
       case 'pending':
