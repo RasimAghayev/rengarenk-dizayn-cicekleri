@@ -106,17 +106,11 @@ const UserRoleAssignments = () => {
         if (userError) console.error('Error fetching user:', userError);
         
         // Get user email from auth
-        const { data: authData, error: authError } = await supabase.auth.admin.listUsers({
-          page: 1,
-          perPage: 1,
-          query: assignment.user_id
-        });
-        
-        if (authError) console.error('Error fetching auth user:', authError);
+        const { data: authData } = await supabase.auth.admin.getUserById(assignment.user_id);
         
         let email = 'Unknown';
-        if (authData && authData.users && authData.users.length > 0) {
-          email = authData.users[0].email || 'Unknown';
+        if (authData && authData.user) {
+          email = authData.user.email || 'Unknown';
         }
         
         // Get product details
@@ -177,22 +171,13 @@ const UserRoleAssignments = () => {
       
       // Get limited user details for each profile
       const usersWithProfiles = await Promise.all(profiles.map(async (profile) => {
-        const { data: authData, error: authError } = await supabase.auth.admin.listUsers({
-          page: 1,
-          perPage: 1,
-          query: profile.id
-        });
+        const { data: authData } = await supabase.auth.admin.getUserById(profile.id);
         
-        if (authError) {
-          console.error('Error fetching auth user:', authError);
+        if (!authData || !authData.user) {
           return null;
         }
         
-        if (!authData || !authData.users || authData.users.length === 0) {
-          return null;
-        }
-        
-        const user = authData.users[0];
+        const user = authData.user;
         
         return {
           id: profile.id,

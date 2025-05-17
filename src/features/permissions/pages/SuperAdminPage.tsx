@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import MainLayout from '@/layouts/MainLayout';
+import AdminLayout from '@/layouts/AdminLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProductRolesManagement from '../components/ProductRolesManagement';
 import ProductPermissionsManagement from '../components/ProductPermissionsManagement';
@@ -12,10 +12,9 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { supabase } from '@/integrations/supabase/client';
 
 const SuperAdminPage = () => {
-  const { user, loading } = useUser();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -23,68 +22,48 @@ const SuperAdminPage = () => {
     totalPermissions: 0,
     totalAssignments: 0,
   });
-
-  // Check if user is admin
-  useEffect(() => {
-    if (!loading && user && user.user_metadata.role !== 'admin') {
-      toast({
-        variant: 'destructive',
-        title: 'Access Denied',
-        description: 'You do not have permission to access this page',
-      });
-      navigate('/');
-    }
-  }, [user, loading, navigate, toast]);
+  const [activeTab, setActiveTab] = useState("roles");
 
   // Fetch dashboard stats
   useEffect(() => {
-    if (user && user.user_metadata.role === 'admin') {
-      const fetchStats = async () => {
-        try {
-          // This would be better implemented as a stored procedure or backend function
-          // For now, we'll use multiple queries for simplicity
-          const { data: users } = await supabase.from('profiles').select('id').throwOnError();
-          const { data: roles } = await supabase.from('product_roles').select('id').throwOnError();
-          const { data: permissions } = await supabase.from('product_permissions').select('id').throwOnError();
-          const { data: assignments } = await supabase.from('user_product_roles').select('id').throwOnError();
-          
-          setStats({
-            totalUsers: users?.length || 0,
-            totalRoles: roles?.length || 0,
-            totalPermissions: permissions?.length || 0,
-            totalAssignments: assignments?.length || 0,
-          });
-        } catch (error) {
-          console.error('Error fetching admin stats:', error);
-        }
-      };
-      
-      fetchStats();
-    }
-  }, [user]);
+    const fetchStats = async () => {
+      try {
+        // This would be better implemented as a stored procedure or backend function
+        // For now, we'll use multiple queries for simplicity
+        const { data: users } = await supabase.from('profiles').select('id').throwOnError();
+        const { data: roles } = await supabase.from('product_roles').select('id').throwOnError();
+        const { data: permissions } = await supabase.from('product_permissions').select('id').throwOnError();
+        const { data: assignments } = await supabase.from('user_product_roles').select('id').throwOnError();
+        
+        setStats({
+          totalUsers: users?.length || 0,
+          totalRoles: roles?.length || 0,
+          totalPermissions: permissions?.length || 0,
+          totalAssignments: assignments?.length || 0,
+        });
+      } catch (error) {
+        console.error('Error fetching admin stats:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Error fetching stats',
+          description: 'Could not load dashboard statistics',
+        });
+      }
+    };
+    
+    fetchStats();
+  }, [toast]);
 
-  if (loading) {
-    return (
-      <MainLayout>
-        <div className="container py-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
-        </div>
-      </MainLayout>
-    );
-  }
-
-  if (!user || user.user_metadata.role !== 'admin') {
-    return null; // Will redirect via the useEffect
-  }
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
 
   return (
-    <MainLayout>
-      <div className="container py-8">
-        <h1 className="text-3xl font-bold mb-8">Super Admin Dashboard</h1>
+    <AdminLayout>
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold">Administration Dashboard</h1>
         
-        <Alert className="mb-8 bg-amber-50 border-amber-200">
+        <Alert className="bg-amber-50 border-amber-200">
           <AlertTriangle className="h-5 w-5 text-amber-500" />
           <AlertTitle className="text-amber-700">Admin Access Only</AlertTitle>
           <AlertDescription className="text-amber-600">
@@ -93,7 +72,7 @@ const SuperAdminPage = () => {
         </Alert>
         
         {/* Dashboard Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="bg-gradient-to-br from-purple-50 to-white border-purple-100">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-purple-700 flex items-center">
@@ -147,7 +126,7 @@ const SuperAdminPage = () => {
           </Card>
         </div>
         
-        <Tabs defaultValue="roles" className="space-y-4">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
           <TabsList className="grid w-full grid-cols-3 h-14 bg-muted/30">
             <TabsTrigger 
               value="roles" 
@@ -185,7 +164,7 @@ const SuperAdminPage = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </MainLayout>
+    </AdminLayout>
   );
 };
 
