@@ -2,78 +2,124 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, LineChart, PieChart, TrendingUp, Users, Archive, Calendar, DollarSign } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell } from 'recharts';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { 
+  BarChart3, 
+  Download,
+  Calendar,
+  PieChart,
+  LineChart,
+  Share2,
+  ShoppingCart,
+  DollarSign,
+  Users,
+  TrendingUp,
+  ChevronDown
+} from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from '@/components/ui/skeleton';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell } from 'recharts';
+
+// Generate sample data for reports
+const generateSalesData = () => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  
+  return months.map((month, index) => {
+    // Generate more realistic sales data
+    const baseSales = Math.floor(Math.random() * 50000) + 30000;
+    const isCurrentMonth = index === currentMonth;
+    const isPastMonth = index < currentMonth;
+    
+    let sales = isPastMonth ? baseSales : isCurrentMonth ? baseSales * 0.7 : 0;
+    
+    // Add some trend pattern
+    if (index > 0 && index < 6) {
+      sales = sales * (1 + (index * 0.05));
+    } else if (index >= 6) {
+      sales = sales * (1 + ((12 - index) * 0.08));
+    }
+    
+    // Holiday season boost
+    if (index === 10 || index === 11) {
+      sales = sales * 1.3;
+    }
+    
+    return {
+      name: month,
+      sales: isPastMonth || isCurrentMonth ? Math.round(sales) : null,
+      target: Math.round(baseSales * 1.1)
+    };
+  });
+};
+
+const generateCategoryData = () => {
+  return [
+    { name: 'Electronics', value: 35 },
+    { name: 'Clothing', value: 25 },
+    { name: 'Groceries', value: 20 },
+    { name: 'Home & Garden', value: 15 },
+    { name: 'Other', value: 5 }
+  ];
+};
+
+const generateTopProducts = () => {
+  return [
+    { id: 1, name: 'Premium Wireless Headphones', sales: 256, revenue: 38656, growth: 12.5 },
+    { id: 2, name: 'Smart Watch Pro', sales: 189, revenue: 47439, growth: 8.3 },
+    { id: 3, name: 'Organic Cotton T-shirt', sales: 423, revenue: 12690, growth: 23.7 },
+    { id: 4, name: 'Stainless Steel Water Bottle', sales: 318, revenue: 6360, growth: 15.2 },
+    { id: 5, name: 'Bluetooth Speaker', sales: 156, revenue: 12480, growth: -2.1 }
+  ];
+};
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 const ReportsPage = () => {
-  const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('sales');
-  const [timeRange, setTimeRange] = useState('week');
-  const [loading, setLoading] = useState(false);
-
-  // Sample data - in production, this would come from the database
-  const salesData = [
-    { name: 'Mon', sales: 4000 },
-    { name: 'Tue', sales: 3000 },
-    { name: 'Wed', sales: 2000 },
-    { name: 'Thu', sales: 2780 },
-    { name: 'Fri', sales: 1890 },
-    { name: 'Sat', sales: 2390 },
-    { name: 'Sun', sales: 3490 },
-  ];
-
-  const userActivityData = [
-    { name: 'Mon', active: 500 },
-    { name: 'Tue', active: 620 },
-    { name: 'Wed', active: 710 },
-    { name: 'Thu', active: 580 },
-    { name: 'Fri', active: 490 },
-    { name: 'Sat', active: 380 },
-    { name: 'Sun', active: 450 },
-  ];
-
-  const categoryData = [
-    { name: 'Electronics', value: 400 },
-    { name: 'Clothing', value: 300 },
-    { name: 'Food', value: 300 },
-    { name: 'Books', value: 200 },
-    { name: 'Other', value: 100 },
-  ];
-
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
-
-  const handleTimeRangeChange = (value: string) => {
-    setTimeRange(value);
-    setLoading(true);
-    
-    // Simulate loading data
-    setTimeout(() => {
-      setLoading(false);
-      toast({
-        title: "Report updated",
-        description: `Showing data for the last ${value}`,
-      });
-    }, 800);
-  };
+  const [timeRange, setTimeRange] = useState('year');
+  const [reportType, setReportType] = useState('sales');
+  const [loading, setLoading] = useState(true);
+  const [salesData, setSalesData] = useState<any[]>([]);
+  const [categoryData, setCategoryData] = useState<any[]>([]);
+  const [topProducts, setTopProducts] = useState<any[]>([]);
   
-  const handleExport = (format: string) => {
-    toast({
-      title: "Exporting report",
-      description: `Your report is being exported as ${format.toUpperCase()}`,
-    });
-    // In a real app, this would initiate a file download
-  };
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-  };
-
+  // Simulate loading data
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSalesData(generateSalesData());
+      setCategoryData(generateCategoryData());
+      setTopProducts(generateTopProducts());
+      setLoading(false);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  // Calculate summary data
+  const totalSales = salesData
+    .filter(item => item.sales !== null)
+    .reduce((sum, item) => sum + item.sales, 0);
+    
+  const totalTarget = salesData
+    .filter(item => item.sales !== null)
+    .reduce((sum, item) => sum + item.target, 0);
+    
+  const averageOrderValue = Math.round(totalSales / 1283); // Simulated order count
+  
+  const percentOfTarget = totalTarget > 0 
+    ? Math.round((totalSales / totalTarget) * 100) 
+    : 0;
+    
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -81,252 +127,446 @@ const ReportsPage = () => {
           <h1 className="text-3xl font-bold">Reports & Analytics</h1>
           
           <div className="flex items-center gap-3">
-            <Select 
-              value={timeRange} 
-              onValueChange={handleTimeRangeChange}
+            <Select
+              value={timeRange}
+              onValueChange={setTimeRange}
             >
               <SelectTrigger className="w-[180px]">
+                <Calendar className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Select time range" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="day">Last 24 Hours</SelectItem>
-                <SelectItem value="week">Last Week</SelectItem>
-                <SelectItem value="month">Last Month</SelectItem>
-                <SelectItem value="quarter">Last Quarter</SelectItem>
-                <SelectItem value="year">Last Year</SelectItem>
+                <SelectItem value="7days">Last 7 Days</SelectItem>
+                <SelectItem value="30days">Last 30 Days</SelectItem>
+                <SelectItem value="quarter">This Quarter</SelectItem>
+                <SelectItem value="year">This Year</SelectItem>
+                <SelectItem value="custom">Custom Range</SelectItem>
               </SelectContent>
             </Select>
             
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handleExport('pdf')}
-              >
-                Export PDF
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handleExport('csv')}
-              >
-                Export CSV
-              </Button>
-            </div>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Share2 className="h-4 w-4" />
+              Share
+            </Button>
+            
+            <Button variant="outline" className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
           </div>
         </div>
         
-        {/* Dashboard Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Stats Summary Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Sales
-              </CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$12,345</div>
-              <p className="text-xs text-muted-foreground mt-1 flex items-center">
-                <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-                <span className="text-green-500 font-medium">12%</span> from last {timeRange}
-              </p>
+              {loading ? (
+                <Skeleton className="h-8 w-36" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    ${(totalSales / 1000).toFixed(1)}k
+                  </div>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <span className={`text-xs ${percentOfTarget >= 100 ? 'text-green-500' : 'text-amber-500'}`}>
+                      {percentOfTarget}% of target
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      ${(totalTarget / 1000).toFixed(1)}k
+                    </span>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
           
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                New Users
-              </CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-sm font-medium">Orders</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">1,283</div>
+                  <div className="flex items-center mt-1">
+                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
+                    <span className="text-xs text-green-500">+12.5%</span>
+                    <span className="text-xs text-muted-foreground ml-1">vs. previous</span>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-sm font-medium">Average Order Value</CardTitle>
+              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">${averageOrderValue}</div>
+                  <div className="flex items-center mt-1">
+                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
+                    <span className="text-xs text-green-500">+3.2%</span>
+                    <span className="text-xs text-muted-foreground ml-1">vs. previous</span>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-sm font-medium">Customers</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">321</div>
-              <p className="text-xs text-muted-foreground mt-1 flex items-center">
-                <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-                <span className="text-green-500 font-medium">8%</span> from last {timeRange}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Products Sold
-              </CardTitle>
-              <Archive className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">587</div>
-              <p className="text-xs text-muted-foreground mt-1 flex items-center">
-                <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-                <span className="text-green-500 font-medium">5%</span> from last {timeRange}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Conversion Rate
-              </CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">4.7%</div>
-              <p className="text-xs text-muted-foreground mt-1 flex items-center">
-                <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-                <span className="text-green-500 font-medium">2%</span> from last {timeRange}
-              </p>
+              {loading ? (
+                <Skeleton className="h-8 w-20" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">842</div>
+                  <div className="flex items-center mt-1">
+                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
+                    <span className="text-xs text-green-500">+8.7%</span>
+                    <span className="text-xs text-muted-foreground ml-1">vs. previous</span>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
         
-        {/* Main Reports Tabs */}
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 h-14 bg-muted/30">
-            <TabsTrigger 
-              value="sales" 
-              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary h-full flex items-center"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Sales Report
+        {/* Report Tabs */}
+        <Tabs defaultValue="sales" className="space-y-6" onValueChange={setReportType}>
+          <TabsList className="grid w-full grid-cols-3 md:w-auto md:inline-flex">
+            <TabsTrigger value="sales" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Sales Report</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="users" 
-              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary h-full flex items-center"
-            >
-              <LineChart className="h-4 w-4 mr-2" />
-              User Activity
+            <TabsTrigger value="products" className="flex items-center gap-2">
+              <LineChart className="h-4 w-4" />
+              <span className="hidden sm:inline">Product Performance</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="products" 
-              className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary h-full flex items-center"
-            >
-              <PieChart className="h-4 w-4 mr-2" />
-              Product Categories
+            <TabsTrigger value="categories" className="flex items-center gap-2">
+              <PieChart className="h-4 w-4" />
+              <span className="hidden sm:inline">Category Analysis</span>
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="sales" className="p-6 border rounded-md bg-white shadow-sm">
-            <Card>
+          {/* Sales Report */}
+          <TabsContent value="sales" className="space-y-6">
+            <Card className="bg-white">
               <CardHeader>
-                <CardTitle>Sales Overview</CardTitle>
-                <CardDescription>Daily sales for the past week</CardDescription>
+                <CardTitle className="text-xl">Sales Overview</CardTitle>
+                <CardDescription>
+                  Monthly sales performance compared to targets
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {loading ? (
-                  <div className="h-80 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                  <div className="w-full h-80 flex items-center justify-center bg-muted/20 rounded-md">
+                    <div className="text-center">
+                      <Skeleton className="h-8 w-28 mx-auto mb-4" />
+                      <Skeleton className="h-4 w-48 mx-auto" />
+                    </div>
                   </div>
                 ) : (
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={salesData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="sales" fill="#8884d8" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <div className="w-full h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={salesData}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
+                        <Legend />
+                        <Bar dataKey="sales" name="Sales" fill="#4f46e5" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="target" name="Target" fill="#e4e4e7" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
                 )}
-                <div className="mt-4">
-                  <Alert className="bg-muted/50">
-                    <AlertDescription>
-                      Sales have increased by 12% compared to the previous {timeRange}.
-                    </AlertDescription>
-                  </Alert>
+                
+                <div className="mt-6 border-t pt-4">
+                  <h3 className="font-medium mb-4">Sales Breakdown</h3>
+                  {loading ? (
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <Skeleton key={i} className="h-12 w-full" />
+                      ))}
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Month</TableHead>
+                          <TableHead>Sales</TableHead>
+                          <TableHead>Target</TableHead>
+                          <TableHead>Variance</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {salesData
+                          .filter(item => item.sales !== null)
+                          .map((item) => {
+                            const variance = item.sales - item.target;
+                            const percentVariance = Math.round((variance / item.target) * 100);
+                            
+                            return (
+                              <TableRow key={item.name}>
+                                <TableCell className="font-medium">{item.name}</TableCell>
+                                <TableCell>${item.sales.toLocaleString()}</TableCell>
+                                <TableCell>${item.target.toLocaleString()}</TableCell>
+                                <TableCell>
+                                  <span className={variance >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                    {variance >= 0 ? '+' : ''}{variance.toLocaleString()} ({percentVariance}%)
+                                  </span>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })
+                        }
+                      </TableBody>
+                    </Table>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="users" className="p-6 border rounded-md bg-white shadow-sm">
-            <Card>
+          {/* Product Performance */}
+          <TabsContent value="products" className="space-y-6">
+            <Card className="bg-white">
               <CardHeader>
-                <CardTitle>User Activity</CardTitle>
-                <CardDescription>Daily active users for the past week</CardDescription>
+                <CardTitle className="text-xl">Top Selling Products</CardTitle>
+                <CardDescription>
+                  Products with the best sales performance
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 {loading ? (
-                  <div className="h-80 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                  <div className="space-y-4">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <Skeleton key={i} className="h-12 w-full" />
+                    ))}
                   </div>
                 ) : (
-                  <ResponsiveContainer width="100%" height={400}>
-                    <RechartsLineChart data={userActivityData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="active" stroke="#82ca9d" />
-                    </RechartsLineChart>
-                  </ResponsiveContainer>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Product</TableHead>
+                        <TableHead>Units Sold</TableHead>
+                        <TableHead>Revenue</TableHead>
+                        <TableHead>Growth</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {topProducts.map((product) => (
+                        <TableRow key={product.id}>
+                          <TableCell className="font-medium">{product.name}</TableCell>
+                          <TableCell>{product.sales}</TableCell>
+                          <TableCell>${product.revenue.toLocaleString()}</TableCell>
+                          <TableCell>
+                            <span className={product.growth >= 0 ? 'text-green-600' : 'text-red-600'}>
+                              {product.growth >= 0 ? '+' : ''}{product.growth}%
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
-                <div className="mt-4">
-                  <Alert className="bg-muted/50">
-                    <AlertDescription>
-                      User activity peaked on Wednesday with 710 active users.
-                    </AlertDescription>
-                  </Alert>
+                
+                <div className="mt-8">
+                  <h3 className="font-medium mb-4">Sales Trend Over Time</h3>
+                  {loading ? (
+                    <div className="w-full h-64 flex items-center justify-center bg-muted/20 rounded-md">
+                      <div className="text-center">
+                        <Skeleton className="h-8 w-28 mx-auto mb-4" />
+                        <Skeleton className="h-4 w-48 mx-auto" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsLineChart
+                          data={salesData}
+                          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <Tooltip formatter={(value) => (value !== null ? `$${value.toLocaleString()}` : 'N/A')} />
+                          <Legend />
+                          <Line 
+                            type="monotone" 
+                            dataKey="sales" 
+                            name="Sales" 
+                            stroke="#4f46e5" 
+                            activeDot={{ r: 8 }}
+                            strokeWidth={2}
+                          />
+                        </RechartsLineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="products" className="p-6 border rounded-md bg-white shadow-sm">
-            <Card>
+          {/* Category Analysis */}
+          <TabsContent value="categories" className="space-y-6">
+            <Card className="bg-white">
               <CardHeader>
-                <CardTitle>Product Categories</CardTitle>
-                <CardDescription>Distribution of sales by category</CardDescription>
+                <CardTitle className="text-xl">Sales by Category</CardTitle>
+                <CardDescription>
+                  Distribution of sales across different product categories
+                </CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col md:flex-row gap-4 items-center">
-                {loading ? (
-                  <div className="h-80 w-full flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="w-full md:w-1/2">
-                      <ResponsiveContainer width="100%" height={300}>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {loading ? (
+                    <div className="w-full h-64 flex items-center justify-center bg-muted/20 rounded-md">
+                      <div className="text-center">
+                        <Skeleton className="h-8 w-28 mx-auto mb-4" />
+                        <Skeleton className="h-4 w-48 mx-auto" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-64">
+                      <ResponsiveContainer width="100%" height="100%">
                         <RechartsPieChart>
                           <Pie
                             data={categoryData}
                             cx="50%"
                             cy="50%"
                             labelLine={false}
+                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                             outerRadius={80}
                             fill="#8884d8"
                             dataKey="value"
-                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                           >
                             {categoryData.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                             ))}
                           </Pie>
-                          <Tooltip />
+                          <Tooltip formatter={(value) => `${value}%`} />
+                          <Legend />
                         </RechartsPieChart>
                       </ResponsiveContainer>
                     </div>
-                    
-                    <div className="w-full md:w-1/2">
+                  )}
+                  
+                  <div className="space-y-4">
+                    <h3 className="font-medium">Category Breakdown</h3>
+                    {loading ? (
                       <div className="space-y-4">
-                        {categoryData.map((item, index) => (
-                          <div key={item.name} className="flex items-center justify-between">
-                            <div className="flex items-center">
-                              <div
-                                className="w-3 h-3 mr-2 rounded-full"
-                                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <Skeleton key={i} className="h-8 w-full" />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {categoryData.map((category, index) => (
+                          <div key={category.name} className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div 
+                                className="w-3 h-3 rounded-full" 
+                                style={{ backgroundColor: COLORS[index % COLORS.length] }} 
                               />
-                              <span>{item.name}</span>
+                              <span className="font-medium">{category.name}</span>
                             </div>
-                            <div className="font-medium">{item.value} sales</div>
+                            <div className="text-sm">
+                              <span className="font-medium">{category.value}%</span>
+                            </div>
                           </div>
                         ))}
                       </div>
+                    )}
+                    
+                    <div className="pt-4 mt-4 border-t">
+                      <Button variant="outline" className="w-full flex items-center justify-center gap-1">
+                        View Detailed Report
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
                     </div>
-                  </>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white">
+              <CardHeader>
+                <CardTitle className="text-xl">Category Growth</CardTitle>
+                <CardDescription>
+                  Year-over-year growth by product category
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="space-y-2">
+                        <div className="flex justify-between">
+                          <Skeleton className="h-4 w-[100px]" />
+                          <Skeleton className="h-4 w-[50px]" />
+                        </div>
+                        <Skeleton className="h-2 w-full" />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {categoryData.map((category, index) => {
+                      // Generate random growth between -10 and 30
+                      const growth = Math.round((Math.random() * 40) - 10);
+                      const isPositive = growth >= 0;
+                      
+                      return (
+                        <div key={category.name} className="space-y-2">
+                          <div className="flex justify-between">
+                            <div className="flex items-center gap-2">
+                              <div 
+                                className="w-3 h-3 rounded-full" 
+                                style={{ backgroundColor: COLORS[index % COLORS.length] }} 
+                              />
+                              <span className="font-medium">{category.name}</span>
+                            </div>
+                            <div className={isPositive ? 'text-green-600' : 'text-red-600'}>
+                              {isPositive ? '+' : ''}{growth}%
+                            </div>
+                          </div>
+                          <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                            <div 
+                              className={`h-full rounded-full ${isPositive ? 'bg-green-500' : 'bg-red-500'}`} 
+                              style={{ width: `${Math.abs(growth) * 2}%` }}
+                            ></div>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {isPositive 
+                              ? `${category.name} has shown strong growth compared to last year.` 
+                              : `${category.name} has declined compared to last year.`
+                            }
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </CardContent>
             </Card>

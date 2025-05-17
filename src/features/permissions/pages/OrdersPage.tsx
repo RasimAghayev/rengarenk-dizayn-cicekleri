@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,11 @@ import {
   CheckCircle,
   Clock,
   Package,
-  Truck
+  Truck,
+  CalendarClock,
+  DollarSign,
+  Users,
+  BarChart3
 } from 'lucide-react';
 import {
   Table,
@@ -34,6 +39,8 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Sample data - in a real app, this would come from your database
 const orders = [
@@ -43,7 +50,10 @@ const orders = [
     date: '2023-05-17T08:30:00',
     status: 'completed',
     total: 124.99,
-    items: 3
+    items: 3,
+    email: 'john.smith@example.com',
+    phone: '+1 (555) 123-4567',
+    paymentMethod: 'Credit Card'
   },
   { 
     id: 'ORD-1235',
@@ -51,7 +61,10 @@ const orders = [
     date: '2023-05-17T09:45:00',
     status: 'processing',
     total: 89.50,
-    items: 2
+    items: 2,
+    email: 'sarah.j@example.com',
+    phone: '+1 (555) 234-5678',
+    paymentMethod: 'PayPal'
   },
   { 
     id: 'ORD-1236',
@@ -59,7 +72,10 @@ const orders = [
     date: '2023-05-16T14:20:00',
     status: 'shipped',
     total: 254.25,
-    items: 4
+    items: 4,
+    email: 'mbrown@example.com',
+    phone: '+1 (555) 345-6789',
+    paymentMethod: 'Credit Card'
   },
   { 
     id: 'ORD-1237',
@@ -67,7 +83,10 @@ const orders = [
     date: '2023-05-16T11:10:00',
     status: 'pending',
     total: 75.00,
-    items: 1
+    items: 1,
+    email: 'emily.davis@example.com',
+    phone: '+1 (555) 456-7890',
+    paymentMethod: 'Bank Transfer'
   },
   { 
     id: 'ORD-1238',
@@ -75,23 +94,69 @@ const orders = [
     date: '2023-05-15T16:30:00',
     status: 'completed',
     total: 349.99,
-    items: 5
+    items: 5,
+    email: 'dwilson@example.com',
+    phone: '+1 (555) 567-8901',
+    paymentMethod: 'Credit Card'
+  },
+  { 
+    id: 'ORD-1239',
+    customer: 'Jessica Brown',
+    date: '2023-05-15T10:15:00',
+    status: 'shipped',
+    total: 124.50,
+    items: 2,
+    email: 'jess.brown@example.com',
+    phone: '+1 (555) 678-9012',
+    paymentMethod: 'PayPal'
+  },
+  { 
+    id: 'ORD-1240',
+    customer: 'Thomas Miller',
+    date: '2023-05-14T13:45:00',
+    status: 'processing',
+    total: 89.99,
+    items: 1,
+    email: 'thomas.m@example.com',
+    phone: '+1 (555) 789-0123',
+    paymentMethod: 'Credit Card'
   },
 ];
+
+// Stats data
+const orderStats = {
+  total: 5289,
+  completed: 3941,
+  pending: 427,
+  revenue: 258946.75
+};
 
 const OrdersPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isNewOrderDialogOpen, setIsNewOrderDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [viewOrder, setViewOrder] = useState<any>(null);
   
+  // Simulate data loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   // Filter orders based on search term and status filter
   const filteredOrders = orders.filter(order => {
     const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          order.customer.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+    const matchesTab = activeTab === 'all' || order.status === activeTab;
     
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesTab;
   });
 
   // Format date to a readable string
@@ -150,7 +215,7 @@ const OrdersPage = () => {
                 Create Order
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[525px]">
               <DialogHeader>
                 <DialogTitle>Create New Order</DialogTitle>
                 <DialogDescription>
@@ -158,18 +223,124 @@ const OrdersPage = () => {
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                <p className="text-center text-muted-foreground">
-                  Order creation form will be implemented here.
-                </p>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <label htmlFor="customer" className="text-right text-sm font-medium">
+                    Customer
+                  </label>
+                  <Input
+                    id="customer"
+                    placeholder="Customer name"
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <label htmlFor="email" className="text-right text-sm font-medium">
+                    Email
+                  </label>
+                  <Input
+                    id="email"
+                    placeholder="customer@example.com"
+                    type="email"
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <label htmlFor="items" className="text-right text-sm font-medium">
+                    Items
+                  </label>
+                  <div className="col-span-3">
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select product" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="product1">Product A</SelectItem>
+                        <SelectItem value="product2">Product B</SelectItem>
+                        <SelectItem value="product3">Product C</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <label htmlFor="payment" className="text-right text-sm font-medium">
+                    Payment
+                  </label>
+                  <div className="col-span-3">
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Payment method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="credit_card">Credit Card</SelectItem>
+                        <SelectItem value="paypal">PayPal</SelectItem>
+                        <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsNewOrderDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button>Create Order</Button>
+                <Button onClick={() => setIsNewOrderDialogOpen(false)}>Create Order</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
+        </div>
+        
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{loading ? <Skeleton className="h-8 w-16" /> : orderStats.total}</div>
+              <p className="text-xs text-muted-foreground">
+                +18% from last month
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-sm font-medium">Completed</CardTitle>
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{loading ? <Skeleton className="h-8 w-16" /> : orderStats.completed}</div>
+              <p className="text-xs text-muted-foreground">
+                +5% from last month
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-sm font-medium">Pending</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{loading ? <Skeleton className="h-8 w-16" /> : orderStats.pending}</div>
+              <p className="text-xs text-muted-foreground">
+                -2% from last month
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {loading ? <Skeleton className="h-8 w-24" /> : `$${orderStats.revenue.toLocaleString()}`}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                +12% from last month
+              </p>
+            </CardContent>
+          </Card>
         </div>
         
         <Card className="bg-white">
@@ -183,6 +354,17 @@ const OrdersPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+              <TabsList className="grid grid-cols-5 md:w-[600px] w-full">
+                <TabsTrigger value="all">All Orders</TabsTrigger>
+                <TabsTrigger value="pending">Pending</TabsTrigger>
+                <TabsTrigger value="processing">Processing</TabsTrigger>
+                <TabsTrigger value="shipped">Shipped</TabsTrigger>
+                <TabsTrigger value="completed">Completed</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          
             <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -216,7 +398,20 @@ const OrdersPage = () => {
               </div>
             </div>
             
-            {filteredOrders.length > 0 ? (
+            {loading ? (
+              // Loading skeleton
+              <div className="space-y-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="flex items-center space-x-4 py-4">
+                    <Skeleton className="h-12 w-12 rounded-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-[250px]" />
+                      <Skeleton className="h-4 w-[200px]" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredOrders.length > 0 ? (
               <div className="rounded-md border">
                 <Table>
                   <TableHeader>
@@ -248,8 +443,12 @@ const OrdersPage = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>View details</DropdownMenuItem>
-                              <DropdownMenuItem>Update status</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setViewOrder(order)}>
+                                View details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                Update status
+                              </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem className="text-destructive">
                                 Cancel order
@@ -268,9 +467,105 @@ const OrdersPage = () => {
                 <p className="mt-2">Try adjusting your search or filter settings.</p>
               </div>
             )}
+            
+            {/* Pagination */}
+            <div className="flex items-center justify-end space-x-2 mt-4">
+              <Button variant="outline" size="sm" disabled>
+                Previous
+              </Button>
+              <Button variant="outline" size="sm" className="bg-primary/10">
+                1
+              </Button>
+              <Button variant="outline" size="sm">
+                2
+              </Button>
+              <Button variant="outline" size="sm">
+                3
+              </Button>
+              <Button variant="outline" size="sm">
+                Next
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
+      
+      {/* Order details dialog */}
+      <Dialog open={!!viewOrder} onOpenChange={(open) => !open && setViewOrder(null)}>
+        <DialogContent className="sm:max-w-[625px]">
+          <DialogHeader>
+            <DialogTitle>Order Details</DialogTitle>
+            <DialogDescription>
+              Complete information about order {viewOrder?.id}
+            </DialogDescription>
+          </DialogHeader>
+          {viewOrder && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Customer Information</h4>
+                  <p className="text-sm">{viewOrder.customer}</p>
+                  <p className="text-sm">{viewOrder.email}</p>
+                  <p className="text-sm">{viewOrder.phone}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Order Information</h4>
+                  <p className="text-sm">ID: {viewOrder.id}</p>
+                  <p className="text-sm">Date: {formatDate(viewOrder.date)}</p>
+                  <p className="text-sm">Status: {viewOrder.status}</p>
+                  <p className="text-sm">Payment: {viewOrder.paymentMethod}</p>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Order Items</h4>
+                <div className="border rounded-md">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Item</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead className="text-right">Price</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell>Sample Product</TableCell>
+                        <TableCell>1</TableCell>
+                        <TableCell className="text-right">${(viewOrder.total / viewOrder.items).toFixed(2)}</TableCell>
+                      </TableRow>
+                      {viewOrder.items > 1 && (
+                        <TableRow>
+                          <TableCell>Another Product</TableCell>
+                          <TableCell>{viewOrder.items - 1}</TableCell>
+                          <TableCell className="text-right">${(viewOrder.total - viewOrder.total / viewOrder.items).toFixed(2)}</TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <div>
+                  <span className="text-sm font-semibold">Total Items:</span>
+                  <span className="ml-2">{viewOrder.items}</span>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold">Order Total:</span>
+                  <span className="ml-2 text-lg font-bold">${viewOrder.total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewOrder(null)}>
+              Close
+            </Button>
+            <Button>Process Order</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
