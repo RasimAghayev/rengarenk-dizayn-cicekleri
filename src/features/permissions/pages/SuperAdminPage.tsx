@@ -30,10 +30,10 @@ const SuperAdminPage = () => {
       try {
         // This would be better implemented as a stored procedure or backend function
         // For now, we'll use multiple queries for simplicity
-        const { data: users } = await supabase.from('profiles').select('id').throwOnError();
-        const { data: roles } = await supabase.from('product_roles').select('id').throwOnError();
-        const { data: permissions } = await supabase.from('product_permissions').select('id').throwOnError();
-        const { data: assignments } = await supabase.from('user_product_roles').select('id').throwOnError();
+        const { data: users } = await supabase.from('profiles').select('id');
+        const { data: roles } = await supabase.from('product_roles').select('id');
+        const { data: permissions } = await supabase.from('product_permissions').select('id');
+        const { data: assignments } = await supabase.from('user_product_roles').select('id');
         
         setStats({
           totalUsers: users?.length || 0,
