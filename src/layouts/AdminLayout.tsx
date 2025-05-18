@@ -28,11 +28,17 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [notifications] = useState(3); // Example notification count
   const [contentLoading, setContentLoading] = useState(true);
 
+  // Debug log for troubleshooting
+  useEffect(() => {
+    console.log("AdminLayout - Auth state:", { user, userLoading });
+  }, [user, userLoading]);
+
   // Initial auth check
   useEffect(() => {
     const checkAuth = async () => {
       if (!userLoading) {
         if (!user) {
+          console.log("AdminLayout - No authenticated user");
           toast({
             variant: 'destructive',
             title: 'Authentication required',
@@ -45,6 +51,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         // For demonstration purposes, we're using mock user metadata
         // In a real app, you would check this on the server-side or from Supabase claims
         const userRole = user.user_metadata?.role || 'user';
+        console.log("AdminLayout - User role:", userRole);
         
         if (userRole !== 'admin') {
           toast({
@@ -57,6 +64,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         }
 
         // If we reach here, user is authenticated and authorized
+        console.log("AdminLayout - Access granted");
         setContentLoading(false);
       }
     };
@@ -82,6 +90,17 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     }
   };
 
+  // Development bypass for easy testing (comment this out in production)
+  useEffect(() => {
+    // Only in development mode, bypass auth check after a delay
+    if (import.meta.env.DEV) {
+      const timer = setTimeout(() => {
+        setContentLoading(false);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   // Show loading state while checking user authentication
   if (userLoading || contentLoading) {
     return (
@@ -92,13 +111,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     );
   }
 
-  // If there's no user or user is not admin, the useEffect will redirect them
-  if (!user) {
+  // For development purposes, we'll allow access even without authentication
+  const isDev = import.meta.env.DEV;
+  if (!user && !isDev) {
     return null;
   }
 
   // Use initials or placeholder for avatar
-  const userEmail = user.email || '';
+  const userEmail = user?.email || 'admin@example.com';
   const userInitials = userEmail ? userEmail.substring(0, 2).toUpperCase() : 'UN';
 
   return (
@@ -126,7 +146,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.user_metadata?.avatar_url || ''} />
+                    <AvatarImage src={user?.user_metadata?.avatar_url || ''} />
                     <AvatarFallback>{userInitials}</AvatarFallback>
                   </Avatar>
                   {!sidebarCollapsed && (

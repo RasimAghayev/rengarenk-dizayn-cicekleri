@@ -60,6 +60,7 @@ interface ProductRole {
   name: string;
   description: string | null;
   created_at: string;
+  updated_at: string; // Add the missing updated_at property
   permissions?: ProductPermission[];
 }
 
@@ -429,18 +430,21 @@ const ProductRolesManagement = () => {
         name: "Administrator",
         description: "Full access to all system features",
         created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
         id: "2",
         name: "Editor",
         description: "Can edit content but cannot modify system settings",
         created_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
         id: "3",
         name: "Viewer",
         description: "Read-only access to content",
         created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
       }
     ];
   }

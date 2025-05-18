@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { useToast } from './use-toast';
 import { Database } from '@/integrations/supabase/types';
 
@@ -14,6 +13,8 @@ interface UserMetadata {
   name?: string;
   avatar_url?: string;
   role?: UserRole;
+  first_name?: string;
+  last_name?: string;
 }
 
 interface User {
@@ -37,7 +38,6 @@ export function useUser() {
 
   // This function checks if the session is still valid
   const getSession = async () => {
-    setLoading(true);
     try {
       const { data, error } = await supabase.auth.getSession();
       if (error) {
@@ -48,15 +48,17 @@ export function useUser() {
     } catch (error) {
       console.error('Unexpected error getting session:', error);
       return null;
-    } finally {
-      setLoading(false);
     }
   };
 
   // This effect will run once when the component mounts to set the initial user state
   useEffect(() => {
+    console.log("useUser hook initializing");
+    setLoading(true);
+    
     // First set up the auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      console.log("Auth state changed:", event, currentSession?.user?.id ? "(user authenticated)" : "(no user)");
       setSession(currentSession as Session | null);
       setUser(currentSession?.user as User | null);
       setLoading(false);
@@ -64,6 +66,7 @@ export function useUser() {
 
     // Then check if there's an existing session
     getSession().then((currentSession) => {
+      console.log("Initial session check:", currentSession?.user?.id ? "(user authenticated)" : "(no user)");
       setSession(currentSession as Session | null);
       setUser(currentSession?.user as User | null);
       setLoading(false);
@@ -77,6 +80,7 @@ export function useUser() {
 
   // Sign in with email and password
   const signIn = async (email: string, password: string) => {
+    setLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -89,6 +93,7 @@ export function useUser() {
           description: error.message,
           variant: "destructive",
         });
+        setLoading(false);
         return { data: null, error };
       }
 
@@ -97,6 +102,7 @@ export function useUser() {
         description: "Welcome back!",
       });
       
+      setLoading(false);
       return { data, error: null };
     } catch (error: any) {
       toast({
@@ -104,13 +110,16 @@ export function useUser() {
         description: error.message || "An unexpected error occurred",
         variant: "destructive",
       });
+      setLoading(false);
       return { data: null, error };
     }
   };
 
   // Sign up with email and password
   const signUp = async (email: string, password: string, metadata: UserMetadata = {}) => {
+    setLoading(true);
     try {
+      console.log("Signing up with metadata:", metadata);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -120,11 +129,13 @@ export function useUser() {
       });
 
       if (error) {
+        console.error("Sign up error:", error);
         toast({
           title: "Sign up failed",
           description: error.message,
           variant: "destructive",
         });
+        setLoading(false);
         return { data: null, error };
       }
 
@@ -133,19 +144,23 @@ export function useUser() {
         description: "Please check your email for verification.",
       });
       
+      setLoading(false);
       return { data, error: null };
     } catch (error: any) {
+      console.error("Unexpected sign up error:", error);
       toast({
         title: "Sign up failed",
         description: error.message || "An unexpected error occurred",
         variant: "destructive",
       });
+      setLoading(false);
       return { data: null, error };
     }
   };
 
   // Sign out
   const signOut = async () => {
+    setLoading(true);
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
@@ -154,10 +169,12 @@ export function useUser() {
           description: error.message,
           variant: "destructive",
         });
+        setLoading(false);
         return { error };
       }
       
       // The onAuthStateChange event will update our state
+      setLoading(false);
       return { error: null };
     } catch (error: any) {
       toast({
@@ -165,6 +182,7 @@ export function useUser() {
         description: error.message || "An unexpected error occurred",
         variant: "destructive",
       });
+      setLoading(false);
       return { error };
     }
   };

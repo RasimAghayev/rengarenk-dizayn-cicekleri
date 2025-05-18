@@ -20,7 +20,7 @@ import CategoriesPage from "./features/permissions/pages/CategoriesPage";
 import OrdersPage from "./features/permissions/pages/OrdersPage";
 import ReportsPage from "./features/permissions/pages/ReportsPage";
 import { useUser } from "./hooks/use-user";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
 // Create a query client for React Query
@@ -43,7 +43,16 @@ const LoadingFallback = () => (
 
 // Protected route component to guard admin routes
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useUser();
+  const { user, loading, signOut } = useUser();
+  
+  // Debug log to help troubleshooting
+  useEffect(() => {
+    console.log("Protected route - Auth state:", { user, loading });
+    // Check if session is expired and attempt reauth if needed
+    if (!user && !loading) {
+      console.log("No authenticated user found");
+    }
+  }, [user, loading]);
 
   if (loading) {
     return <LoadingFallback />;
@@ -56,9 +65,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const hasAccess = isDev || (user && user.user_metadata?.role === 'admin');
 
   if (!hasAccess) {
+    console.log("Access denied - Redirecting to login");
     return <Navigate to="/login" replace />;
   }
 
+  console.log("Access granted to protected route");
   return <>{children}</>;
 };
 
