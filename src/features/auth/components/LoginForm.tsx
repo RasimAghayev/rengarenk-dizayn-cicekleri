@@ -6,42 +6,78 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { useUser } from '@/hooks/use-user';
+import { Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { signIn } = useUser();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    
+    if (!email || !password) {
+      toast({
+        title: "Validation error",
+        description: "Please enter both email and password",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
     
     try {
-      // Simulate login - replace with actual authentication logic
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
-      });
-      // Redirect would happen here
-    } catch (error) {
+      const { data, error } = await signIn(email, password);
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      if (data?.session) {
+        // Successfully logged in, redirect to home page
+        navigate('/');
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
       toast({
         title: "Login failed",
-        description: "Please check your credentials and try again.",
+        description: error.message || "Please check your credentials and try again",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
   
-  const handleSocialLogin = (provider: string) => {
-    toast({
-      title: "Social Login",
-      description: `Logging in with ${provider}...`,
-    });
-    // Implement actual social login logic here
+  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+      
+      if (error) {
+        throw error;
+      }
+
+      // Social login initiated successfully
+      // The user will be redirected to the provider's authentication page
+    } catch (error: any) {
+      toast({
+        title: `${provider} login failed`,
+        description: error.message || "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -57,7 +93,8 @@ const LoginForm = () => {
             variant="outline" 
             type="button" 
             className="flex items-center justify-center gap-2"
-            onClick={() => handleSocialLogin('Google')}
+            onClick={() => handleSocialLogin('google')}
+            disabled={isSubmitting}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
               <path fill="#EA4335" d="M5.26620003,9.76452941 C6.19878754,6.93863203 8.85444915,4.90909091 12,4.90909091 C13.6909091,4.90909091 15.2181818,5.50909091 16.4181818,6.49090909 L19.9090909,3 C17.7818182,1.14545455 15.0545455,0 12,0 C7.27006974,0 3.1977497,2.69829785 1.23999023,6.65002441 L5.26620003,9.76452941 Z"/>
@@ -72,7 +109,8 @@ const LoginForm = () => {
             variant="outline" 
             type="button" 
             className="flex items-center justify-center gap-2" 
-            onClick={() => handleSocialLogin('Facebook')}
+            onClick={() => handleSocialLogin('facebook')}
+            disabled={isSubmitting}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
               <path fill="#1877F2" d="M24,12.073c0,-6.627 -5.373,-12 -12,-12c-6.627,0 -12,5.373 -12,12c0,5.99 4.388,10.954 10.125,11.854l0,-8.385l-3.047,0l0,-3.469l3.047,0l0,-2.642c0,-3.007 1.792,-4.669 4.533,-4.669c1.312,0 2.686,0.235 2.686,0.235l0,2.953l-1.514,0c-1.491,0 -1.956,0.925 -1.956,1.874l0,2.25l3.328,0l-0.532,3.469l-2.796,0l0,8.385c5.737,-0.9 10.125,-5.864 10.125,-11.854Z"/>
@@ -102,6 +140,7 @@ const LoginForm = () => {
               placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isSubmitting}
               required
             />
           </div>
@@ -112,17 +151,23 @@ const LoginForm = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isSubmitting}
               required
             />
           </div>
           
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Logging in..." : "Login"}
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Logging in...
+              </>
+            ) : "Login"}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button variant="outline" type="button" onClick={() => window.history.back()} className="w-full mr-2">
+        <Button variant="outline" type="button" onClick={() => window.history.back()} className="w-full mr-2" disabled={isSubmitting}>
           Cancel
         </Button>
       </CardFooter>
