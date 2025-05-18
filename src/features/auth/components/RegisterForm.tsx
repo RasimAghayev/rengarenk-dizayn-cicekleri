@@ -7,8 +7,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { UserRole } from '@/types/auth';
-import { supabase } from '@/integrations/supabase/client';
+import { UserRole } from '@/hooks/use-user';
+import { useUser } from '@/hooks/use-user';
+import { useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -21,6 +23,8 @@ const RegisterForm = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { signUp } = useUser();
+  const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -45,32 +49,33 @@ const RegisterForm = () => {
     setIsLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            role: formData.role,
-          }
+      // Use our hook instead of direct Supabase call
+      const { data, error } = await signUp(
+        formData.email, 
+        formData.password,
+        {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          role: formData.role,
         }
-      });
+      );
 
       if (error) throw error;
 
       toast({
         title: "Registration successful",
-        description: "Your account has been created.",
+        description: "Your account has been created. Please check your email for verification.",
       });
       
-      // Redirect will happen automatically if auth state changes
+      // Navigate to login page after successful registration
+      navigate('/login');
     } catch (error: any) {
       toast({
         title: "Registration failed",
         description: error.message || "There was a problem creating your account.",
         variant: "destructive",
       });
+      console.error("Registration error details:", error);
     } finally {
       setIsLoading(false);
     }
@@ -97,6 +102,7 @@ const RegisterForm = () => {
             type="button" 
             className="flex items-center justify-center gap-2"
             onClick={() => handleSocialRegister('Google')}
+            disabled={isLoading}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
               <path fill="#EA4335" d="M5.26620003,9.76452941 C6.19878754,6.93863203 8.85444915,4.90909091 12,4.90909091 C13.6909091,4.90909091 15.2181818,5.50909091 16.4181818,6.49090909 L19.9090909,3 C17.7818182,1.14545455 15.0545455,0 12,0 C7.27006974,0 3.1977497,2.69829785 1.23999023,6.65002441 L5.26620003,9.76452941 Z"/>
@@ -112,6 +118,7 @@ const RegisterForm = () => {
             type="button" 
             className="flex items-center justify-center gap-2" 
             onClick={() => handleSocialRegister('Facebook')}
+            disabled={isLoading}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
               <path fill="#1877F2" d="M24,12.073c0,-6.627 -5.373,-12 -12,-12c-6.627,0 -12,5.373 -12,12c0,5.99 4.388,10.954 10.125,11.854l0,-8.385l-3.047,0l0,-3.469l3.047,0l0,-2.642c0,-3.007 1.792,-4.669 4.533,-4.669c1.312,0 2.686,0.235 2.686,0.235l0,2.953l-1.514,0c-1.491,0 -1.956,0.925 -1.956,1.874l0,2.25l3.328,0l-0.532,3.469l-2.796,0l0,8.385c5.737,-0.9 10.125,-5.864 10.125,-11.854Z"/>
@@ -143,6 +150,7 @@ const RegisterForm = () => {
                 value={formData.firstName}
                 onChange={handleInputChange}
                 required
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -154,6 +162,7 @@ const RegisterForm = () => {
                 value={formData.lastName}
                 onChange={handleInputChange}
                 required
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -167,12 +176,17 @@ const RegisterForm = () => {
               value={formData.email}
               onChange={handleInputChange}
               required
+              disabled={isLoading}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="role">Account Type</Label>
-            <Select value={formData.role} onValueChange={handleRoleChange}>
+            <Select 
+              value={formData.role} 
+              onValueChange={handleRoleChange as (value: string) => void}
+              disabled={isLoading}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select your role" />
               </SelectTrigger>
@@ -193,6 +207,7 @@ const RegisterForm = () => {
               value={formData.password}
               onChange={handleInputChange}
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -204,17 +219,25 @@ const RegisterForm = () => {
               value={formData.confirmPassword}
               onChange={handleInputChange}
               required
+              disabled={isLoading}
             />
           </div>
           
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Registering..." : "Register"}
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+                Registering...
+              </>
+            ) : (
+              "Register"
+            )}
           </Button>
         </form>
       </CardContent>
       
       <CardFooter className="flex justify-between">
-        <Button variant="outline" type="button" onClick={() => window.history.back()} className="w-full mr-2">
+        <Button variant="outline" type="button" onClick={() => navigate('/login')} className="w-full mr-2" disabled={isLoading}>
           Cancel
         </Button>
       </CardFooter>

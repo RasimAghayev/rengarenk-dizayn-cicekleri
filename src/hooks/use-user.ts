@@ -209,6 +209,59 @@ export function useUser() {
     }
   };
 
+  // Create a sample admin user for development
+  const createAdminUser = async () => {
+    if (!import.meta.env.DEV) {
+      console.warn("createAdminUser is only for development mode");
+      return;
+    }
+
+    const email = 'admin@example.com';
+    const password = 'adminpassword';
+    
+    try {
+      // Check if user already exists
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (!error && data.user) {
+        toast({
+          title: "Dev admin exists",
+          description: `Use email: ${email} | password: ${password}`,
+        });
+        return;
+      }
+      
+      // Create admin user if it doesn't exist
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            role: 'admin',
+            first_name: 'Admin',
+            last_name: 'User',
+          }
+        }
+      });
+      
+      if (signUpError) {
+        console.error("Error creating admin user:", signUpError);
+        return;
+      }
+      
+      toast({
+        title: "Dev admin created",
+        description: `Use email: ${email} | password: ${password}`,
+      });
+      
+    } catch (error) {
+      console.error("Error in createAdminUser:", error);
+    }
+  };
+
   return {
     user,
     session,
@@ -217,5 +270,6 @@ export function useUser() {
     signUp,
     signOut,
     hasPermission,
+    createAdminUser,
   };
 }
