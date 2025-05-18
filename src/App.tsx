@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./features/auth/pages/LoginPage";
@@ -19,8 +19,48 @@ import ProductsPage from "./features/permissions/pages/ProductsPage";
 import CategoriesPage from "./features/permissions/pages/CategoriesPage";
 import OrdersPage from "./features/permissions/pages/OrdersPage";
 import ReportsPage from "./features/permissions/pages/ReportsPage";
+import { useUser } from "./hooks/use-user";
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
 
-const queryClient = new QueryClient();
+// Create a query client for React Query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 30000,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="h-screen w-full flex justify-center items-center">
+    <Loader2 className="h-12 w-12 text-primary animate-spin" />
+  </div>
+);
+
+// Protected route component to guard admin routes
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useUser();
+
+  if (loading) {
+    return <LoadingFallback />;
+  }
+
+  // Allow access in dev environment for testing when no auth is setup
+  const isDev = import.meta.env.DEV;
+  
+  // Use direct access for demo purposes or check if user exists and is admin
+  const hasAccess = isDev || (user && user.user_metadata?.role === 'admin');
+
+  if (!hasAccess) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -28,24 +68,85 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/cash" element={<CashPage />} />
-          <Route path="/onboarding" element={<OnboardingPage />} />
-          <Route path="/setup" element={<StepByStepOnboarding />} />
-          <Route path="/admin" element={<SuperAdminPage />} />
-          <Route path="/admin/settings" element={<AdminSettingsPage />} />
-          <Route path="/admin/users" element={<UsersPage />} />
-          <Route path="/admin/roles" element={<RolesPage />} />
-          <Route path="/admin/products" element={<ProductsPage />} />
-          <Route path="/admin/categories" element={<CategoriesPage />} />
-          <Route path="/admin/orders" element={<OrdersPage />} />
-          <Route path="/admin/reports" element={<ReportsPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/cash" element={<CashPage />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
+            <Route path="/setup" element={<StepByStepOnboarding />} />
+            
+            {/* Admin Routes */}
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute>
+                  <SuperAdminPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route 
+              path="/admin/settings" 
+              element={
+                <ProtectedRoute>
+                  <AdminSettingsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route 
+              path="/admin/users" 
+              element={
+                <ProtectedRoute>
+                  <UsersPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route 
+              path="/admin/roles" 
+              element={
+                <ProtectedRoute>
+                  <RolesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route 
+              path="/admin/products" 
+              element={
+                <ProtectedRoute>
+                  <ProductsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route 
+              path="/admin/categories" 
+              element={
+                <ProtectedRoute>
+                  <CategoriesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route 
+              path="/admin/orders" 
+              element={
+                <ProtectedRoute>
+                  <OrdersPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route 
+              path="/admin/reports" 
+              element={
+                <ProtectedRoute>
+                  <ReportsPage />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
