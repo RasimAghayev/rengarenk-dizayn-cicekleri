@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { useUser } from '@/hooks/use-user';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Facebook, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
@@ -58,10 +58,16 @@ const LoginForm = () => {
   
   const handleSocialLogin = async (provider: 'google' | 'facebook') => {
     try {
+      setIsSubmitting(true);
+      toast({
+        title: `Signing in with ${provider}`,
+        description: "You will be redirected to continue the login process",
+      });
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: window.location.origin + '/login',
         },
       });
       
@@ -69,14 +75,17 @@ const LoginForm = () => {
         throw error;
       }
 
+      console.log(`${provider} auth initiated:`, data);
       // Social login initiated successfully
       // The user will be redirected to the provider's authentication page
     } catch (error: any) {
+      console.error(`${provider} login error:`, error);
       toast({
         title: `${provider} login failed`,
         description: error.message || "An unexpected error occurred",
         variant: "destructive",
       });
+      setIsSubmitting(false);
     }
   };
 
@@ -112,10 +121,7 @@ const LoginForm = () => {
             onClick={() => handleSocialLogin('facebook')}
             disabled={isSubmitting}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
-              <path fill="#1877F2" d="M24,12.073c0,-6.627 -5.373,-12 -12,-12c-6.627,0 -12,5.373 -12,12c0,5.99 4.388,10.954 10.125,11.854l0,-8.385l-3.047,0l0,-3.469l3.047,0l0,-2.642c0,-3.007 1.792,-4.669 4.533,-4.669c1.312,0 2.686,0.235 2.686,0.235l0,2.953l-1.514,0c-1.491,0 -1.956,0.925 -1.956,1.874l0,2.25l3.328,0l-0.532,3.469l-2.796,0l0,8.385c5.737,-0.9 10.125,-5.864 10.125,-11.854Z"/>
-              <path fill="#FFFFFF" d="M16.671,15.542l0.532,-3.469l-3.328,0l0,-2.25c0,-0.949 0.465,-1.874 1.956,-1.874l1.514,0l0,-2.953c0,0 -1.374,-0.235 -2.686,-0.235c-2.741,0 -4.533,1.662 -4.533,4.669l0,2.642l-3.047,0l0,3.469l3.047,0l0,8.385c0.611,0.096 1.24,0.145 1.875,0.145c0.635,0 1.264,-0.05 1.875,-0.145l0,-8.385l2.796,0Z"/>
-            </svg>
+            <Facebook className="h-5 w-5 text-[#1877F2]" />
             <span>Facebook</span>
           </Button>
         </div>
@@ -162,7 +168,12 @@ const LoginForm = () => {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Logging in...
               </>
-            ) : "Login"}
+            ) : (
+              <>
+                <Mail className="mr-2 h-4 w-4" />
+                Login with Email
+              </>
+            )}
           </Button>
         </form>
       </CardContent>
