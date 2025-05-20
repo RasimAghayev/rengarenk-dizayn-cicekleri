@@ -64,10 +64,18 @@ const LoginForm = () => {
         description: "You will be redirected to continue the login process",
       });
       
+      // Get the current URL origin
+      const origin = window.location.origin;
+      console.log(`Current origin: ${origin}`);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: window.location.origin + '/login',
+          redirectTo: origin,
+          queryParams: provider === 'google' ? {
+            access_type: 'offline',
+            prompt: 'consent',
+          } : undefined,
         },
       });
       
