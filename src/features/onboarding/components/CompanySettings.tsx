@@ -1,8 +1,7 @@
-
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -11,42 +10,45 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Settings } from 'lucide-react';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+} from "@/components/ui/form";
+import { Settings } from "lucide-react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 interface CompanySettingsProps {
   onSave: () => void;
 }
 
 const companySchema = z.object({
-  name: z.string().min(2, 'Company name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().min(6, 'Phone number must be at least 6 characters'),
-  address: z.string().min(5, 'Address must be at least 5 characters'),
-  taxId: z.string().min(5, 'Tax ID must be at least 5 characters'),
-  website: z.string().url('Invalid website URL').optional().or(z.literal('')),
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
+  name: z.string().min(2, "Company name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(6, "Phone number must be at least 6 characters"),
+  address: z.string().min(5, "Address must be at least 5 characters"),
+  taxId: z.string().min(5, "Tax ID must be at least 5 characters"),
+  website: z.string().url("Invalid website URL").optional().or(z.literal("")),
+  description: z
+    .string()
+    .max(500, "Description must be less than 500 characters")
+    .optional(),
 });
 
 const CompanySettings: React.FC<CompanySettingsProps> = ({ onSave }) => {
   const form = useForm<z.infer<typeof companySchema>>({
     resolver: zodResolver(companySchema),
     defaultValues: {
-      name: 'My Company',
-      email: 'contact@mycompany.com',
-      phone: '555-123-4567',
-      address: '123 Business St, City, Country',
-      taxId: 'TAX123456',
-      website: 'https://www.mycompany.com',
-      description: 'A leading retailer in our industry.',
+      name: "My Company",
+      email: "contact@mycompany.com",
+      phone: "555-123-4567",
+      address: "123 Business St, City, Country",
+      taxId: "TAX123456",
+      website: "https://www.mycompany.com",
+      description: "A leading retailer in our industry.",
     },
   });
 
   const handleSubmit = (data: z.infer<typeof companySchema>) => {
-    console.log('Company data saved:', data);
+    console.log("Company data saved:", data);
     onSave();
   };
 
@@ -125,9 +127,7 @@ const CompanySettings: React.FC<CompanySettingsProps> = ({ onSave }) => {
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Optional company website
-                  </FormDescription>
+                  <FormDescription>Optional company website</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -155,14 +155,15 @@ const CompanySettings: React.FC<CompanySettingsProps> = ({ onSave }) => {
               <FormItem>
                 <FormLabel>Company Description</FormLabel>
                 <FormControl>
-                  <Textarea 
-                    {...field} 
+                  <Textarea
+                    {...field}
                     className="min-h-[100px]"
                     placeholder="Brief description of your company"
                   />
                 </FormControl>
                 <FormDescription>
-                  This may appear on receipts and other customer-facing documents.
+                  This may appear on receipts and other customer-facing
+                  documents.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

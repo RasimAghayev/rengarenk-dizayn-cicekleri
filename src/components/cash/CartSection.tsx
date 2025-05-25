@@ -1,13 +1,18 @@
-
-import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import CartItems from './CartItems';
-import PaymentSection from './PaymentSection';
-import BarcodeScanner from './BarcodeScanner';
-import ReceiptComponent from './Receipt';
-import { Product, Customer } from '@/types/cash-register';
-import { Trash2 } from 'lucide-react';
+import React from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import CartItems from "./CartItems";
+import PaymentSection from "./PaymentSection";
+import BarcodeScanner from "./BarcodeScanner";
+import ReceiptComponent from "./Receipt";
+import { Product, Customer } from "@/types/cash-register";
+import { Trash2 } from "lucide-react";
 
 interface CartSectionProps {
   cart: Product[];
@@ -24,7 +29,7 @@ interface CartSectionProps {
   removeFromCart: (productId: number, price: number) => void;
   addToCart: (product: Product) => void;
   isAtStockLimit: (productId: number) => boolean;
-  viewMode: 'all' | 'cart';
+  viewMode: "all" | "cart";
   onBarcodeScanned: (barcode: string) => void;
   clearCart: () => void; // Make this required
 }
@@ -46,15 +51,15 @@ const CartSection: React.FC<CartSectionProps> = ({
   isAtStockLimit,
   viewMode,
   onBarcodeScanned,
-  clearCart
+  clearCart,
 }) => {
-  const isCheckoutDisabled = 
-    cart.length === 0 || 
-    (calculateChange() < 0 && !isDebt) || 
+  const isCheckoutDisabled =
+    cart.length === 0 ||
+    (calculateChange() < 0 && !isDebt) ||
     (isDebt && !selectedCustomer);
 
   return (
-    <Card className={viewMode === 'all' ? "md:col-span-1" : "w-full"}>
+    <Card className={viewMode === "all" ? "md:col-span-1" : "w-full"}>
       <CardHeader>
         <CardTitle className="text-brandRed">Current Sale</CardTitle>
       </CardHeader>
@@ -64,9 +69,9 @@ const CartSection: React.FC<CartSectionProps> = ({
             <h3 className="text-lg font-semibold">Cart Items</h3>
             <div className="flex items-center gap-2">
               {cart.length > 0 && (
-                <Button 
-                  variant="destructive" 
-                  size="sm" 
+                <Button
+                  variant="destructive"
+                  size="sm"
                   onClick={clearCart}
                   className="flex items-center gap-1"
                 >
@@ -77,7 +82,7 @@ const CartSection: React.FC<CartSectionProps> = ({
               <BarcodeScanner onScan={onBarcodeScanned} />
             </div>
           </div>
-          <CartItems 
+          <CartItems
             cart={cart}
             removeFromCart={removeFromCart}
             addToCart={addToCart}
@@ -105,7 +110,7 @@ const CartSection: React.FC<CartSectionProps> = ({
         >
           Complete Sale
         </Button>
-        
+
         {cart.length > 0 && (
           <ReceiptComponent
             cart={cart}

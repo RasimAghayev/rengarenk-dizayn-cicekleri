@@ -1,14 +1,17 @@
-
-import React from 'react';
-import { Search, Info } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Product } from '@/types/cash-register';
-import { Skeleton } from '@/components/ui/skeleton';
+import React from "react";
+import { Search, Info } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Product } from "@/types/cash-register";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProductsSectionProps {
   searchQuery: string;
@@ -17,7 +20,7 @@ interface ProductsSectionProps {
   addToCart: (product: Product) => void;
   handleInfoClick: (product: Product, e: React.MouseEvent) => void;
   isAtStockLimit: (productId: number) => boolean;
-  viewMode: 'all' | 'products';
+  viewMode: "all" | "products";
   isLoading?: boolean;
 }
 
@@ -29,7 +32,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
   handleInfoClick,
   isAtStockLimit,
   viewMode,
-  isLoading = false
+  isLoading = false,
 }) => {
   // Loading skeleton for products
   const ProductSkeleton = () => (
@@ -42,7 +45,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
   );
 
   return (
-    <Card className={viewMode === 'all' ? "md:col-span-1" : "w-full"}>
+    <Card className={viewMode === "all" ? "md:col-span-1" : "w-full"}>
       <CardHeader>
         <CardTitle className="text-brandBlue">Products</CardTitle>
         <div className="relative mt-2">
@@ -66,22 +69,29 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
           ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 gap-4">
               {filteredProducts.map((product) => (
-                <div 
-                  key={product.id} 
-                  className={`border-2 ${!product.inStock ? 'border-red-500' : product.stockQuantity && isAtStockLimit(product.id) ? 'border-red-500' : 'border-brandGreen'} 
-                    rounded-lg overflow-hidden cursor-pointer ${!product.inStock ? 'opacity-80' : ''}`}
+                <div
+                  key={product.id}
+                  className={`border-2 ${!product.inStock ? "border-red-500" : product.stockQuantity && isAtStockLimit(product.id) ? "border-red-500" : "border-brandGreen"} 
+                    rounded-lg overflow-hidden cursor-pointer ${!product.inStock ? "opacity-80" : ""}`}
                   onClick={() => product.inStock && addToCart(product)}
                 >
                   <div className="relative">
-                    <img src={product.image} alt={product.name} className="w-full h-24 object-cover" />
-                    
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-24 object-cover"
+                    />
+
                     {/* Stock quantity (top left) */}
                     {product.stockQuantity !== undefined && (
-                      <Badge variant="outline" className="absolute top-2 left-2 bg-white dark:bg-gray-800 dark:text-white">
+                      <Badge
+                        variant="outline"
+                        className="absolute top-2 left-2 bg-white dark:bg-gray-800 dark:text-white"
+                      >
                         Stock: {product.stockQuantity}
                       </Badge>
                     )}
-                    
+
                     {/* Price and discount (top right) */}
                     <div className="absolute top-2 right-2 flex flex-col items-end">
                       {product.discounted ? (
@@ -102,14 +112,17 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
                         </span>
                       )}
                     </div>
-                    
+
                     {/* Info button (bottom left) */}
-                    <div className="absolute bottom-2 left-2" onClick={(e) => e.stopPropagation()}>
+                    <div
+                      className="absolute bottom-2 left-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            size="icon" 
+                          <Button
+                            variant="outline"
+                            size="icon"
                             className="h-6 w-6 rounded-full bg-white dark:bg-gray-800"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -122,8 +135,14 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
                         <PopoverContent>
                           <div className="space-y-2">
                             <h3 className="font-medium">{product.name}</h3>
-                            <img src={product.image} alt={product.name} className="w-full h-32 object-cover rounded" />
-                            <p className="text-sm text-muted-foreground">{product.description}</p>
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-full h-32 object-cover rounded"
+                            />
+                            <p className="text-sm text-muted-foreground">
+                              {product.description}
+                            </p>
                             <div className="flex justify-between">
                               <span>Price: ${product.price.toFixed(2)}</span>
                               <span>Stock: {product.stockQuantity || 0}</span>
@@ -132,20 +151,25 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
                         </PopoverContent>
                       </Popover>
                     </div>
-                    
+
                     {/* Out of stock overlay */}
                     {!product.inStock && (
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                        <Badge variant="destructive" className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <Badge
+                          variant="destructive"
+                          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                        >
                           Out of Stock
                         </Badge>
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Product name (bottom) */}
                   <div className="p-3">
-                    <div className="text-center font-semibold">{product.name}</div>
+                    <div className="text-center font-semibold">
+                      {product.name}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -153,7 +177,9 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
           ) : (
             <div className="flex flex-col items-center justify-center h-64">
               <p className="text-muted-foreground">No products found</p>
-              <p className="text-sm text-muted-foreground mt-2">Try changing the category or search term</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Try changing the category or search term
+              </p>
             </div>
           )}
         </ScrollArea>

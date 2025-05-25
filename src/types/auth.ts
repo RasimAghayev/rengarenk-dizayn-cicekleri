@@ -1,5 +1,4 @@
-
-export type UserRole = 'admin' | 'staff' | 'client' | 'company';
+export type UserRole = "admin" | "staff" | "client" | "company";
 
 export interface RegisterFormData {
   email: string;

@@ -1,16 +1,15 @@
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { 
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -18,19 +17,19 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
-} from '@/components/ui/dialog';
-import { 
+} from "@/components/ui/dialog";
+import {
   Form,
   FormField,
   FormItem,
   FormLabel,
   FormControl,
   FormMessage,
-} from '@/components/ui/form';
-import { Plus, X, Edit, User } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+} from "@/components/ui/form";
+import { Plus, X, Edit, User } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface CustomerManagementProps {
   onSave: () => void;
@@ -46,32 +45,44 @@ interface Customer {
 
 // Sample initial data
 const initialCustomers: Customer[] = [
-  { id: 1, name: 'John Doe', email: 'john@example.com', phone: '555-1234', address: '123 Main St' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com', phone: '555-5678', address: '456 Oak Ave' },
+  {
+    id: 1,
+    name: "John Doe",
+    email: "john@example.com",
+    phone: "555-1234",
+    address: "123 Main St",
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    email: "jane@example.com",
+    phone: "555-5678",
+    address: "456 Oak Ave",
+  },
 ];
 
 const customerSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().min(6, 'Phone number must be at least 6 characters'),
-  address: z.string().min(5, 'Address must be at least 5 characters'),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(6, "Phone number must be at least 6 characters"),
+  address: z.string().min(5, "Address must be at least 5 characters"),
 });
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
 
 const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
     defaultValues: {
-      name: '',
-      email: '',
-      phone: '',
-      address: '',
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
     },
   });
 
@@ -79,27 +90,32 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
     (customer) =>
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.phone.includes(searchTerm)
+      customer.phone.includes(searchTerm),
   );
 
   const handleAddCustomer = (data: CustomerFormValues) => {
     if (editingCustomer) {
       // Update existing customer
-      setCustomers(customers.map(c => 
-        c.id === editingCustomer.id ? { ...c, ...data } : c
-      ));
+      setCustomers(
+        customers.map((c) =>
+          c.id === editingCustomer.id ? { ...c, ...data } : c,
+        ),
+      );
     } else {
       // Add new customer - fix by explicitly defining all required fields
       const newCustomer: Customer = {
-        id: customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1,
+        id:
+          customers.length > 0
+            ? Math.max(...customers.map((c) => c.id)) + 1
+            : 1,
         name: data.name,
         email: data.email,
         phone: data.phone,
-        address: data.address
+        address: data.address,
       };
       setCustomers([...customers, newCustomer]);
     }
-    
+
     form.reset();
     setEditingCustomer(null);
     setIsDialogOpen(false);
@@ -118,7 +134,7 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
   };
 
   const handleDeleteCustomer = (id: number) => {
-    setCustomers(customers.filter(c => c.id !== id));
+    setCustomers(customers.filter((c) => c.id !== id));
     onSave();
   };
 
@@ -137,15 +153,15 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
           <User className="h-6 w-6" />
           <span>Customer Management</span>
         </h2>
-        
+
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-          <Input 
-            placeholder="Search customers..." 
+          <Input
+            placeholder="Search customers..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full md:w-64"
           />
-          
+
           <Dialog open={isDialogOpen} onOpenChange={handleDialogOpen}>
             <DialogTrigger asChild>
               <Button className="flex items-center gap-2 whitespace-nowrap">
@@ -156,12 +172,15 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingCustomer ? 'Edit Customer' : 'Add New Customer'}
+                  {editingCustomer ? "Edit Customer" : "Add New Customer"}
                 </DialogTitle>
               </DialogHeader>
-              
+
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleAddCustomer)} className="space-y-4">
+                <form
+                  onSubmit={form.handleSubmit(handleAddCustomer)}
+                  className="space-y-4"
+                >
                   <FormField
                     control={form.control}
                     name="name"
@@ -175,7 +194,7 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="email"
@@ -189,7 +208,7 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="phone"
@@ -203,7 +222,7 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="address"
@@ -217,13 +236,15 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button type="button" variant="outline">Cancel</Button>
+                      <Button type="button" variant="outline">
+                        Cancel
+                      </Button>
                     </DialogClose>
                     <Button type="submit">
-                      {editingCustomer ? 'Update Customer' : 'Add Customer'}
+                      {editingCustomer ? "Update Customer" : "Add Customer"}
                     </Button>
                   </DialogFooter>
                 </form>
@@ -254,15 +275,15 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
                   <TableCell>{customer.address}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="icon"
                         onClick={() => handleEditCustomer(customer)}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="destructive" 
+                      <Button
+                        variant="destructive"
                         size="icon"
                         onClick={() => handleDeleteCustomer(customer.id)}
                       >
@@ -274,7 +295,10 @@ const CustomerManagement: React.FC<CustomerManagementProps> = ({ onSave }) => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-4 text-gray-500">
+                <TableCell
+                  colSpan={5}
+                  className="text-center py-4 text-gray-500"
+                >
                   No customers found
                 </TableCell>
               </TableRow>

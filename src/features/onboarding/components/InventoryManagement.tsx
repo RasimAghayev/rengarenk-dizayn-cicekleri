@@ -1,16 +1,15 @@
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { 
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -18,26 +17,26 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
-} from '@/components/ui/dialog';
-import { 
+} from "@/components/ui/dialog";
+import {
   Form,
   FormField,
   FormItem,
   FormLabel,
   FormControl,
   FormMessage,
-} from '@/components/ui/form';
-import { 
+} from "@/components/ui/form";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Plus, X, Edit, FileText } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+} from "@/components/ui/select";
+import { Plus, X, Edit, FileText } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface InventoryManagementProps {
   onSave: () => void;
@@ -54,36 +53,63 @@ interface Product {
 
 // Sample initial data
 const initialProducts: Product[] = [
-  { id: 1, name: 'Coffee', category: 'Beverages', price: 3.99, stockQuantity: 50, barcode: '1234567890' },
-  { id: 2, name: 'Bread', category: 'Bakery', price: 2.49, stockQuantity: 30, barcode: '2345678901' },
+  {
+    id: 1,
+    name: "Coffee",
+    category: "Beverages",
+    price: 3.99,
+    stockQuantity: 50,
+    barcode: "1234567890",
+  },
+  {
+    id: 2,
+    name: "Bread",
+    category: "Bakery",
+    price: 2.49,
+    stockQuantity: 30,
+    barcode: "2345678901",
+  },
 ];
 
 const productSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  category: z.string().min(1, 'Category is required'),
-  price: z.coerce.number().positive('Price must be positive'),
-  stockQuantity: z.coerce.number().int().nonnegative('Stock quantity must be non-negative'),
-  barcode: z.string().min(4, 'Barcode must be at least 4 characters'),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  category: z.string().min(1, "Category is required"),
+  price: z.coerce.number().positive("Price must be positive"),
+  stockQuantity: z.coerce
+    .number()
+    .int()
+    .nonnegative("Stock quantity must be non-negative"),
+  barcode: z.string().min(4, "Barcode must be at least 4 characters"),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
-const categories = ['Beverages', 'Bakery', 'Dairy', 'Produce', 'Meat', 'Snacks', 'Other'];
+const categories = [
+  "Beverages",
+  "Bakery",
+  "Dairy",
+  "Produce",
+  "Meat",
+  "Snacks",
+  "Other",
+];
 
-const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => {
+const InventoryManagement: React.FC<InventoryManagementProps> = ({
+  onSave,
+}) => {
   const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      name: '',
-      category: '',
+      name: "",
+      category: "",
       price: 0,
       stockQuantity: 0,
-      barcode: '',
+      barcode: "",
     },
   });
 
@@ -91,28 +117,31 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.barcode.includes(searchTerm)
+      product.barcode.includes(searchTerm),
   );
 
   const handleAddProduct = (data: ProductFormValues) => {
     if (editingProduct) {
       // Update existing product
-      setProducts(products.map(p => 
-        p.id === editingProduct.id ? { ...p, ...data } : p
-      ));
+      setProducts(
+        products.map((p) =>
+          p.id === editingProduct.id ? { ...p, ...data } : p,
+        ),
+      );
     } else {
       // Add new product - fix by explicitly defining all required fields
       const newProduct: Product = {
-        id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
+        id:
+          products.length > 0 ? Math.max(...products.map((p) => p.id)) + 1 : 1,
         name: data.name,
         category: data.category,
         price: data.price,
         stockQuantity: data.stockQuantity,
-        barcode: data.barcode
+        barcode: data.barcode,
       };
       setProducts([...products, newProduct]);
     }
-    
+
     form.reset();
     setEditingProduct(null);
     setIsDialogOpen(false);
@@ -132,7 +161,7 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
   };
 
   const handleDeleteProduct = (id: number) => {
-    setProducts(products.filter(p => p.id !== id));
+    setProducts(products.filter((p) => p.id !== id));
     onSave();
   };
 
@@ -151,15 +180,15 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
           <FileText className="h-6 w-6" />
           <span>Inventory Management</span>
         </h2>
-        
+
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-          <Input 
-            placeholder="Search inventory..." 
+          <Input
+            placeholder="Search inventory..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full md:w-64"
           />
-          
+
           <Dialog open={isDialogOpen} onOpenChange={handleDialogOpen}>
             <DialogTrigger asChild>
               <Button className="flex items-center gap-2 whitespace-nowrap">
@@ -170,12 +199,15 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingProduct ? 'Edit Product' : 'Add New Product'}
+                  {editingProduct ? "Edit Product" : "Add New Product"}
                 </DialogTitle>
               </DialogHeader>
-              
+
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleAddProduct)} className="space-y-4">
+                <form
+                  onSubmit={form.handleSubmit(handleAddProduct)}
+                  className="space-y-4"
+                >
                   <FormField
                     control={form.control}
                     name="name"
@@ -189,15 +221,15 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="category"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Category</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
+                        <Select
+                          onValueChange={field.onChange}
                           defaultValue={field.value}
                           value={field.value}
                         >
@@ -218,7 +250,7 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
                       </FormItem>
                     )}
                   />
-                  
+
                   <div className="flex gap-4">
                     <FormField
                       control={form.control}
@@ -227,13 +259,18 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
                         <FormItem className="flex-1">
                           <FormLabel>Price</FormLabel>
                           <FormControl>
-                            <Input type="number" step="0.01" min="0" {...field} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="stockQuantity"
@@ -248,7 +285,7 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
                       )}
                     />
                   </div>
-                  
+
                   <FormField
                     control={form.control}
                     name="barcode"
@@ -262,13 +299,15 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
                       </FormItem>
                     )}
                   />
-                  
+
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button type="button" variant="outline">Cancel</Button>
+                      <Button type="button" variant="outline">
+                        Cancel
+                      </Button>
                     </DialogClose>
                     <Button type="submit">
-                      {editingProduct ? 'Update Product' : 'Add Product'}
+                      {editingProduct ? "Update Product" : "Add Product"}
                     </Button>
                   </DialogFooter>
                 </form>
@@ -301,15 +340,15 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
                   <TableCell>{product.barcode}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="icon"
                         onClick={() => handleEditProduct(product)}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="destructive" 
+                      <Button
+                        variant="destructive"
                         size="icon"
                         onClick={() => handleDeleteProduct(product.id)}
                       >
@@ -321,7 +360,10 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4 text-gray-500">
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-4 text-gray-500"
+                >
                   No products found
                 </TableCell>
               </TableRow>

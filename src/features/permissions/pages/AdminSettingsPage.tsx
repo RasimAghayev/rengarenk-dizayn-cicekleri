@@ -1,23 +1,17 @@
-
-import React, { useState } from 'react';
-import AdminLayout from '@/layouts/AdminLayout';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
+import React, { useState } from "react";
+import AdminLayout from "@/layouts/AdminLayout";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
-} from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -26,23 +20,23 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { 
-  Save, 
-  Globe, 
-  Mail, 
-  ShieldAlert, 
+} from "@/components/ui/form";
+import {
+  Save,
+  Globe,
+  Mail,
+  ShieldAlert,
   Database,
   Server,
   UserCog,
   BellRing,
-  Palette
-} from 'lucide-react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+  Palette,
+} from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const generalSettingsSchema = z.object({
   siteName: z.string().min(2, {
@@ -56,7 +50,7 @@ const generalSettingsSchema = z.object({
   }),
   enableMaintenanceMode: z.boolean().default(false),
   companyName: z.string().min(2, {
-    message: "Company name must be at least 2 characters."
+    message: "Company name must be at least 2 characters.",
   }),
   companyAddress: z.string().optional(),
   supportPhone: z.string().optional(),
@@ -74,28 +68,28 @@ const securitySettingsSchema = z.object({
 
 const emailSettingsSchema = z.object({
   smtpServer: z.string().min(1, {
-    message: "SMTP server is required."
+    message: "SMTP server is required.",
   }),
   smtpPort: z.number().int().min(1).max(65535),
   smtpUsername: z.string().min(1, {
-    message: "SMTP username is required."
+    message: "SMTP username is required.",
   }),
   smtpPassword: z.string().min(1, {
-    message: "SMTP password is required."
+    message: "SMTP password is required.",
   }),
   enableTLS: z.boolean().default(true),
   fromEmail: z.string().email({
-    message: "Please enter a valid email address."
+    message: "Please enter a valid email address.",
   }),
   fromName: z.string().min(1, {
-    message: "From name is required."
+    message: "From name is required.",
   }),
 });
 
 const notificationSettingsSchema = z.object({
   enableEmailNotifications: z.boolean().default(true),
   enableBrowserNotifications: z.boolean().default(true),
-  digestFrequency: z.enum(['never', 'daily', 'weekly', 'monthly']),
+  digestFrequency: z.enum(["never", "daily", "weekly", "monthly"]),
   notifyOnLogin: z.boolean().default(true),
   notifyOnFailedLogin: z.boolean().default(true),
 });
@@ -154,7 +148,7 @@ const AdminSettingsPage = () => {
     defaultValues: {
       enableEmailNotifications: true,
       enableBrowserNotifications: true,
-      digestFrequency: 'daily',
+      digestFrequency: "daily",
       notifyOnLogin: true,
       notifyOnFailedLogin: true,
     },
@@ -168,21 +162,21 @@ const AdminSettingsPage = () => {
     setSaving(true);
     try {
       // In a real application, this would save to a settings table in the database
-      console.log('Saving general settings:', data);
-      
+      console.log("Saving general settings:", data);
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       toast({
-        title: 'Settings Saved',
-        description: 'Your general settings have been updated successfully.',
+        title: "Settings Saved",
+        description: "Your general settings have been updated successfully.",
       });
     } catch (error: any) {
-      console.error('Error saving settings:', error);
+      console.error("Error saving settings:", error);
       toast({
-        variant: 'destructive',
-        title: 'Failed to Save Settings',
-        description: error.message || 'An unexpected error occurred',
+        variant: "destructive",
+        title: "Failed to Save Settings",
+        description: error.message || "An unexpected error occurred",
       });
     } finally {
       setSaving(false);
@@ -192,18 +186,18 @@ const AdminSettingsPage = () => {
   const onSecuritySubmit = async (data: SecuritySettingsValues) => {
     setSaving(true);
     try {
-      console.log('Saving security settings:', data);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log("Saving security settings:", data);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       toast({
-        title: 'Settings Saved',
-        description: 'Your security settings have been updated successfully.',
+        title: "Settings Saved",
+        description: "Your security settings have been updated successfully.",
       });
     } catch (error: any) {
-      console.error('Error saving settings:', error);
+      console.error("Error saving settings:", error);
       toast({
-        variant: 'destructive',
-        title: 'Failed to Save Settings',
-        description: error.message || 'An unexpected error occurred',
+        variant: "destructive",
+        title: "Failed to Save Settings",
+        description: error.message || "An unexpected error occurred",
       });
     } finally {
       setSaving(false);
@@ -213,18 +207,18 @@ const AdminSettingsPage = () => {
   const onEmailSubmit = async (data: EmailSettingsValues) => {
     setSaving(true);
     try {
-      console.log('Saving email settings:', data);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log("Saving email settings:", data);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       toast({
-        title: 'Settings Saved',
-        description: 'Your email settings have been updated successfully.',
+        title: "Settings Saved",
+        description: "Your email settings have been updated successfully.",
       });
     } catch (error: any) {
-      console.error('Error saving settings:', error);
+      console.error("Error saving settings:", error);
       toast({
-        variant: 'destructive',
-        title: 'Failed to Save Settings',
-        description: error.message || 'An unexpected error occurred',
+        variant: "destructive",
+        title: "Failed to Save Settings",
+        description: error.message || "An unexpected error occurred",
       });
     } finally {
       setSaving(false);
@@ -234,18 +228,19 @@ const AdminSettingsPage = () => {
   const onNotificationSubmit = async (data: NotificationSettingsValues) => {
     setSaving(true);
     try {
-      console.log('Saving notification settings:', data);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log("Saving notification settings:", data);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       toast({
-        title: 'Settings Saved',
-        description: 'Your notification settings have been updated successfully.',
+        title: "Settings Saved",
+        description:
+          "Your notification settings have been updated successfully.",
       });
     } catch (error: any) {
-      console.error('Error saving settings:', error);
+      console.error("Error saving settings:", error);
       toast({
-        variant: 'destructive',
-        title: 'Failed to Save Settings',
-        description: error.message || 'An unexpected error occurred',
+        variant: "destructive",
+        title: "Failed to Save Settings",
+        description: error.message || "An unexpected error occurred",
       });
     } finally {
       setSaving(false);
@@ -257,14 +252,17 @@ const AdminSettingsPage = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">System Settings</h1>
-          <Alert variant="default" className="max-w-md bg-blue-50 text-blue-800 border-blue-200">
+          <Alert
+            variant="default"
+            className="max-w-md bg-blue-50 text-blue-800 border-blue-200"
+          >
             <AlertDescription className="flex items-center text-sm">
               <Globe className="h-4 w-4 mr-2" />
               Changes made here will affect the entire system
             </AlertDescription>
           </Alert>
         </div>
-        
+
         <Card className="bg-white shadow-sm">
           <CardHeader>
             <CardTitle>System Configuration</CardTitle>
@@ -273,29 +271,51 @@ const AdminSettingsPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+            <Tabs
+              value={activeTab}
+              onValueChange={handleTabChange}
+              className="space-y-6"
+            >
               <TabsList className="grid w-full grid-cols-6 mb-8 h-14 p-1">
-                <TabsTrigger value="general" className="flex flex-col items-center gap-1 h-full data-[state=active]:bg-primary/10">
+                <TabsTrigger
+                  value="general"
+                  className="flex flex-col items-center gap-1 h-full data-[state=active]:bg-primary/10"
+                >
                   <Globe className="h-4 w-4" />
                   <span className="text-xs">General</span>
                 </TabsTrigger>
-                <TabsTrigger value="security" className="flex flex-col items-center gap-1 h-full data-[state=active]:bg-primary/10">
+                <TabsTrigger
+                  value="security"
+                  className="flex flex-col items-center gap-1 h-full data-[state=active]:bg-primary/10"
+                >
                   <ShieldAlert className="h-4 w-4" />
                   <span className="text-xs">Security</span>
                 </TabsTrigger>
-                <TabsTrigger value="email" className="flex flex-col items-center gap-1 h-full data-[state=active]:bg-primary/10">
+                <TabsTrigger
+                  value="email"
+                  className="flex flex-col items-center gap-1 h-full data-[state=active]:bg-primary/10"
+                >
                   <Mail className="h-4 w-4" />
                   <span className="text-xs">Email</span>
                 </TabsTrigger>
-                <TabsTrigger value="database" className="flex flex-col items-center gap-1 h-full data-[state=active]:bg-primary/10">
+                <TabsTrigger
+                  value="database"
+                  className="flex flex-col items-center gap-1 h-full data-[state=active]:bg-primary/10"
+                >
                   <Database className="h-4 w-4" />
                   <span className="text-xs">Database</span>
                 </TabsTrigger>
-                <TabsTrigger value="appearance" className="flex flex-col items-center gap-1 h-full data-[state=active]:bg-primary/10">
+                <TabsTrigger
+                  value="appearance"
+                  className="flex flex-col items-center gap-1 h-full data-[state=active]:bg-primary/10"
+                >
                   <Palette className="h-4 w-4" />
                   <span className="text-xs">Appearance</span>
                 </TabsTrigger>
-                <TabsTrigger value="notifications" className="flex flex-col items-center gap-1 h-full data-[state=active]:bg-primary/10">
+                <TabsTrigger
+                  value="notifications"
+                  className="flex flex-col items-center gap-1 h-full data-[state=active]:bg-primary/10"
+                >
                   <BellRing className="h-4 w-4" />
                   <span className="text-xs">Notifications</span>
                 </TabsTrigger>
@@ -308,9 +328,12 @@ const AdminSettingsPage = () => {
                     These settings affect your entire site and all users
                   </p>
                 </div>
-                
+
                 <Form {...generalForm}>
-                  <form onSubmit={generalForm.handleSubmit(onGeneralSubmit)} className="space-y-6">
+                  <form
+                    onSubmit={generalForm.handleSubmit(onGeneralSubmit)}
+                    className="space-y-6"
+                  >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={generalForm.control}
@@ -328,7 +351,7 @@ const AdminSettingsPage = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={generalForm.control}
                         name="siteUrl"
@@ -346,7 +369,7 @@ const AdminSettingsPage = () => {
                         )}
                       />
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={generalForm.control}
@@ -364,7 +387,7 @@ const AdminSettingsPage = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={generalForm.control}
                         name="companyName"
@@ -382,7 +405,7 @@ const AdminSettingsPage = () => {
                         )}
                       />
                     </div>
-                    
+
                     <FormField
                       control={generalForm.control}
                       name="companyAddress"
@@ -396,7 +419,7 @@ const AdminSettingsPage = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={generalForm.control}
                       name="supportPhone"
@@ -410,16 +433,19 @@ const AdminSettingsPage = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={generalForm.control}
                       name="enableMaintenanceMode"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">Maintenance Mode</FormLabel>
+                            <FormLabel className="text-base">
+                              Maintenance Mode
+                            </FormLabel>
                             <FormDescription>
-                              Put your site in maintenance mode to prevent user access
+                              Put your site in maintenance mode to prevent user
+                              access
                             </FormDescription>
                           </div>
                           <FormControl>
@@ -431,10 +457,14 @@ const AdminSettingsPage = () => {
                         </FormItem>
                       )}
                     />
-                    
-                    <Button type="submit" className="flex gap-2 items-center" disabled={saving}>
+
+                    <Button
+                      type="submit"
+                      className="flex gap-2 items-center"
+                      disabled={saving}
+                    >
                       <Save className="h-4 w-4" />
-                      {saving ? 'Saving...' : 'Save Changes'}
+                      {saving ? "Saving..." : "Save Changes"}
                     </Button>
                   </form>
                 </Form>
@@ -447,9 +477,12 @@ const AdminSettingsPage = () => {
                     Configure security settings to protect your application
                   </p>
                 </div>
-                
+
                 <Form {...securityForm}>
-                  <form onSubmit={securityForm.handleSubmit(onSecuritySubmit)} className="space-y-6">
+                  <form
+                    onSubmit={securityForm.handleSubmit(onSecuritySubmit)}
+                    className="space-y-6"
+                  >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={securityForm.control}
@@ -458,20 +491,23 @@ const AdminSettingsPage = () => {
                           <FormItem>
                             <FormLabel>Max Login Attempts</FormLabel>
                             <FormControl>
-                              <Input 
-                                type="number" 
-                                {...field} 
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} 
+                              <Input
+                                type="number"
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(parseInt(e.target.value) || 0)
+                                }
                               />
                             </FormControl>
                             <FormDescription>
-                              Maximum number of failed login attempts before lockout
+                              Maximum number of failed login attempts before
+                              lockout
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={securityForm.control}
                         name="sessionTimeout"
@@ -479,21 +515,24 @@ const AdminSettingsPage = () => {
                           <FormItem>
                             <FormLabel>Session Timeout (minutes)</FormLabel>
                             <FormControl>
-                              <Input 
-                                type="number" 
-                                {...field} 
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              <Input
+                                type="number"
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(parseInt(e.target.value) || 0)
+                                }
                               />
                             </FormControl>
                             <FormDescription>
-                              How long user sessions remain active after inactivity
+                              How long user sessions remain active after
+                              inactivity
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={securityForm.control}
@@ -502,10 +541,12 @@ const AdminSettingsPage = () => {
                           <FormItem>
                             <FormLabel>Minimum Password Length</FormLabel>
                             <FormControl>
-                              <Input 
-                                type="number" 
-                                {...field} 
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              <Input
+                                type="number"
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(parseInt(e.target.value) || 0)
+                                }
                               />
                             </FormControl>
                             <FormDescription>
@@ -515,29 +556,34 @@ const AdminSettingsPage = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={securityForm.control}
                         name="accountLockoutDuration"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Account Lockout Duration (minutes)</FormLabel>
+                            <FormLabel>
+                              Account Lockout Duration (minutes)
+                            </FormLabel>
                             <FormControl>
-                              <Input 
-                                type="number" 
-                                {...field} 
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              <Input
+                                type="number"
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(parseInt(e.target.value) || 0)
+                                }
                               />
                             </FormControl>
                             <FormDescription>
-                              Duration accounts remain locked after exceeding max login attempts
+                              Duration accounts remain locked after exceeding
+                              max login attempts
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    
+
                     <FormField
                       control={securityForm.control}
                       name="enforcePasswordHistory"
@@ -545,20 +591,23 @@ const AdminSettingsPage = () => {
                         <FormItem>
                           <FormLabel>Password History</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="number" 
-                              {...field} 
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            <Input
+                              type="number"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value) || 0)
+                              }
                             />
                           </FormControl>
                           <FormDescription>
-                            Number of previous passwords that users cannot reuse (0 to disable)
+                            Number of previous passwords that users cannot reuse
+                            (0 to disable)
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
+
                     <div className="space-y-4">
                       <FormField
                         control={securityForm.control}
@@ -566,9 +615,12 @@ const AdminSettingsPage = () => {
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                             <div className="space-y-0.5">
-                              <FormLabel className="text-base">Two-Factor Authentication</FormLabel>
+                              <FormLabel className="text-base">
+                                Two-Factor Authentication
+                              </FormLabel>
                               <FormDescription>
-                                Require users to verify identity using a second method
+                                Require users to verify identity using a second
+                                method
                               </FormDescription>
                             </div>
                             <FormControl>
@@ -580,16 +632,19 @@ const AdminSettingsPage = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={securityForm.control}
                         name="requireSpecialChar"
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                             <div className="space-y-0.5">
-                              <FormLabel className="text-base">Require Special Characters</FormLabel>
+                              <FormLabel className="text-base">
+                                Require Special Characters
+                              </FormLabel>
                               <FormDescription>
-                                Require passwords to contain at least one special character
+                                Require passwords to contain at least one
+                                special character
                               </FormDescription>
                             </div>
                             <FormControl>
@@ -602,10 +657,14 @@ const AdminSettingsPage = () => {
                         )}
                       />
                     </div>
-                    
-                    <Button type="submit" className="flex gap-2 items-center" disabled={saving}>
+
+                    <Button
+                      type="submit"
+                      className="flex gap-2 items-center"
+                      disabled={saving}
+                    >
                       <Save className="h-4 w-4" />
-                      {saving ? 'Saving...' : 'Save Changes'}
+                      {saving ? "Saving..." : "Save Changes"}
                     </Button>
                   </form>
                 </Form>
@@ -618,9 +677,12 @@ const AdminSettingsPage = () => {
                     Configure email server settings and notification templates
                   </p>
                 </div>
-                
+
                 <Form {...emailForm}>
-                  <form onSubmit={emailForm.handleSubmit(onEmailSubmit)} className="space-y-6">
+                  <form
+                    onSubmit={emailForm.handleSubmit(onEmailSubmit)}
+                    className="space-y-6"
+                  >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={emailForm.control}
@@ -638,7 +700,7 @@ const AdminSettingsPage = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={emailForm.control}
                         name="smtpPort"
@@ -646,10 +708,12 @@ const AdminSettingsPage = () => {
                           <FormItem>
                             <FormLabel>SMTP Port</FormLabel>
                             <FormControl>
-                              <Input 
-                                type="number" 
-                                {...field} 
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              <Input
+                                type="number"
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(parseInt(e.target.value) || 0)
+                                }
                               />
                             </FormControl>
                             <FormDescription>
@@ -660,7 +724,7 @@ const AdminSettingsPage = () => {
                         )}
                       />
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={emailForm.control}
@@ -675,7 +739,7 @@ const AdminSettingsPage = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={emailForm.control}
                         name="smtpPassword"
@@ -690,7 +754,7 @@ const AdminSettingsPage = () => {
                         )}
                       />
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={emailForm.control}
@@ -708,7 +772,7 @@ const AdminSettingsPage = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={emailForm.control}
                         name="fromName"
@@ -726,14 +790,16 @@ const AdminSettingsPage = () => {
                         )}
                       />
                     </div>
-                    
+
                     <FormField
                       control={emailForm.control}
                       name="enableTLS"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">Enable TLS/SSL</FormLabel>
+                            <FormLabel className="text-base">
+                              Enable TLS/SSL
+                            </FormLabel>
                             <FormDescription>
                               Use secure connection for sending emails
                             </FormDescription>
@@ -747,10 +813,14 @@ const AdminSettingsPage = () => {
                         </FormItem>
                       )}
                     />
-                    
-                    <Button type="submit" className="flex gap-2 items-center" disabled={saving}>
+
+                    <Button
+                      type="submit"
+                      className="flex gap-2 items-center"
+                      disabled={saving}
+                    >
                       <Save className="h-4 w-4" />
-                      {saving ? 'Saving...' : 'Save Changes'}
+                      {saving ? "Saving..." : "Save Changes"}
                     </Button>
                   </form>
                 </Form>
@@ -763,9 +833,14 @@ const AdminSettingsPage = () => {
                     Configure system notification settings
                   </p>
                 </div>
-                
+
                 <Form {...notificationForm}>
-                  <form onSubmit={notificationForm.handleSubmit(onNotificationSubmit)} className="space-y-6">
+                  <form
+                    onSubmit={notificationForm.handleSubmit(
+                      onNotificationSubmit,
+                    )}
+                    className="space-y-6"
+                  >
                     <div className="grid grid-cols-1 gap-6">
                       <FormField
                         control={notificationForm.control}
@@ -793,7 +868,7 @@ const AdminSettingsPage = () => {
                         )}
                       />
                     </div>
-                    
+
                     <div className="space-y-4">
                       <FormField
                         control={notificationForm.control}
@@ -801,7 +876,9 @@ const AdminSettingsPage = () => {
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                             <div className="space-y-0.5">
-                              <FormLabel className="text-base">Email Notifications</FormLabel>
+                              <FormLabel className="text-base">
+                                Email Notifications
+                              </FormLabel>
                               <FormDescription>
                                 Send notification emails to users
                               </FormDescription>
@@ -815,14 +892,16 @@ const AdminSettingsPage = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={notificationForm.control}
                         name="enableBrowserNotifications"
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                             <div className="space-y-0.5">
-                              <FormLabel className="text-base">Browser Notifications</FormLabel>
+                              <FormLabel className="text-base">
+                                Browser Notifications
+                              </FormLabel>
                               <FormDescription>
                                 Enable push notifications in browser
                               </FormDescription>
@@ -836,14 +915,16 @@ const AdminSettingsPage = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={notificationForm.control}
                         name="notifyOnLogin"
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                             <div className="space-y-0.5">
-                              <FormLabel className="text-base">Login Notifications</FormLabel>
+                              <FormLabel className="text-base">
+                                Login Notifications
+                              </FormLabel>
                               <FormDescription>
                                 Send notifications when users log in
                               </FormDescription>
@@ -857,14 +938,16 @@ const AdminSettingsPage = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={notificationForm.control}
                         name="notifyOnFailedLogin"
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                             <div className="space-y-0.5">
-                              <FormLabel className="text-base">Failed Login Notifications</FormLabel>
+                              <FormLabel className="text-base">
+                                Failed Login Notifications
+                              </FormLabel>
                               <FormDescription>
                                 Send notifications on failed login attempts
                               </FormDescription>
@@ -879,10 +962,14 @@ const AdminSettingsPage = () => {
                         )}
                       />
                     </div>
-                    
-                    <Button type="submit" className="flex gap-2 items-center" disabled={saving}>
+
+                    <Button
+                      type="submit"
+                      className="flex gap-2 items-center"
+                      disabled={saving}
+                    >
                       <Save className="h-4 w-4" />
-                      {saving ? 'Saving...' : 'Save Changes'}
+                      {saving ? "Saving..." : "Save Changes"}
                     </Button>
                   </form>
                 </Form>
@@ -891,17 +978,25 @@ const AdminSettingsPage = () => {
               <TabsContent value="database">
                 <div className="p-8 text-center text-gray-500">
                   <Database className="mx-auto h-12 w-12 opacity-30" />
-                  <h3 className="mt-4 text-lg font-medium">Database Settings</h3>
-                  <p className="mt-2 mb-4">Manage database connections and configure backups</p>
+                  <h3 className="mt-4 text-lg font-medium">
+                    Database Settings
+                  </h3>
+                  <p className="mt-2 mb-4">
+                    Manage database connections and configure backups
+                  </p>
                   <Button disabled>Coming Soon</Button>
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="appearance">
                 <div className="p-8 text-center text-gray-500">
                   <Palette className="mx-auto h-12 w-12 opacity-30" />
-                  <h3 className="mt-4 text-lg font-medium">Appearance Settings</h3>
-                  <p className="mt-2 mb-4">Customize the look and feel of your application</p>
+                  <h3 className="mt-4 text-lg font-medium">
+                    Appearance Settings
+                  </h3>
+                  <p className="mt-2 mb-4">
+                    Customize the look and feel of your application
+                  </p>
                   <Button disabled>Coming Soon</Button>
                 </div>
               </TabsContent>

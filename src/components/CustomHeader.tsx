@@ -1,8 +1,7 @@
-
-import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import Logo from './Logo';
-import { Button } from './ui/button';
+import React from "react";
+import { Link, NavLink } from "react-router-dom";
+import Logo from "./Logo";
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,13 +9,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useUser } from '@/hooks/use-user';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { ShieldCheck } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
+import { useUser } from "@/hooks/use-user";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { ShieldCheck } from "lucide-react";
 
 const CustomHeader = () => {
   const { user, session, signOut } = useUser();
@@ -29,10 +28,10 @@ const CustomHeader = () => {
       title: "Logged out",
       description: "You have been successfully logged out.",
     });
-    navigate('/login');
+    navigate("/login");
   };
 
-  const isAdmin = user?.user_metadata?.role === 'admin';
+  const isAdmin = user?.user_metadata?.role === "admin";
 
   return (
     <header className="bg-background py-4 border-b">
@@ -48,7 +47,7 @@ const CustomHeader = () => {
             className={({ isActive }) =>
               cn(
                 "text-muted-foreground hover:text-foreground transition-colors duration-200",
-                isActive ? "text-foreground font-semibold" : ""
+                isActive ? "text-foreground font-semibold" : "",
               )
             }
           >
@@ -59,7 +58,7 @@ const CustomHeader = () => {
             className={({ isActive }) =>
               cn(
                 "text-muted-foreground hover:text-foreground transition-colors duration-200",
-                isActive ? "text-foreground font-semibold" : ""
+                isActive ? "text-foreground font-semibold" : "",
               )
             }
           >
@@ -70,20 +69,20 @@ const CustomHeader = () => {
             className={({ isActive }) =>
               cn(
                 "text-muted-foreground hover:text-foreground transition-colors duration-200",
-                isActive ? "text-foreground font-semibold" : ""
+                isActive ? "text-foreground font-semibold" : "",
               )
             }
           >
             Onboarding
           </NavLink>
-          
+
           {isAdmin && (
             <NavLink
               to="/admin"
               className={({ isActive }) =>
                 cn(
                   "text-muted-foreground hover:text-foreground transition-colors duration-200 flex items-center",
-                  isActive ? "text-foreground font-semibold" : ""
+                  isActive ? "text-foreground font-semibold" : "",
                 )
               }
             >
@@ -98,8 +97,13 @@ const CustomHeader = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={user?.user_metadata?.avatar_url as string} alt={user?.user_metadata?.name as string} />
-                  <AvatarFallback>{(user?.user_metadata?.name as string)?.charAt(0)}</AvatarFallback>
+                  <AvatarImage
+                    src={user?.user_metadata?.avatar_url as string}
+                    alt={user?.user_metadata?.name as string}
+                  />
+                  <AvatarFallback>
+                    {(user?.user_metadata?.name as string)?.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -120,7 +124,9 @@ const CustomHeader = () => {
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut}>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSignOut}>
+                Logout
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
