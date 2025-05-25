@@ -1,63 +1,67 @@
-
-import React, { useState, useEffect } from 'react';
-import CategoriesSection from './cash/CategoriesSection';
-import ProductsSection from './cash/ProductsSection';
-import CartSection from './cash/CartSection';
-import { customers } from './cash/mockData';
-import { Product } from '@/types/cash-register';
-import { toast } from '@/hooks/use-toast';
-import { getCategories, getProducts } from '@/features/cash/services/cashService';
+import React, { useState, useEffect } from "react";
+import CategoriesSection from "./cash/CategoriesSection";
+import ProductsSection from "./cash/ProductsSection";
+import CartSection from "./cash/CartSection";
+import { customers } from "./cash/mockData";
+import { Product } from "@/types/cash-register";
+import { toast } from "@/hooks/use-toast";
+import {
+  getCategories,
+  getProducts,
+} from "@/features/cash/services/cashService";
 
 interface CashRegisterProps {
-  viewMode: 'all' | 'categories' | 'products' | 'cart';
+  viewMode: "all" | "categories" | "products" | "cart";
 }
 
 const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
   // Use localStorage to persist cart data across view changes
   const [cart, setCart] = useState<Product[]>(() => {
-    const savedCart = localStorage.getItem('cart');
+    const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
-  
+
   const [total, setTotal] = useState(() => {
-    const savedTotal = localStorage.getItem('cartTotal');
+    const savedTotal = localStorage.getItem("cartTotal");
     return savedTotal ? parseFloat(savedTotal) : 0;
   });
-  
+
   const [payment, setPayment] = useState(() => {
-    const savedPayment = localStorage.getItem('payment');
-    return savedPayment || '';
+    const savedPayment = localStorage.getItem("payment");
+    return savedPayment || "";
   });
-  
+
   const [isDebt, setIsDebt] = useState(() => {
-    const savedIsDebt = localStorage.getItem('isDebt');
+    const savedIsDebt = localStorage.getItem("isDebt");
     return savedIsDebt ? JSON.parse(savedIsDebt) : false;
   });
-  
+
   const [selectedCustomer, setSelectedCustomer] = useState(() => {
-    const savedCustomer = localStorage.getItem('selectedCustomer');
-    return savedCustomer || '';
+    const savedCustomer = localStorage.getItem("selectedCustomer");
+    return savedCustomer || "";
   });
-  
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(() => {
-    const savedCategory = localStorage.getItem('selectedCategory');
-    return savedCategory || 'All Products';
-  });
-  
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    () => {
+      const savedCategory = localStorage.getItem("selectedCategory");
+      return savedCategory || "All Products";
+    },
+  );
+
   const [searchQuery, setSearchQuery] = useState(() => {
-    const savedQuery = localStorage.getItem('searchQuery');
-    return savedQuery || '';
+    const savedQuery = localStorage.getItem("searchQuery");
+    return savedQuery || "";
   });
-  
+
   // Store categories and products from API or mock data
   const [categories, setCategories] = useState([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // State for product info modal
   const [productInfoData, setProductInfoData] = useState<Product | null>(null);
-  
+
   // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
@@ -73,10 +77,10 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
         });
       }
     };
-    
+
     fetchCategories();
   }, []);
-  
+
   // Fetch products based on selected category
   useEffect(() => {
     const fetchProducts = async () => {
@@ -95,45 +99,54 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
         setIsLoading(false);
       }
     };
-    
+
     fetchProducts();
   }, [selectedCategory]);
-  
+
   // Filter products based on search query
   useEffect(() => {
-    if (searchQuery.trim() !== '') {
+    if (searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase();
-      const filtered = allProducts.filter(product => 
-        product.name.toLowerCase().includes(query) || 
-        product.category.toLowerCase().includes(query)
+      const filtered = allProducts.filter(
+        (product) =>
+          product.name.toLowerCase().includes(query) ||
+          product.category.toLowerCase().includes(query),
       );
       setFilteredProducts(filtered);
     } else {
       setFilteredProducts(allProducts);
     }
   }, [searchQuery, allProducts]);
-  
+
   // Save cart data to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-    localStorage.setItem('cartTotal', total.toString());
-    localStorage.setItem('payment', payment);
-    localStorage.setItem('isDebt', JSON.stringify(isDebt));
-    localStorage.setItem('selectedCustomer', selectedCustomer);
-    localStorage.setItem('selectedCategory', selectedCategory || '');
-    localStorage.setItem('searchQuery', searchQuery);
-  }, [cart, total, payment, isDebt, selectedCustomer, selectedCategory, searchQuery]);
-  
+    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem("cartTotal", total.toString());
+    localStorage.setItem("payment", payment);
+    localStorage.setItem("isDebt", JSON.stringify(isDebt));
+    localStorage.setItem("selectedCustomer", selectedCustomer);
+    localStorage.setItem("selectedCategory", selectedCategory || "");
+    localStorage.setItem("searchQuery", searchQuery);
+  }, [
+    cart,
+    total,
+    payment,
+    isDebt,
+    selectedCustomer,
+    selectedCategory,
+    searchQuery,
+  ]);
+
   // Update cart items with current product stock information
   useEffect(() => {
     if (allProducts.length > 0 && cart.length > 0) {
-      const updatedCart = cart.map(cartItem => {
-        const currentProduct = allProducts.find(p => p.id === cartItem.id);
+      const updatedCart = cart.map((cartItem) => {
+        const currentProduct = allProducts.find((p) => p.id === cartItem.id);
         if (currentProduct) {
           return {
             ...cartItem,
             inStock: currentProduct.inStock,
-            stockQuantity: currentProduct.stockQuantity
+            stockQuantity: currentProduct.stockQuantity,
           };
         }
         return cartItem;
@@ -144,9 +157,9 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
 
   const addToCart = (product: Product) => {
     if (!product.inStock) return;
-    
+
     const existingProduct = cart.find((item) => item.id === product.id);
-    
+
     // Check if adding more would exceed stock quantity
     if (existingProduct && product.stockQuantity !== undefined) {
       if (existingProduct.quantity >= product.stockQuantity) {
@@ -158,12 +171,12 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
         return; // Cannot add more than stock
       }
     }
-    
+
     if (existingProduct) {
       const updatedCart = cart.map((item) =>
         item.id === product.id
           ? { ...item, quantity: item.quantity + 1 }
-          : item
+          : item,
       );
       setCart(updatedCart);
     } else {
@@ -173,42 +186,40 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
         description: `${product.name} added to cart`,
       });
     }
-    
+
     setTotal((prevTotal) => prevTotal + product.price);
-    
+
     // Update product stock in all products
-    setAllProducts(prevProducts => 
-      prevProducts.map(p => 
+    setAllProducts((prevProducts) =>
+      prevProducts.map((p) =>
         p.id === product.id && p.stockQuantity !== undefined
           ? { ...p, stockQuantity: p.stockQuantity - 1 }
-          : p
-      )
+          : p,
+      ),
     );
   };
 
   const removeFromCart = (productId: number, price: number) => {
-    const productToRemove = cart.find(item => item.id === productId);
-    
+    const productToRemove = cart.find((item) => item.id === productId);
+
     if (!productToRemove) return;
-    
+
     const updatedCart = cart
       .map((item) =>
-        item.id === productId
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
+        item.id === productId ? { ...item, quantity: item.quantity - 1 } : item,
       )
       .filter((item) => item.quantity > 0);
-    
+
     setCart(updatedCart);
     setTotal((prevTotal) => prevTotal - price);
-    
+
     // Update product stock in all products
-    setAllProducts(prevProducts => 
-      prevProducts.map(p => 
+    setAllProducts((prevProducts) =>
+      prevProducts.map((p) =>
         p.id === productId && p.stockQuantity !== undefined
           ? { ...p, stockQuantity: p.stockQuantity + 1 }
-          : p
-      )
+          : p,
+      ),
     );
   };
 
@@ -232,25 +243,26 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     }
     setCart([]);
     setTotal(0);
-    setPayment('');
+    setPayment("");
     setIsDebt(false);
-    setSelectedCustomer('');
-    
+    setSelectedCustomer("");
+
     // Clear localStorage on checkout
-    localStorage.removeItem('cart');
-    localStorage.removeItem('cartTotal');
-    localStorage.removeItem('payment');
-    localStorage.removeItem('isDebt');
-    localStorage.removeItem('selectedCustomer');
+    localStorage.removeItem("cart");
+    localStorage.removeItem("cartTotal");
+    localStorage.removeItem("payment");
+    localStorage.removeItem("isDebt");
+    localStorage.removeItem("selectedCustomer");
   };
 
   // Check if a product in cart has reached its stock limit
   const isAtStockLimit = (productId: number) => {
-    const cartItem = cart.find(item => item.id === productId);
-    const product = allProducts.find(p => p.id === productId);
-    
-    if (!cartItem || !product || product.stockQuantity === undefined) return false;
-    
+    const cartItem = cart.find((item) => item.id === productId);
+    const product = allProducts.find((p) => p.id === productId);
+
+    if (!cartItem || !product || product.stockQuantity === undefined)
+      return false;
+
     return cartItem.quantity >= product.stockQuantity;
   };
 
@@ -265,8 +277,8 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     // In a real app, you would look up the product by barcode in your database
     // For this demo, we'll just use the product ID as a barcode stand-in
     const productId = parseInt(barcode);
-    const product = allProducts.find(p => p.id === productId);
-    
+    const product = allProducts.find((p) => p.id === productId);
+
     if (product) {
       addToCart(product);
       toast({
@@ -286,7 +298,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
   const clearCart = () => {
     setCart([]);
     setTotal(0);
-    setPayment('');
+    setPayment("");
     toast({
       title: "Cart cleared",
       description: "All items have been removed from the cart",
@@ -294,44 +306,50 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
   };
 
   // Render different sections based on viewMode
-  if (viewMode === 'categories') {
-    return <CategoriesSection
-      categories={categories}
-      selectedCategory={selectedCategory}
-      setSelectedCategory={setSelectedCategory}
-      viewMode="categories"
-    />;
-  } else if (viewMode === 'products') {
-    return <ProductsSection
-      searchQuery={searchQuery}
-      setSearchQuery={setSearchQuery}
-      filteredProducts={filteredProducts}
-      addToCart={addToCart}
-      handleInfoClick={handleInfoClick}
-      isAtStockLimit={isAtStockLimit}
-      viewMode="products"
-      isLoading={isLoading}
-    />;
-  } else if (viewMode === 'cart') {
-    return <CartSection
-      cart={cart}
-      total={total}
-      payment={payment}
-      setPayment={setPayment}
-      calculateChange={calculateChange}
-      isDebt={isDebt}
-      setIsDebt={setIsDebt}
-      selectedCustomer={selectedCustomer}
-      setSelectedCustomer={setSelectedCustomer}
-      customers={customers}
-      handleCheckout={handleCheckout}
-      removeFromCart={removeFromCart}
-      addToCart={addToCart}
-      isAtStockLimit={isAtStockLimit}
-      viewMode="cart"
-      onBarcodeScanned={handleBarcodeScanned}
-      clearCart={clearCart}
-    />;
+  if (viewMode === "categories") {
+    return (
+      <CategoriesSection
+        categories={categories}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        viewMode="categories"
+      />
+    );
+  } else if (viewMode === "products") {
+    return (
+      <ProductsSection
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        filteredProducts={filteredProducts}
+        addToCart={addToCart}
+        handleInfoClick={handleInfoClick}
+        isAtStockLimit={isAtStockLimit}
+        viewMode="products"
+        isLoading={isLoading}
+      />
+    );
+  } else if (viewMode === "cart") {
+    return (
+      <CartSection
+        cart={cart}
+        total={total}
+        payment={payment}
+        setPayment={setPayment}
+        calculateChange={calculateChange}
+        isDebt={isDebt}
+        setIsDebt={setIsDebt}
+        selectedCustomer={selectedCustomer}
+        setSelectedCustomer={setSelectedCustomer}
+        customers={customers}
+        handleCheckout={handleCheckout}
+        removeFromCart={removeFromCart}
+        addToCart={addToCart}
+        isAtStockLimit={isAtStockLimit}
+        viewMode="cart"
+        onBarcodeScanned={handleBarcodeScanned}
+        clearCart={clearCart}
+      />
+    );
   }
 
   // All sections for desktop

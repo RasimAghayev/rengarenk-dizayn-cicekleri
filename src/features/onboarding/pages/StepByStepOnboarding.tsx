@@ -1,40 +1,45 @@
-
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import MainLayout from '@/layouts/MainLayout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import CustomerManagement from '../components/CustomerManagement';
-import InventoryManagement from '../components/InventoryManagement';
-import CompanySettings from '../components/CompanySettings';
-import UserManagement from '../components/UserManagement';
-import { useToast } from '@/hooks/use-toast';
-import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import MainLayout from "@/layouts/MainLayout";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import CustomerManagement from "../components/CustomerManagement";
+import InventoryManagement from "../components/InventoryManagement";
+import CompanySettings from "../components/CompanySettings";
+import UserManagement from "../components/UserManagement";
+import { useToast } from "@/hooks/use-toast";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 
 const steps = [
   {
-    id: 'company',
-    title: 'Company Information',
-    description: 'Set up your company details',
+    id: "company",
+    title: "Company Information",
+    description: "Set up your company details",
     component: CompanySettings,
   },
   {
-    id: 'users',
-    title: 'User Management',
-    description: 'Add users and set permissions',
+    id: "users",
+    title: "User Management",
+    description: "Add users and set permissions",
     component: UserManagement,
   },
   {
-    id: 'inventory',
-    title: 'Inventory Setup',
-    description: 'Add your products and categories',
+    id: "inventory",
+    title: "Inventory Setup",
+    description: "Add your products and categories",
     component: InventoryManagement,
   },
   {
-    id: 'customers',
-    title: 'Customer Management',
-    description: 'Add your customers',
+    id: "customers",
+    title: "Customer Management",
+    description: "Add your customers",
     component: CustomerManagement,
   },
 ];
@@ -52,7 +57,7 @@ const StepByStepOnboarding = () => {
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps([...completedSteps, currentStep]);
     }
-    
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
@@ -60,9 +65,10 @@ const StepByStepOnboarding = () => {
       // All steps completed
       toast({
         title: "Setup complete!",
-        description: "Your business setup is complete. You can now start using the system.",
+        description:
+          "Your business setup is complete. You can now start using the system.",
       });
-      navigate('/');
+      navigate("/");
     }
   };
 
@@ -78,7 +84,7 @@ const StepByStepOnboarding = () => {
       title: "Settings saved",
       description: `${steps[currentStep].title} have been saved successfully.`,
     });
-    
+
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps([...completedSteps, currentStep]);
     }
@@ -90,15 +96,19 @@ const StepByStepOnboarding = () => {
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Business Setup</h1>
-        
+
         <div className="mb-8">
           <div className="flex justify-between mb-2">
-            <span className="text-sm font-medium">Step {currentStep + 1} of {steps.length}</span>
-            <span className="text-sm font-medium">{Math.round(progress)}% complete</span>
+            <span className="text-sm font-medium">
+              Step {currentStep + 1} of {steps.length}
+            </span>
+            <span className="text-sm font-medium">
+              {Math.round(progress)}% complete
+            </span>
           </div>
           <Progress value={progress} className="w-full h-2" />
         </div>
-        
+
         <div className="flex flex-wrap gap-4 mb-8">
           {steps.map((step, idx) => (
             <Button
@@ -119,7 +129,7 @@ const StepByStepOnboarding = () => {
             </Button>
           ))}
         </div>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>{steps[currentStep].title}</CardTitle>
@@ -128,18 +138,16 @@ const StepByStepOnboarding = () => {
             <CurrentStepComponent onSave={handleSave} />
           </CardContent>
           <CardFooter className="flex justify-between pt-6 border-t">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleBack}
               disabled={currentStep === 0}
             >
               <ChevronLeft size={16} className="mr-2" />
               Back
             </Button>
-            <Button 
-              onClick={handleNext}
-            >
-              {isLastStep ? 'Finish' : 'Next'}
+            <Button onClick={handleNext}>
+              {isLastStep ? "Finish" : "Next"}
               {!isLastStep && <ChevronRight size={16} className="ml-2" />}
             </Button>
           </CardFooter>

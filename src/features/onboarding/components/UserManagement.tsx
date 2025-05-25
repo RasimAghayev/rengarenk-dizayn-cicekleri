@@ -1,16 +1,15 @@
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { 
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -18,8 +17,8 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
-} from '@/components/ui/dialog';
-import { 
+} from "@/components/ui/dialog";
+import {
   Form,
   FormField,
   FormItem,
@@ -27,26 +26,26 @@ import {
   FormControl,
   FormMessage,
   FormDescription,
-} from '@/components/ui/form';
-import { 
+} from "@/components/ui/form";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Plus, X, Edit, Users } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Plus, X, Edit, Users } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface UserManagementProps {
   onSave: () => void;
 }
 
-type UserRole = 'admin' | 'manager' | 'cashier' | 'inventory' | 'sales';
-type UserStatus = 'active' | 'inactive';
+type UserRole = "admin" | "manager" | "cashier" | "inventory" | "sales";
+type UserStatus = "active" | "inactive";
 
 interface User {
   id: number;
@@ -58,43 +57,61 @@ interface User {
 
 // Sample initial data
 const initialUsers: User[] = [
-  { id: 1, name: 'Admin User', email: 'admin@example.com', role: 'admin', status: 'active' },
-  { id: 2, name: 'Cashier 1', email: 'cashier1@example.com', role: 'cashier', status: 'active' },
-  { id: 3, name: 'Sales Rep', email: 'sales@example.com', role: 'sales', status: 'inactive' },
+  {
+    id: 1,
+    name: "Admin User",
+    email: "admin@example.com",
+    role: "admin",
+    status: "active",
+  },
+  {
+    id: 2,
+    name: "Cashier 1",
+    email: "cashier1@example.com",
+    role: "cashier",
+    status: "active",
+  },
+  {
+    id: 3,
+    name: "Sales Rep",
+    email: "sales@example.com",
+    role: "sales",
+    status: "inactive",
+  },
 ];
 
 const userSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.enum(['admin', 'manager', 'cashier', 'inventory', 'sales']),
-  status: z.enum(['active', 'inactive']),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  role: z.enum(["admin", "manager", "cashier", "inventory", "sales"]),
+  status: z.enum(["active", "inactive"]),
 });
 
 type UserFormValues = z.infer<typeof userSchema>;
 
 const roles = [
-  { value: 'admin', label: 'Administrator' },
-  { value: 'manager', label: 'Manager' },
-  { value: 'cashier', label: 'Cashier' },
-  { value: 'inventory', label: 'Inventory Manager' },
-  { value: 'sales', label: 'Sales Representative' },
+  { value: "admin", label: "Administrator" },
+  { value: "manager", label: "Manager" },
+  { value: "cashier", label: "Cashier" },
+  { value: "inventory", label: "Inventory Manager" },
+  { value: "sales", label: "Sales Representative" },
 ];
 
 const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
   const [users, setUsers] = useState<User[]>(initialUsers);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
     defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      role: 'cashier',
-      status: 'active',
+      name: "",
+      email: "",
+      password: "",
+      role: "cashier",
+      status: "active",
     },
   });
 
@@ -102,19 +119,19 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.role.toLowerCase().includes(searchTerm.toLowerCase())
+      user.role.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const handleAddUser = (data: UserFormValues) => {
     if (editingUser) {
       // Update existing user
-      setUsers(users.map(u => 
-        u.id === editingUser.id ? { ...u, ...data } : u
-      ));
+      setUsers(
+        users.map((u) => (u.id === editingUser.id ? { ...u, ...data } : u)),
+      );
     } else {
       // Add new user
       const newUser: User = {
-        id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
+        id: users.length > 0 ? Math.max(...users.map((u) => u.id)) + 1 : 1,
         name: data.name,
         email: data.email,
         role: data.role,
@@ -122,7 +139,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
       };
       setUsers([...users, newUser]);
     }
-    
+
     form.reset();
     setEditingUser(null);
     setIsDialogOpen(false);
@@ -134,7 +151,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
     form.reset({
       name: user.name,
       email: user.email,
-      password: '', // Don't populate password for security
+      password: "", // Don't populate password for security
       role: user.role,
       status: user.status,
     });
@@ -142,16 +159,21 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
   };
 
   const handleToggleStatus = (userId: number) => {
-    setUsers(users.map(user => 
-      user.id === userId 
-        ? { ...user, status: user.status === 'active' ? 'inactive' : 'active' } 
-        : user
-    ));
+    setUsers(
+      users.map((user) =>
+        user.id === userId
+          ? {
+              ...user,
+              status: user.status === "active" ? "inactive" : "active",
+            }
+          : user,
+      ),
+    );
     onSave();
   };
 
   const handleDeleteUser = (id: number) => {
-    setUsers(users.filter(u => u.id !== id));
+    setUsers(users.filter((u) => u.id !== id));
     onSave();
   };
 
@@ -165,12 +187,18 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'bg-red-500';
-      case 'manager': return 'bg-purple-500';
-      case 'cashier': return 'bg-blue-500';
-      case 'inventory': return 'bg-green-500';
-      case 'sales': return 'bg-orange-500';
-      default: return 'bg-gray-500';
+      case "admin":
+        return "bg-red-500";
+      case "manager":
+        return "bg-purple-500";
+      case "cashier":
+        return "bg-blue-500";
+      case "inventory":
+        return "bg-green-500";
+      case "sales":
+        return "bg-orange-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
@@ -181,15 +209,15 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
           <Users className="h-6 w-6" />
           <span>User Management</span>
         </h2>
-        
+
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-          <Input 
-            placeholder="Search users..." 
+          <Input
+            placeholder="Search users..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full md:w-64"
           />
-          
+
           <Dialog open={isDialogOpen} onOpenChange={handleDialogOpen}>
             <DialogTrigger asChild>
               <Button className="flex items-center gap-2 whitespace-nowrap">
@@ -200,12 +228,15 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingUser ? 'Edit User' : 'Add New User'}
+                  {editingUser ? "Edit User" : "Add New User"}
                 </DialogTitle>
               </DialogHeader>
-              
+
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleAddUser)} className="space-y-4">
+                <form
+                  onSubmit={form.handleSubmit(handleAddUser)}
+                  className="space-y-4"
+                >
                   <FormField
                     control={form.control}
                     name="name"
@@ -219,7 +250,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="email"
@@ -233,7 +264,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="password"
@@ -241,10 +272,12 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="password" 
-                            placeholder={editingUser ? '••••••••' : 'Enter password'} 
-                            {...field} 
+                          <Input
+                            type="password"
+                            placeholder={
+                              editingUser ? "••••••••" : "Enter password"
+                            }
+                            {...field}
                           />
                         </FormControl>
                         {editingUser && (
@@ -256,7 +289,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -264,8 +297,8 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Role</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
+                          <Select
+                            onValueChange={field.onChange}
                             defaultValue={field.value}
                             value={field.value}
                           >
@@ -286,15 +319,15 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="status"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Status</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
+                          <Select
+                            onValueChange={field.onChange}
                             defaultValue={field.value}
                             value={field.value}
                           >
@@ -313,13 +346,15 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
                       )}
                     />
                   </div>
-                  
+
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button type="button" variant="outline">Cancel</Button>
+                      <Button type="button" variant="outline">
+                        Cancel
+                      </Button>
                     </DialogClose>
                     <Button type="submit">
-                      {editingUser ? 'Update User' : 'Add User'}
+                      {editingUser ? "Update User" : "Add User"}
                     </Button>
                   </DialogFooter>
                 </form>
@@ -348,32 +383,37 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
                     <Badge className={`${getRoleBadgeColor(user.role)}`}>
-                      {roles.find(r => r.value === user.role)?.label || user.role}
+                      {roles.find((r) => r.value === user.role)?.label ||
+                        user.role}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.status === 'active' ? 'default' : 'outline'}>
-                      {user.status === 'active' ? 'Active' : 'Inactive'}
+                    <Badge
+                      variant={user.status === "active" ? "default" : "outline"}
+                    >
+                      {user.status === "active" ? "Active" : "Inactive"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button 
-                        variant={user.status === 'active' ? 'destructive' : 'outline'} 
+                      <Button
+                        variant={
+                          user.status === "active" ? "destructive" : "outline"
+                        }
                         size="sm"
                         onClick={() => handleToggleStatus(user.id)}
                       >
-                        {user.status === 'active' ? 'Deactivate' : 'Activate'}
+                        {user.status === "active" ? "Deactivate" : "Activate"}
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="icon"
                         onClick={() => handleEditUser(user)}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="destructive" 
+                      <Button
+                        variant="destructive"
                         size="icon"
                         onClick={() => handleDeleteUser(user.id)}
                       >
@@ -385,7 +425,10 @@ const UserManagement: React.FC<UserManagementProps> = ({ onSave }) => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-4 text-gray-500">
+                <TableCell
+                  colSpan={5}
+                  className="text-center py-4 text-gray-500"
+                >
                   No users found
                 </TableCell>
               </TableRow>

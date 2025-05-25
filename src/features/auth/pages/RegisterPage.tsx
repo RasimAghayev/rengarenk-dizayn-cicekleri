@@ -1,8 +1,7 @@
-
-import React from 'react';
-import RegisterForm from '../components/RegisterForm';
-import MainLayout from '@/layouts/MainLayout';
-import { Link } from 'react-router-dom';
+import React from "react";
+import RegisterForm from "../components/RegisterForm";
+import MainLayout from "@/layouts/MainLayout";
+import { Link } from "react-router-dom";
 
 const RegisterPage = () => {
   return (
@@ -12,13 +11,16 @@ const RegisterPage = () => {
           <h1 className="text-3xl font-bold mb-2">Create an Account</h1>
           <p className="text-muted-foreground">Join us today and get started</p>
         </div>
-        
+
         <RegisterForm />
-        
+
         <div className="mt-6 text-center">
           <p className="text-muted-foreground">
-            Already have an account?{' '}
-            <Link to="/login" className="text-primary font-medium hover:underline">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-primary font-medium hover:underline"
+            >
               Login
             </Link>
           </p>

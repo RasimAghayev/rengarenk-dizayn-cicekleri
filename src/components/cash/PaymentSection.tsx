@@ -1,10 +1,15 @@
-
-import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Customer } from '@/types/cash-register';
+import React from "react";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Customer } from "@/types/cash-register";
 
 interface PaymentSectionProps {
   total: number;
@@ -27,16 +32,16 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
   setIsDebt,
   selectedCustomer,
   setSelectedCustomer,
-  customers
+  customers,
 }) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between font-bold text-lg">
         <span>Total:</span>
-        <Input 
-          value={`$${total.toFixed(2)}`} 
-          className="w-32 text-right font-bold" 
-          readOnly 
+        <Input
+          value={`$${total.toFixed(2)}`}
+          className="w-32 text-right font-bold"
+          readOnly
         />
       </div>
 
@@ -56,7 +61,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
 
       <div className="flex justify-between font-bold">
         <span>Change:</span>
-        <span className={calculateChange() < 0 ? 'text-red-500' : ''}>
+        <span className={calculateChange() < 0 ? "text-red-500" : ""}>
           ${calculateChange().toFixed(2)}
         </span>
       </div>
@@ -64,14 +69,14 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
       {calculateChange() < 0 && (
         <div className="flex flex-col space-y-3 border p-3 rounded-md bg-gray-50 dark:bg-gray-800">
           <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="debt" 
+            <Checkbox
+              id="debt"
               checked={isDebt}
               onCheckedChange={(checked) => setIsDebt(checked === true)}
             />
             <Label htmlFor="debt">Record as customer debt</Label>
           </div>
-          
+
           {isDebt && (
             <Select
               value={selectedCustomer}
@@ -81,7 +86,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
                 <SelectValue placeholder="Select customer" />
               </SelectTrigger>
               <SelectContent>
-                {customers.map(customer => (
+                {customers.map((customer) => (
                   <SelectItem key={customer.id} value={customer.name}>
                     {customer.name}
                   </SelectItem>

@@ -1,19 +1,24 @@
-
-import React, { useState, useEffect } from 'react';
-import AdminLayout from '@/layouts/AdminLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { 
-  Tag, 
-  Plus, 
-  Search, 
-  ArrowUpDown, 
+import React, { useState, useEffect } from "react";
+import AdminLayout from "@/layouts/AdminLayout";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Tag,
+  Plus,
+  Search,
+  ArrowUpDown,
   MoreHorizontal,
   Edit,
   Trash,
   Package,
-  Check
-} from 'lucide-react';
+  Check,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -24,105 +29,131 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Skeleton } from '@/components/ui/skeleton';
-import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
 
 // Sample categories data
 const categoriesData = [
   {
-    id: '1',
-    name: 'Electronics',
-    icon: '💻',
+    id: "1",
+    name: "Electronics",
+    icon: "💻",
     productCount: 24,
-    createdAt: '2023-01-15T10:00:00',
-    updatedAt: '2023-04-20T14:30:00'
+    createdAt: "2023-01-15T10:00:00",
+    updatedAt: "2023-04-20T14:30:00",
   },
   {
-    id: '2',
-    name: 'Clothing',
-    icon: '👕',
+    id: "2",
+    name: "Clothing",
+    icon: "👕",
     productCount: 18,
-    createdAt: '2023-01-15T10:15:00',
-    updatedAt: '2023-04-18T11:45:00'
+    createdAt: "2023-01-15T10:15:00",
+    updatedAt: "2023-04-18T11:45:00",
   },
   {
-    id: '3',
-    name: 'Groceries',
-    icon: '🥕',
+    id: "3",
+    name: "Groceries",
+    icon: "🥕",
     productCount: 32,
-    createdAt: '2023-01-15T10:30:00',
-    updatedAt: '2023-04-22T09:15:00'
+    createdAt: "2023-01-15T10:30:00",
+    updatedAt: "2023-04-22T09:15:00",
   },
   {
-    id: '4',
-    name: 'Home & Garden',
-    icon: '🏡',
+    id: "4",
+    name: "Home & Garden",
+    icon: "🏡",
     productCount: 15,
-    createdAt: '2023-02-10T14:00:00',
-    updatedAt: '2023-04-15T16:20:00'
+    createdAt: "2023-02-10T14:00:00",
+    updatedAt: "2023-04-15T16:20:00",
   },
   {
-    id: '5',
-    name: 'Sports & Outdoors',
-    icon: '⚽',
+    id: "5",
+    name: "Sports & Outdoors",
+    icon: "⚽",
     productCount: 21,
-    createdAt: '2023-02-15T11:20:00',
-    updatedAt: '2023-04-10T13:10:00'
+    createdAt: "2023-02-15T11:20:00",
+    updatedAt: "2023-04-10T13:10:00",
   },
   {
-    id: '6',
-    name: 'Books & Media',
-    icon: '📚',
+    id: "6",
+    name: "Books & Media",
+    icon: "📚",
     productCount: 27,
-    createdAt: '2023-03-05T09:30:00',
-    updatedAt: '2023-04-05T15:40:00'
+    createdAt: "2023-03-05T09:30:00",
+    updatedAt: "2023-04-05T15:40:00",
   },
   {
-    id: '7',
-    name: 'Health & Beauty',
-    icon: '💄',
+    id: "7",
+    name: "Health & Beauty",
+    icon: "💄",
     productCount: 19,
-    createdAt: '2023-03-20T13:15:00',
-    updatedAt: '2023-04-12T10:30:00'
-  }
+    createdAt: "2023-03-20T13:15:00",
+    updatedAt: "2023-04-12T10:30:00",
+  },
 ];
 
 // Icons options for categories
 const iconOptions = [
-  '💻', '👕', '🥕', '🏡', '⚽', '📚', '💄', '🛋️', '🎮', '🎸', 
-  '🚗', '✈️', '🎁', '🍷', '👶', '🐱', '🥾', '💍', '🛠️', '🧩'
+  "💻",
+  "👕",
+  "🥕",
+  "🏡",
+  "⚽",
+  "📚",
+  "💄",
+  "🛋️",
+  "🎮",
+  "🎸",
+  "🚗",
+  "✈️",
+  "🎁",
+  "🍷",
+  "👶",
+  "🐱",
+  "🥾",
+  "💍",
+  "🛠️",
+  "🧩",
 ];
 
 const CategoriesPage = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   // Form states for new/edit category
-  const [categoryName, setCategoryName] = useState('');
-  const [categoryIcon, setCategoryIcon] = useState('');
-  
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryIcon, setCategoryIcon] = useState("");
+
   // Simulate loading data
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
     }, 800);
-    
+
     return () => clearTimeout(timer);
   }, []);
-  
+
   // Reset form when dialog opens/closes
   useEffect(() => {
     if (isCategoryDialogOpen) {
@@ -130,71 +161,71 @@ const CategoriesPage = () => {
         setCategoryName(selectedCategory.name);
         setCategoryIcon(selectedCategory.icon);
       } else {
-        setCategoryName('');
-        setCategoryIcon('');
+        setCategoryName("");
+        setCategoryIcon("");
       }
     }
   }, [isCategoryDialogOpen, isEditMode, selectedCategory]);
-  
+
   // Filter categories based on search
-  const filteredCategories = categoriesData.filter(category => {
+  const filteredCategories = categoriesData.filter((category) => {
     return category.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
-  
+
   // Format date to a readable string
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
-  
+
   // Handle edit category
   const handleEditCategory = (category: any) => {
     setSelectedCategory(category);
     setIsEditMode(true);
     setIsCategoryDialogOpen(true);
   };
-  
+
   // Handle delete category
   const handleDeleteCategory = (category: any) => {
     setSelectedCategory(category);
     setIsDeleteDialogOpen(true);
   };
-  
+
   // Handle save category (new or edit)
   const handleSaveCategory = () => {
     // This would save to database in a real app
-    console.log('Saving category:', {
+    console.log("Saving category:", {
       name: categoryName,
       icon: categoryIcon,
-      id: isEditMode ? selectedCategory?.id : 'new'
+      id: isEditMode ? selectedCategory?.id : "new",
     });
-    
+
     setIsCategoryDialogOpen(false);
     setIsEditMode(false);
     setSelectedCategory(null);
   };
-  
+
   // Handle confirming category deletion
   const handleConfirmDelete = () => {
     // This would delete from database in a real app
-    console.log('Deleting category:', selectedCategory);
-    
+    console.log("Deleting category:", selectedCategory);
+
     setIsDeleteDialogOpen(false);
     setSelectedCategory(null);
   };
-  
+
   return (
     <AdminLayout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h1 className="text-3xl font-bold">Categories</h1>
-          
-          <Dialog 
-            open={isCategoryDialogOpen} 
+
+          <Dialog
+            open={isCategoryDialogOpen}
             onOpenChange={(open) => {
               setIsCategoryDialogOpen(open);
               if (!open) {
@@ -211,11 +242,13 @@ const CategoriesPage = () => {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
-                <DialogTitle>{isEditMode ? 'Edit Category' : 'Add New Category'}</DialogTitle>
+                <DialogTitle>
+                  {isEditMode ? "Edit Category" : "Add New Category"}
+                </DialogTitle>
                 <DialogDescription>
-                  {isEditMode 
-                    ? 'Update the category information below.' 
-                    : 'Create a new category for organizing your products.'}
+                  {isEditMode
+                    ? "Update the category information below."
+                    : "Create a new category for organizing your products."}
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-6 py-4">
@@ -228,7 +261,7 @@ const CategoriesPage = () => {
                     onChange={(e) => setCategoryName(e.target.value)}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label>Category Icon</Label>
                   <div className="grid grid-cols-10 gap-2">
@@ -238,9 +271,10 @@ const CategoriesPage = () => {
                         type="button"
                         onClick={() => setCategoryIcon(icon)}
                         className={`h-10 w-10 text-lg flex items-center justify-center rounded-md transition-colors
-                          ${categoryIcon === icon 
-                            ? 'bg-primary/20 border-2 border-primary' 
-                            : 'hover:bg-muted border border-transparent'
+                          ${
+                            categoryIcon === icon
+                              ? "bg-primary/20 border-2 border-primary"
+                              : "hover:bg-muted border border-transparent"
                           }`}
                       >
                         {icon}
@@ -248,34 +282,39 @@ const CategoriesPage = () => {
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="bg-muted/50 p-4 rounded-md">
                   <h3 className="text-sm font-medium mb-2">Preview</h3>
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 bg-primary/10 rounded-md flex items-center justify-center text-lg">
-                      {categoryIcon || '?'}
+                      {categoryIcon || "?"}
                     </div>
-                    <span className="font-medium">{categoryName || 'Category Name'}</span>
+                    <span className="font-medium">
+                      {categoryName || "Category Name"}
+                    </span>
                   </div>
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsCategoryDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCategoryDialogOpen(false)}
+                >
                   Cancel
                 </Button>
-                <Button 
+                <Button
                   onClick={handleSaveCategory}
                   disabled={!categoryName.trim()}
                 >
-                  {isEditMode ? 'Update Category' : 'Create Category'}
+                  {isEditMode ? "Update Category" : "Create Category"}
                 </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          
+
           {/* Delete Confirmation Dialog */}
-          <Dialog 
-            open={isDeleteDialogOpen} 
+          <Dialog
+            open={isDeleteDialogOpen}
             onOpenChange={(open) => {
               setIsDeleteDialogOpen(open);
               if (!open) setSelectedCategory(null);
@@ -285,7 +324,8 @@ const CategoriesPage = () => {
               <DialogHeader>
                 <DialogTitle>Delete Category</DialogTitle>
                 <DialogDescription>
-                  Are you sure you want to delete this category? This action cannot be undone.
+                  Are you sure you want to delete this category? This action
+                  cannot be undone.
                 </DialogDescription>
               </DialogHeader>
               <div className="py-4">
@@ -302,26 +342,27 @@ const CategoriesPage = () => {
                     </div>
                   </div>
                 )}
-                
+
                 <p className="mt-4 text-sm text-destructive">
-                  Warning: All products in this category will need to be reassigned.
+                  Warning: All products in this category will need to be
+                  reassigned.
                 </p>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDeleteDialogOpen(false)}
+                >
                   Cancel
                 </Button>
-                <Button 
-                  variant="destructive"
-                  onClick={handleConfirmDelete}
-                >
+                <Button variant="destructive" onClick={handleConfirmDelete}>
                   Delete Category
                 </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
-        
+
         <Card className="bg-white">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-xl">
@@ -329,7 +370,8 @@ const CategoriesPage = () => {
               Category Management
             </CardTitle>
             <CardDescription>
-              Organize your products with categories for easier navigation and filtering.
+              Organize your products with categories for easier navigation and
+              filtering.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -349,7 +391,7 @@ const CategoriesPage = () => {
                 </Button>
               </div>
             </div>
-            
+
             {loading ? (
               // Loading skeleton
               <div className="space-y-2">
@@ -387,23 +429,27 @@ const CategoriesPage = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className="bg-blue-50 text-blue-800">
-                            <Package className="h-3 w-3 mr-1" /> {category.productCount}
+                          <Badge
+                            variant="secondary"
+                            className="bg-blue-50 text-blue-800"
+                          >
+                            <Package className="h-3 w-3 mr-1" />{" "}
+                            {category.productCount}
                           </Badge>
                         </TableCell>
                         <TableCell>{formatDate(category.createdAt)}</TableCell>
                         <TableCell>{formatDate(category.updatedAt)}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Button 
-                              size="sm" 
-                              variant="ghost" 
+                            <Button
+                              size="sm"
+                              variant="ghost"
                               onClick={() => handleEditCategory(category)}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               variant="ghost"
                               onClick={() => handleDeleteCategory(category)}
                             >
@@ -419,12 +465,14 @@ const CategoriesPage = () => {
             ) : (
               <div className="text-center p-10 text-gray-500">
                 <p>No categories found matching your search.</p>
-                <p className="mt-2">Try adjusting your search term or create a new category.</p>
+                <p className="mt-2">
+                  Try adjusting your search term or create a new category.
+                </p>
               </div>
             )}
           </CardContent>
         </Card>
-        
+
         {/* Products by Category Overview */}
         <Card className="bg-white">
           <CardHeader>
@@ -451,9 +499,14 @@ const CategoriesPage = () => {
                 {filteredCategories
                   .sort((a, b) => b.productCount - a.productCount)
                   .map((category) => {
-                    const total = categoriesData.reduce((sum, cat) => sum + cat.productCount, 0);
-                    const percentage = Math.round((category.productCount / total) * 100);
-                    
+                    const total = categoriesData.reduce(
+                      (sum, cat) => sum + cat.productCount,
+                      0,
+                    );
+                    const percentage = Math.round(
+                      (category.productCount / total) * 100,
+                    );
+
                     return (
                       <div key={category.id} className="space-y-2">
                         <div className="flex justify-between items-center">
@@ -462,20 +515,23 @@ const CategoriesPage = () => {
                             <span className="font-medium">{category.name}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <span className="font-semibold">{category.productCount}</span>
-                            <span className="text-sm text-muted-foreground">({percentage}%)</span>
+                            <span className="font-semibold">
+                              {category.productCount}
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                              ({percentage}%)
+                            </span>
                           </div>
                         </div>
                         <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary rounded-full" 
+                          <div
+                            className="h-full bg-primary rounded-full"
                             style={{ width: `${percentage}%` }}
                           ></div>
                         </div>
                       </div>
                     );
-                  })
-                }
+                  })}
               </div>
             )}
           </CardContent>
