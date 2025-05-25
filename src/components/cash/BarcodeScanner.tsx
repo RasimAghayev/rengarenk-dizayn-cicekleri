@@ -73,7 +73,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
               value={barcode}
               onChange={(e) => setBarcode(e.target.value)}
               onKeyDown={handleKeyDown}
-              autoFocus
+              
             />
           </div>
           <Button 
