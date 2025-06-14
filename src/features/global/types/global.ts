@@ -1,4 +1,3 @@
-
 // Global types for international features
 export interface Language {
   code: string;
@@ -15,13 +14,13 @@ export interface User {
   language: string;
   country: string;
   timezone: string;
-  role: 'admin' | 'user' | 'premium';
+  role: "admin" | "user" | "premium";
   isOnline: boolean;
   lastSeen: Date;
 }
 
 export interface GlobalSettings {
-  theme: 'light' | 'dark' | 'auto';
+  theme: "light" | "dark" | "auto";
   language: string;
   notifications: boolean;
   sound: boolean;
@@ -32,9 +31,9 @@ export interface GlobalSettings {
 export interface AIMessage {
   id: string;
   content: string;
-  sender: 'user' | 'ai';
+  sender: "user" | "ai";
   timestamp: Date;
-  type: 'text' | 'voice' | 'image' | 'file';
+  type: "text" | "voice" | "image" | "file";
   language?: string;
   translated?: boolean;
 }

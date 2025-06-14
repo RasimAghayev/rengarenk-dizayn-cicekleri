@@ -1,21 +1,26 @@
-
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Globe, Languages } from 'lucide-react';
-import { Language } from '../types/global';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Globe, Languages } from "lucide-react";
+import { Language } from "../types/global";
 
 const languages: Language[] = [
-  { code: 'az', name: 'Azərbaycan', flag: '🇦🇿' },
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
-  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦', rtl: true },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'zh', name: '中文', flag: '🇨🇳' },
-  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: "az", name: "Azərbaycan", flag: "🇦🇿" },
+  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: "tr", name: "Türkçe", flag: "🇹🇷" },
+  { code: "ru", name: "Русский", flag: "🇷🇺" },
+  { code: "ar", name: "العربية", flag: "🇸🇦", rtl: true },
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
+  { code: "zh", name: "中文", flag: "🇨🇳" },
+  { code: "ja", name: "日本語", flag: "🇯🇵" },
 ];
 
 interface LanguageSelectorProps {
@@ -23,8 +28,11 @@ interface LanguageSelectorProps {
   onChange: (language: string) => void;
 }
 
-const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onChange }) => {
-  const selectedLanguage = languages.find(lang => lang.code === value);
+const LanguageSelector: React.FC<LanguageSelectorProps> = ({
+  value,
+  onChange,
+}) => {
+  const selectedLanguage = languages.find((lang) => lang.code === value);
 
   return (
     <Select value={value} onValueChange={onChange}>

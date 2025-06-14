@@ -1,29 +1,28 @@
-
-import React, { useState } from 'react';
-import MainLayout from '@/layouts/MainLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import LanguageSelector from '../components/LanguageSelector';
-import VoiceRecorder from '../components/VoiceRecorder';
-import QRCodeScanner from '../components/QRCodeScanner';
-import NotificationCenter from '../components/NotificationCenter';
-import { useGlobalSettings } from '../hooks/useGlobalSettings';
-import { 
-  Globe, 
-  Mic, 
-  Camera, 
-  Bell, 
-  Users, 
-  MessageSquare, 
-  BarChart3, 
+import React, { useState } from "react";
+import MainLayout from "@/layouts/MainLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import LanguageSelector from "../components/LanguageSelector";
+import VoiceRecorder from "../components/VoiceRecorder";
+import QRCodeScanner from "../components/QRCodeScanner";
+import NotificationCenter from "../components/NotificationCenter";
+import { useGlobalSettings } from "../hooks/useGlobalSettings";
+import {
+  Globe,
+  Mic,
+  Camera,
+  Bell,
+  Users,
+  MessageSquare,
+  BarChart3,
   Settings,
   Sparkles,
   Zap,
   Heart,
-  Star
-} from 'lucide-react';
+  Star,
+} from "lucide-react";
 
 const GlobalDashboard = () => {
   const { settings, updateSettings } = useGlobalSettings();
@@ -32,58 +31,58 @@ const GlobalDashboard = () => {
   const [qrScannedData, setQrScannedData] = useState<string | null>(null);
 
   const handleVoiceRecording = (audioBlob: Blob, duration: number) => {
-    console.log('Voice recorded:', { duration, size: audioBlob.size });
+    console.log("Voice recorded:", { duration, size: audioBlob.size });
     // Process voice recording here
   };
 
   const handleQRScan = (data: string) => {
     setQrScannedData(data);
-    console.log('QR Scanned:', data);
+    console.log("QR Scanned:", data);
   };
 
   const features = [
     {
       icon: Globe,
-      title: 'Multi-language Support',
-      description: '50+ dil dəstəyi',
-      status: 'active',
-      color: 'bg-blue-500'
+      title: "Multi-language Support",
+      description: "50+ dil dəstəyi",
+      status: "active",
+      color: "bg-blue-500",
     },
     {
       icon: Mic,
-      title: 'Voice Commands',
-      description: 'Səsli əmrlər və transkripsiya',
-      status: 'active',
-      color: 'bg-green-500'
+      title: "Voice Commands",
+      description: "Səsli əmrlər və transkripsiya",
+      status: "active",
+      color: "bg-green-500",
     },
     {
       icon: Camera,
-      title: 'QR & Barcode Scanner',
-      description: 'Real-time skaner sistemi',
-      status: 'active',
-      color: 'bg-purple-500'
+      title: "QR & Barcode Scanner",
+      description: "Real-time skaner sistemi",
+      status: "active",
+      color: "bg-purple-500",
     },
     {
       icon: Bell,
-      title: 'Smart Notifications',
-      description: 'Ağıllı bildiriş sistemi',
-      status: 'active',
-      color: 'bg-orange-500'
+      title: "Smart Notifications",
+      description: "Ağıllı bildiriş sistemi",
+      status: "active",
+      color: "bg-orange-500",
     },
     {
       icon: MessageSquare,
-      title: 'Real-time Chat',
-      description: 'Canlı mesajlaşma',
-      status: 'coming-soon',
-      color: 'bg-pink-500'
+      title: "Real-time Chat",
+      description: "Canlı mesajlaşma",
+      status: "coming-soon",
+      color: "bg-pink-500",
     },
     {
       icon: BarChart3,
-      title: 'Advanced Analytics',
-      description: 'Təkmil analitika',
-      status: 'coming-soon',
-      color: 'bg-indigo-500'
-    }
+      title: "Advanced Analytics",
+      description: "Təkmil analitika",
+      status: "coming-soon",
+      color: "bg-indigo-500",
+    },
   ];
 
   return (
@@ -101,9 +100,9 @@ const GlobalDashboard = () => {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <LanguageSelector 
-                value={settings.language} 
-                onChange={(lang) => updateSettings({ language: lang })} 
+              <LanguageSelector
+                value={settings.language}
+                onChange={(lang) => updateSettings({ language: lang })}
               />
             </div>
           </div>
@@ -114,8 +113,12 @@ const GlobalDashboard = () => {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Aktiv İstifadəçilər</p>
-                    <p className="text-2xl font-bold text-green-600">{activeUsers.toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Aktiv İstifadəçilər
+                    </p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {activeUsers.toLocaleString()}
+                    </p>
                   </div>
                   <Users className="w-8 h-8 text-green-500" />
                 </div>
@@ -126,8 +129,12 @@ const GlobalDashboard = () => {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Ümumi Mesajlar</p>
-                    <p className="text-2xl font-bold text-blue-600">{totalMessages.toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Ümumi Mesajlar
+                    </p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {totalMessages.toLocaleString()}
+                    </p>
                   </div>
                   <MessageSquare className="w-8 h-8 text-blue-500" />
                 </div>
@@ -180,17 +187,23 @@ const GlobalDashboard = () => {
                       </div>
                       <div>
                         <h3 className="text-lg">{feature.title}</h3>
-                        <Badge 
-                          variant={feature.status === 'active' ? 'default' : 'secondary'}
+                        <Badge
+                          variant={
+                            feature.status === "active"
+                              ? "default"
+                              : "secondary"
+                          }
                           className="mt-1"
                         >
-                          {feature.status === 'active' ? 'Aktiv' : 'Tezliklə'}
+                          {feature.status === "active" ? "Aktiv" : "Tezliklə"}
                         </Badge>
                       </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground">{feature.description}</p>
+                    <p className="text-muted-foreground">
+                      {feature.description}
+                    </p>
                   </CardContent>
                 </Card>
               ))}
@@ -223,8 +236,12 @@ const GlobalDashboard = () => {
                     <QRCodeScanner onScanResult={handleQRScan} />
                     {qrScannedData && (
                       <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <p className="text-sm font-medium text-green-800">Skaner nəticəsi:</p>
-                        <p className="text-sm text-green-600 break-all">{qrScannedData}</p>
+                        <p className="text-sm font-medium text-green-800">
+                          Skaner nəticəsi:
+                        </p>
+                        <p className="text-sm text-green-600 break-all">
+                          {qrScannedData}
+                        </p>
                       </div>
                     )}
                   </CardContent>
@@ -299,10 +316,12 @@ const GlobalDashboard = () => {
                     <h3 className="font-semibold">Görünüş</h3>
                     <div className="space-y-2">
                       <label className="text-sm">Mövzu</label>
-                      <select 
+                      <select
                         className="w-full p-2 border rounded-md"
                         value={settings.theme}
-                        onChange={(e) => updateSettings({ theme: e.target.value as any })}
+                        onChange={(e) =>
+                          updateSettings({ theme: e.target.value as any })
+                        }
                       >
                         <option value="light">Açıq</option>
                         <option value="dark">Tünd</option>
@@ -315,18 +334,24 @@ const GlobalDashboard = () => {
                     <h3 className="font-semibold">Bildirişlər</h3>
                     <div className="space-y-2">
                       <label className="flex items-center space-x-2">
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           checked={settings.notifications}
-                          onChange={(e) => updateSettings({ notifications: e.target.checked })}
+                          onChange={(e) =>
+                            updateSettings({ notifications: e.target.checked })
+                          }
                         />
-                        <span className="text-sm">Bildirişləri aktivləşdir</span>
+                        <span className="text-sm">
+                          Bildirişləri aktivləşdir
+                        </span>
                       </label>
                       <label className="flex items-center space-x-2">
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           checked={settings.sound}
-                          onChange={(e) => updateSettings({ sound: e.target.checked })}
+                          onChange={(e) =>
+                            updateSettings({ sound: e.target.checked })
+                          }
                         />
                         <span className="text-sm">Səs effektləri</span>
                       </label>
@@ -335,21 +360,27 @@ const GlobalDashboard = () => {
                 </div>
 
                 <div className="pt-4 border-t">
-                  <h3 className="font-semibold mb-4">Məlumat Sinxronizasiyası</h3>
+                  <h3 className="font-semibold mb-4">
+                    Məlumat Sinxronizasiyası
+                  </h3>
                   <div className="space-y-2">
                     <label className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={settings.autoSave}
-                        onChange={(e) => updateSettings({ autoSave: e.target.checked })}
+                        onChange={(e) =>
+                          updateSettings({ autoSave: e.target.checked })
+                        }
                       />
                       <span className="text-sm">Avtomatik saxlama</span>
                     </label>
                     <label className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={settings.syncData}
-                        onChange={(e) => updateSettings({ syncData: e.target.checked })}
+                        onChange={(e) =>
+                          updateSettings({ syncData: e.target.checked })
+                        }
                       />
                       <span className="text-sm">Bulud sinxronizasiyası</span>
                     </label>
