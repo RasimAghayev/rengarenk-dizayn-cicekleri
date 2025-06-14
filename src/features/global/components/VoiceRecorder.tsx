@@ -1,20 +1,21 @@
-
-import React, { useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Mic, MicOff, Play, Pause, Square } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Mic, MicOff, Play, Pause, Square } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface VoiceRecorderProps {
   onRecordingComplete: (audioBlob: Blob, duration: number) => void;
 }
 
-const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onRecordingComplete }) => {
+const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
+  onRecordingComplete,
+}) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -35,11 +36,11 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onRecordingComplete }) =>
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(chunksRef.current, { type: 'audio/wav' });
+        const audioBlob = new Blob(chunksRef.current, { type: "audio/wav" });
         const url = URL.createObjectURL(audioBlob);
         setAudioUrl(url);
         onRecordingComplete(audioBlob, duration);
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
 
       mediaRecorder.start();
@@ -47,7 +48,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onRecordingComplete }) =>
       setDuration(0);
 
       timerRef.current = setInterval(() => {
-        setDuration(prev => prev + 1);
+        setDuration((prev) => prev + 1);
       }, 1000);
 
       toast({
@@ -88,16 +89,14 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onRecordingComplete }) =>
   const formatDuration = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   return (
     <Card className="w-full max-w-md">
       <CardContent className="p-4">
         <div className="flex flex-col items-center space-y-4">
-          <div className="text-2xl font-mono">
-            {formatDuration(duration)}
-          </div>
+          <div className="text-2xl font-mono">{formatDuration(duration)}</div>
 
           <div className="flex items-center space-x-2">
             {!isRecording ? (
@@ -122,7 +121,11 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onRecordingComplete }) =>
                 variant="outline"
                 className="rounded-full w-12 h-12"
               >
-                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                {isPlaying ? (
+                  <Pause className="w-4 h-4" />
+                ) : (
+                  <Play className="w-4 h-4" />
+                )}
               </Button>
             )}
           </div>

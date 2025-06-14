@@ -1,17 +1,16 @@
-
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bell, BellOff, Check, X, Settings } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Bell, BellOff, Check, X, Settings } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
+  type: "info" | "success" | "warning" | "error";
   timestamp: Date;
   read: boolean;
   actionUrl?: string;
@@ -20,18 +19,18 @@ interface Notification {
 const NotificationCenter: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([
     {
-      id: '1',
-      title: 'Xoş gəldiniz!',
-      message: 'Sistemi istifadəyə başlaya bilərsiniz',
-      type: 'success',
+      id: "1",
+      title: "Xoş gəldiniz!",
+      message: "Sistemi istifadəyə başlaya bilərsiniz",
+      type: "success",
       timestamp: new Date(),
       read: false,
     },
     {
-      id: '2',
-      title: 'Yeni funksiya',
-      message: 'AI köməkçi artıq əlçatandır',
-      type: 'info',
+      id: "2",
+      title: "Yeni funksiya",
+      message: "AI köməkçi artıq əlçatandır",
+      type: "info",
       timestamp: new Date(Date.now() - 3600000),
       read: false,
     },
@@ -40,30 +39,26 @@ const NotificationCenter: React.FC = () => {
   const [isEnabled, setIsEnabled] = useState(true);
   const { toast } = useToast();
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAsRead = (id: string) => {
-    setNotifications(prev =>
-      prev.map(notif =>
-        notif.id === id ? { ...notif, read: true } : notif
-      )
+    setNotifications((prev) =>
+      prev.map((notif) => (notif.id === id ? { ...notif, read: true } : notif)),
     );
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev =>
-      prev.map(notif => ({ ...notif, read: true }))
-    );
+    setNotifications((prev) => prev.map((notif) => ({ ...notif, read: true })));
   };
 
   const deleteNotification = (id: string) => {
-    setNotifications(prev => prev.filter(notif => notif.id !== id));
+    setNotifications((prev) => prev.filter((notif) => notif.id !== id));
   };
 
   const requestPermission = async () => {
-    if ('Notification' in window) {
+    if ("Notification" in window) {
       const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
+      if (permission === "granted") {
         setIsEnabled(true);
         toast({
           title: "Bildirişlər aktivləşdirildi",
@@ -75,18 +70,22 @@ const NotificationCenter: React.FC = () => {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'success': return 'bg-green-500';
-      case 'warning': return 'bg-yellow-500';
-      case 'error': return 'bg-red-500';
-      default: return 'bg-blue-500';
+      case "success":
+        return "bg-green-500";
+      case "warning":
+        return "bg-yellow-500";
+      case "error":
+        return "bg-red-500";
+      default:
+        return "bg-blue-500";
     }
   };
 
   const formatTime = (date: Date) => {
     const now = new Date();
     const diffMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
-    
-    if (diffMinutes < 1) return 'İndi';
+
+    if (diffMinutes < 1) return "İndi";
     if (diffMinutes < 60) return `${diffMinutes} dəq əvvəl`;
     if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)} saat əvvəl`;
     return `${Math.floor(diffMinutes / 1440)} gün əvvəl`;
@@ -100,7 +99,10 @@ const NotificationCenter: React.FC = () => {
             <Bell className="w-5 h-5" />
             Bildirişlər
             {unreadCount > 0 && (
-              <Badge variant="destructive" className="h-5 w-5 p-0 flex items-center justify-center text-xs">
+              <Badge
+                variant="destructive"
+                className="h-5 w-5 p-0 flex items-center justify-center text-xs"
+              >
                 {unreadCount}
               </Badge>
             )}
@@ -111,12 +113,16 @@ const NotificationCenter: React.FC = () => {
                 <Check className="w-4 h-4" />
               </Button>
             )}
-            <Button 
-              size="sm" 
-              variant="ghost" 
+            <Button
+              size="sm"
+              variant="ghost"
               onClick={() => setIsEnabled(!isEnabled)}
             >
-              {isEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
+              {isEnabled ? (
+                <Bell className="w-4 h-4" />
+              ) : (
+                <BellOff className="w-4 h-4" />
+              )}
             </Button>
           </div>
         </CardTitle>
@@ -144,17 +150,27 @@ const NotificationCenter: React.FC = () => {
                   <div
                     key={notification.id}
                     className={`p-3 rounded-lg border ${
-                      notification.read ? 'bg-gray-50' : 'bg-blue-50 border-blue-200'
+                      notification.read
+                        ? "bg-gray-50"
+                        : "bg-blue-50 border-blue-200"
                     }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <div className={`w-2 h-2 rounded-full ${getTypeColor(notification.type)}`} />
-                          <h4 className="font-medium text-sm">{notification.title}</h4>
+                          <div
+                            className={`w-2 h-2 rounded-full ${getTypeColor(notification.type)}`}
+                          />
+                          <h4 className="font-medium text-sm">
+                            {notification.title}
+                          </h4>
                         </div>
-                        <p className="text-xs text-gray-600 mb-1">{notification.message}</p>
-                        <span className="text-xs text-gray-400">{formatTime(notification.timestamp)}</span>
+                        <p className="text-xs text-gray-600 mb-1">
+                          {notification.message}
+                        </p>
+                        <span className="text-xs text-gray-400">
+                          {formatTime(notification.timestamp)}
+                        </span>
                       </div>
                       <div className="flex gap-1">
                         {!notification.read && (

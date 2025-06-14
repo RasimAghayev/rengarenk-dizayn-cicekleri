@@ -1,9 +1,8 @@
-
-import React, { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Camera, CameraOff, Zap } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Camera, CameraOff, Zap } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface QRCodeScannerProps {
   onScanResult: (result: string) => void;
@@ -20,9 +19,9 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScanResult }) => {
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' }
+        video: { facingMode: "environment" },
       });
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
@@ -30,7 +29,7 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScanResult }) => {
         setHasPermission(true);
       }
     } catch (error) {
-      console.error('Camera error:', error);
+      console.error("Camera error:", error);
       setHasPermission(false);
       toast({
         title: "Kamera xətası",
@@ -42,7 +41,7 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScanResult }) => {
 
   const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
     setIsScanning(false);
@@ -105,7 +104,10 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScanResult }) => {
                 <CameraOff className="w-4 h-4 mr-2" />
                 Skaneri dayandır
               </Button>
-              <Button onClick={simulateQRScan} className="w-full bg-green-500 hover:bg-green-600">
+              <Button
+                onClick={simulateQRScan}
+                className="w-full bg-green-500 hover:bg-green-600"
+              >
                 <Zap className="w-4 h-4 mr-2" />
                 Test QR oxu
               </Button>

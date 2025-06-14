@@ -1,11 +1,10 @@
-
-import { useState, useEffect } from 'react';
-import { GlobalSettings } from '../types/global';
+import { useState, useEffect } from "react";
+import { GlobalSettings } from "../types/global";
 
 export const useGlobalSettings = () => {
   const [settings, setSettings] = useState<GlobalSettings>({
-    theme: 'light',
-    language: 'az',
+    theme: "light",
+    language: "az",
     notifications: true,
     sound: true,
     autoSave: true,
@@ -14,7 +13,7 @@ export const useGlobalSettings = () => {
 
   useEffect(() => {
     // Load settings from localStorage or API
-    const savedSettings = localStorage.getItem('globalSettings');
+    const savedSettings = localStorage.getItem("globalSettings");
     if (savedSettings) {
       setSettings(JSON.parse(savedSettings));
     }
@@ -23,7 +22,7 @@ export const useGlobalSettings = () => {
   const updateSettings = (newSettings: Partial<GlobalSettings>) => {
     const updatedSettings = { ...settings, ...newSettings };
     setSettings(updatedSettings);
-    localStorage.setItem('globalSettings', JSON.stringify(updatedSettings));
+    localStorage.setItem("globalSettings", JSON.stringify(updatedSettings));
   };
 
   return { settings, updateSettings };
