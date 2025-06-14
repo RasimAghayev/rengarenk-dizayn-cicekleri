@@ -1,19 +1,26 @@
-
-import React, { useState, useRef, useEffect } from 'react';
-import MainLayout from '@/layouts/MainLayout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
-import { Send, Bot, User, Sparkles, MessageSquare, Zap, Heart } from 'lucide-react';
+import React, { useState, useRef, useEffect } from "react";
+import MainLayout from "@/layouts/MainLayout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Send,
+  Bot,
+  User,
+  Sparkles,
+  MessageSquare,
+  Zap,
+  Heart,
+} from "lucide-react";
 
 interface Message {
   id: string;
   content: string;
-  sender: 'user' | 'ai';
+  sender: "user" | "ai";
   timestamp: Date;
   typing?: boolean;
 }
@@ -21,13 +28,14 @@ interface Message {
 const AIAssistantPage = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
-      content: 'Salam! Mən sizin AI assistentinizəm. Sizə necə kömək edə bilərəm? 🌟',
-      sender: 'ai',
+      id: "1",
+      content:
+        "Salam! Mən sizin AI assistentinizəm. Sizə necə kömək edə bilərəm? 🌟",
+      sender: "ai",
       timestamp: new Date(),
-    }
+    },
   ]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -40,7 +48,7 @@ const AIAssistantPage = () => {
     "Siz çox ağıllı sual verdiniz! Cavabım belə olacaq... 🧠",
     "Bu məsələdə sizə praktik məsləhətlər verə bilərəm. 📝",
     "Gözəl! Gəlin bu ideyanı inkişaf etdirək. 🚀",
-    "Sizin fikirləriniz həqiqətən yaradıcıdır! 🎨"
+    "Sizin fikirləriniz həqiqətən yaradıcıdır! 🎨",
   ];
 
   useEffect(() => {
@@ -55,39 +63,54 @@ const AIAssistantPage = () => {
     const userMessage: Message = {
       id: Date.now().toString(),
       content: newMessage,
-      sender: 'user',
+      sender: "user",
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setNewMessage('');
+    setMessages((prev) => [...prev, userMessage]);
+    setNewMessage("");
     setIsTyping(true);
 
     // Simulate AI thinking time
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        content: aiResponses[Math.floor(Math.random() * aiResponses.length)],
-        sender: 'ai',
-        timestamp: new Date(),
-      };
+    setTimeout(
+      () => {
+        const aiResponse: Message = {
+          id: (Date.now() + 1).toString(),
+          content: aiResponses[Math.floor(Math.random() * aiResponses.length)],
+          sender: "ai",
+          timestamp: new Date(),
+        };
 
-      setMessages(prev => [...prev, aiResponse]);
-      setIsTyping(false);
-    }, 1500 + Math.random() * 1000);
+        setMessages((prev) => [...prev, aiResponse]);
+        setIsTyping(false);
+      },
+      1500 + Math.random() * 1000,
+    );
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
   const quickActions = [
-    { icon: MessageSquare, text: "Sual ver", action: () => setNewMessage("Mənə bu barədə məlumat ver: ") },
-    { icon: Zap, text: "İdea al", action: () => setNewMessage("Mənə yaradıcı bir idея ver: ") },
-    { icon: Heart, text: "Məsləhət al", action: () => setNewMessage("Bu məsələdə məsləhətin nədir: ") },
+    {
+      icon: MessageSquare,
+      text: "Sual ver",
+      action: () => setNewMessage("Mənə bu barədə məlumat ver: "),
+    },
+    {
+      icon: Zap,
+      text: "İdea al",
+      action: () => setNewMessage("Mənə yaradıcı bir idея ver: "),
+    },
+    {
+      icon: Heart,
+      text: "Məsləhət al",
+      action: () => setNewMessage("Bu məsələdə məsləhətin nədir: "),
+    },
   ];
 
   return (
@@ -138,11 +161,11 @@ const AIAssistantPage = () => {
                   <div
                     key={message.id}
                     className={`flex items-start gap-3 ${
-                      message.sender === 'user' ? 'flex-row-reverse' : ''
+                      message.sender === "user" ? "flex-row-reverse" : ""
                     }`}
                   >
                     <Avatar className="w-8 h-8">
-                      {message.sender === 'ai' ? (
+                      {message.sender === "ai" ? (
                         <>
                           <AvatarImage src="/ai-avatar.png" />
                           <AvatarFallback className="bg-gradient-to-br from-brandBlue to-brandGreen text-white">
@@ -161,22 +184,28 @@ const AIAssistantPage = () => {
 
                     <div
                       className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                        message.sender === 'user'
-                          ? 'bg-gradient-to-r from-brandBlue to-brandGreen text-white'
-                          : 'bg-muted'
+                        message.sender === "user"
+                          ? "bg-gradient-to-r from-brandBlue to-brandGreen text-white"
+                          : "bg-muted"
                       }`}
                     >
-                      <p className="text-sm leading-relaxed">{message.content}</p>
+                      <p className="text-sm leading-relaxed">
+                        {message.content}
+                      </p>
                       <div className="flex items-center justify-between mt-2">
-                        <span className={`text-xs opacity-70 ${
-                          message.sender === 'user' ? 'text-white' : 'text-muted-foreground'
-                        }`}>
-                          {message.timestamp.toLocaleTimeString('az-AZ', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
+                        <span
+                          className={`text-xs opacity-70 ${
+                            message.sender === "user"
+                              ? "text-white"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {message.timestamp.toLocaleTimeString("az-AZ", {
+                            hour: "2-digit",
+                            minute: "2-digit",
                           })}
                         </span>
-                        {message.sender === 'ai' && (
+                        {message.sender === "ai" && (
                           <Badge variant="secondary" className="text-xs">
                             AI
                           </Badge>
@@ -196,8 +225,14 @@ const AIAssistantPage = () => {
                     <div className="bg-muted rounded-2xl px-4 py-3">
                       <div className="flex space-x-1">
                         <div className="w-2 h-2 bg-brandBlue rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-brandBlue rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-brandBlue rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        <div
+                          className="w-2 h-2 bg-brandBlue rounded-full animate-bounce"
+                          style={{ animationDelay: "0.1s" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-brandBlue rounded-full animate-bounce"
+                          style={{ animationDelay: "0.2s" }}
+                        ></div>
                       </div>
                     </div>
                   </div>
