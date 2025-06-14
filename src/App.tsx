@@ -89,6 +89,13 @@ const App = () => (
             <Route path="/setup" element={<StepByStepOnboarding />} />
             <Route path="/ai" element={<AIAssistantPage />} />
             
+            {/* New Global Dashboard Route */}
+            <Route path="/global" element={
+              <Suspense fallback={<LoadingFallback />}>
+                <GlobalDashboard />
+              </Suspense>
+            } />
+            
             {/* Admin Routes */}
             <Route 
               path="/admin" 
