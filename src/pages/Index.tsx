@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import MainLayout from '@/layouts/MainLayout';
 import { Link } from 'react-router-dom';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Bot, Sparkles, MessageSquare } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -38,6 +39,53 @@ const Index = () => {
               <Logo className="w-48 h-48 animate-float" />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* AI Assistant Section */}
+      <section className="py-20 px-6 md:px-12 bg-gradient-to-br from-brandBlue/5 to-brandGreen/5">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-brandBlue to-brandGreen rounded-full mb-6">
+            <Bot className="w-10 h-10 text-white" />
+          </div>
+          
+          <h2 className="text-3xl font-bold mb-4">AI Assistant</h2>
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Sizin ağıllı köməkçiniz - suallar verin, idealar alın, məsləhətlər əldə edin
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <MessageSquare className="w-8 h-8 text-brandBlue mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Ağıllı Söhbət</h3>
+              <p className="text-sm text-muted-foreground">
+                AI ilə təbii dildə söhbət edin və dərhal cavab alın
+              </p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <Sparkles className="w-8 h-8 text-brandGreen mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Yaradıcı İdealar</h3>
+              <p className="text-sm text-muted-foreground">
+                Yaradıcı həllər və innovativ fikirlər üçün AI köməkçisindən istifadə edin
+              </p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <Bot className="w-8 h-8 text-brandRed mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">24/7 Dəstək</h3>
+              <p className="text-sm text-muted-foreground">
+                Həmişə əlçatan olan AI köməkçisi ilə istənilən vaxt kömək alın
+              </p>
+            </div>
+          </div>
+          
+          <Button asChild size="lg" className="bg-gradient-to-r from-brandBlue to-brandGreen hover:from-brandBlue/90 hover:to-brandGreen/90">
+            <Link to="/ai" className="flex items-center gap-2">
+              <Bot className="w-5 h-5" />
+              AI Assistant ilə Danışın
+            </Link>
+          </Button>
         </div>
       </section>
       
