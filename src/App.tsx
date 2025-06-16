@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +20,7 @@ import CategoriesPage from "./features/permissions/pages/CategoriesPage";
 import OrdersPage from "./features/permissions/pages/OrdersPage";
 import ReportsPage from "./features/permissions/pages/ReportsPage";
 import AIAssistantPage from "./features/ai/pages/AIAssistantPage";
+import GlobalDashboard from "./features/global/pages/GlobalDashboard";
 import { useUser } from "./hooks/use-user";
 import { Suspense, useEffect } from "react";
 import { Loader2 } from "lucide-react";
@@ -89,7 +91,7 @@ const App = () => (
             <Route path="/setup" element={<StepByStepOnboarding />} />
             <Route path="/ai" element={<AIAssistantPage />} />
             
-            {/* New Global Dashboard Route */}
+            {/* Global Dashboard Route */}
             <Route path="/global" element={
               <Suspense fallback={<LoadingFallback />}>
                 <GlobalDashboard />

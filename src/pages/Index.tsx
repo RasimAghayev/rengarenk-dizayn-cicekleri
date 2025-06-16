@@ -1,13 +1,10 @@
 import React from 'react';
 import Logo from '@/components/Logo';
-import ColorBlock from '@/components/ColorBlock';
 import { Button } from '@/components/ui/button';
 import MainLayout from '@/layouts/MainLayout';
 import { Link } from 'react-router-dom';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Bot, Sparkles, MessageSquare, Globe, Mic, Camera } from 'lucide-react';
-import Card from '@/components/ui/card';
-import CardContent from '@/components/ui/card-content';
+import { Card, CardContent } from '@/components/ui/card';
 
 const Index = () => {
   return (
