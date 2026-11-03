@@ -1,4 +1,6 @@
 # Welcome to your Lovable project
+![Views](https://hits.sh/github.com/RasimAghayev/rengarenk-dizayn-cicekleri.svg?label=views&color=0e75b6)
+
 
 ## Project info
 
