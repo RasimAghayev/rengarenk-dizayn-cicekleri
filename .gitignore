@@ -17,8 +17,21 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Secrets / environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Secret-scan hook scratch output (see .githooks/)
+.secret-scan-tmp/
+gitleaks-report.json
