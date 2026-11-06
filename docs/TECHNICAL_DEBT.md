@@ -91,6 +91,21 @@ without being carried to a concrete owner phase.
     `recharts`, `sonner`, `react-day-picker`, some single-use `@radix-ui/*`)
     — single-grep-hit heuristic only, not claimed as dead. Carried from
     Phase 2. Owner: Phase 7.
+12a. **`tailwind.config.ts` is now dead/inert** after Phase 6's Tailwind
+    CSS v3→v4 migration moved its entire `theme.extend`/`darkMode`/
+    `plugins` content into `src/index.css`'s CSS-first `@theme`/
+    `@custom-variant`/`@plugin` directives (the official `@tailwindcss/
+    upgrade` codemod's standard output). Nothing in the build (`postcss.config.js`
+    now loads `@tailwindcss/postcss` directly, no `@config` CSS directive
+    points back at the `.ts` file) reads it anymore - confirmed by the
+    build succeeding identically whether or not it's present. Left in
+    place rather than deleted here (same "never delete on a guess, Phase 7
+    decides with real tooling" policy already applied to `calendar.tsx`/
+    `chart.tsx`/`drawer.tsx`/`resizable.tsx` this phase) because
+    `components.json` (shadcn-ui CLI config) still points `tailwind.config`
+    at it - Phase 7/9 should also update or clear that field (shadcn's own
+    CLI supports an empty config path for v4 projects) before/when
+    deleting the file. Owner: Phase 7.
 13. **Two parallel page-layout conventions** (`src/pages/` flat vs.
     `src/features/*/pages/`) coexist, never reconciled. New finding, this
     phase. Owner: Phase 7/8.
