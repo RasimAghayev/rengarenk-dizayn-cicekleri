@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -46,7 +45,7 @@ const LoadingFallback = () => (
 // Protected route component to guard admin routes
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading, signOut } = useUser();
-  
+
   // Debug log to help troubleshooting
   useEffect(() => {
     console.log("Protected route - Auth state:", { user, loading });
@@ -62,9 +61,9 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   // Allow access in dev environment for testing when no auth is setup
   const isDev = import.meta.env.DEV;
-  
+
   // Use direct access for demo purposes or check if user exists and is admin
-  const hasAccess = isDev || (user && user.user_metadata?.role === 'admin');
+  const hasAccess = isDev || (user && user.user_metadata?.role === "admin");
 
   if (!hasAccess) {
     console.log("Access denied - Redirecting to login");
@@ -90,80 +89,83 @@ const App = () => (
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/setup" element={<StepByStepOnboarding />} />
             <Route path="/ai" element={<AIAssistantPage />} />
-            
+
             {/* Global Dashboard Route */}
-            <Route path="/global" element={
-              <Suspense fallback={<LoadingFallback />}>
-                <GlobalDashboard />
-              </Suspense>
-            } />
-            
+            <Route
+              path="/global"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <GlobalDashboard />
+                </Suspense>
+              }
+            />
+
             {/* Admin Routes */}
-            <Route 
-              path="/admin" 
+            <Route
+              path="/admin"
               element={
                 <ProtectedRoute>
                   <SuperAdminPage />
                 </ProtectedRoute>
               }
             />
-            <Route 
-              path="/admin/settings" 
+            <Route
+              path="/admin/settings"
               element={
                 <ProtectedRoute>
                   <AdminSettingsPage />
                 </ProtectedRoute>
               }
             />
-            <Route 
-              path="/admin/users" 
+            <Route
+              path="/admin/users"
               element={
                 <ProtectedRoute>
                   <UsersPage />
                 </ProtectedRoute>
               }
             />
-            <Route 
-              path="/admin/roles" 
+            <Route
+              path="/admin/roles"
               element={
                 <ProtectedRoute>
                   <RolesPage />
                 </ProtectedRoute>
               }
             />
-            <Route 
-              path="/admin/products" 
+            <Route
+              path="/admin/products"
               element={
                 <ProtectedRoute>
                   <ProductsPage />
                 </ProtectedRoute>
               }
             />
-            <Route 
-              path="/admin/categories" 
+            <Route
+              path="/admin/categories"
               element={
                 <ProtectedRoute>
                   <CategoriesPage />
                 </ProtectedRoute>
               }
             />
-            <Route 
-              path="/admin/orders" 
+            <Route
+              path="/admin/orders"
               element={
                 <ProtectedRoute>
                   <OrdersPage />
                 </ProtectedRoute>
               }
             />
-            <Route 
-              path="/admin/reports" 
+            <Route
+              path="/admin/reports"
               element={
                 <ProtectedRoute>
                   <ReportsPage />
                 </ProtectedRoute>
               }
             />
-            
+
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
