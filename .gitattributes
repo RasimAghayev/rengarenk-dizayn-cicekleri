@@ -1,0 +1,39 @@
+# Normalize line endings for text files; checkout as LF, regardless of
+# platform, unless overridden below. Prevents cross-OS CRLF/LF churn.
+* text=auto eol=lf
+
+# Source / config — explicit LF
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.md text eol=lf
+*.sql text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Windows-only scripts keep CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Generated / vendored files — don't show in diffs, don't count toward
+# language stats
+package-lock.json -diff linguist-generated=true
+bun.lockb -diff linguist-generated=true binary
+
+# Binary — never text-normalize
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
