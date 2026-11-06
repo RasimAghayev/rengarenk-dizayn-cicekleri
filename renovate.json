@@ -1,0 +1,38 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "timezone": "Asia/Baku",
+  "schedule": ["before 6am on monday"],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 0,
+  "rangeStrategy": "bump",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"]
+  },
+  "packageRules": [
+    {
+      "description": "Group same-major minor/patch bumps so routine updates land as one PR instead of one-per-package (what this repo had before - see closed PRs #58/#59/#62/#63).",
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "minor and patch dependency updates"
+    },
+    {
+      "description": "Every major bump stays its own PR - each needs its own Docker-verified migration per this repo's upgrade process (docs/TECHNICAL_DEBT.md, CHANGELOG.md), never batched or auto-merged.",
+      "matchUpdateTypes": ["major"],
+      "groupName": null,
+      "automerge": false
+    },
+    {
+      "description": "GitHub Actions pinned by commit SHA; keep them updated too but on their own schedule/grouping to not mix with npm deps.",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "pinDigests": true
+    }
+  ],
+  "automerge": false,
+  "labels": ["dependencies"],
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Dependency updates (Renovate)"
+}
