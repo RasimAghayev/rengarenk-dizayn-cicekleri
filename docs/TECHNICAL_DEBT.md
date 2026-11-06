@@ -58,13 +58,16 @@ without being carried to a concrete owner phase.
    the `npm run lint` tool-crash documented in `docs/BASELINE.md` finding
    #2 (verified: `eslint .` now exits 1 with real findings instead of
    exit 2 with a `TypeError`). See item 23 below for what that now exposes.
-7. **Multiple direct-dependency major-version gaps**: React 18→19,
+7. ~~**Multiple direct-dependency major-version gaps**: React 18→19,
    `lucide-react` 0.x→1.x, `recharts` 2.x→3.x, `sonner` 1.x→2.x,
    `tailwind-merge` 2.x→3.x, `react-day-picker` 8.x→10.x (×2 majors),
    `react-resizable-panels` 2.x→4.x (×2 majors), `@hookform/resolvers`
-   3.x→7.x (×4 majors), Tailwind CSS v3→v4, TypeScript 5.6→7.x (×2 majors).
-   Full table: `projects/info/deps/rengarenk-dizayn-cicekleri.md`. Owner:
-   Phase 6, one major at a time per standing decision 1.
+   3.x→7.x (×4 majors), Tailwind CSS v3→v4, TypeScript 5.6→7.x (×2 majors).~~
+   **In progress, Phase 6** (one major at a time, each Docker-verified and
+   committed separately — see `CHANGELOG.md` and the Phase 6 handoff for the
+   running list). `react-resizable-panels` capped at `3.0.6`, not the latest
+   `4.18.1` — see item 24 below for why. Full table:
+   `projects/info/deps/rengarenk-dizayn-cicekleri.md`.
 8. **Zero tests of any kind** for an app with a real auth/RBAC surface.
    Carried from Phase 2 (confirmed absence), elevated to P1 given the P0
    findings above that specifically need regression coverage. Owner:
@@ -142,6 +145,36 @@ without being carried to a concrete owner phase.
     (architecture/hooks correctness) for the `set-state-in-effect`/
     `immutability`/`purity`/`static-components` class, several of which
     land inside `CashRegister.tsx` (already item 14, the god-component).
+
+24. **`react-resizable-panels` capped at `3.0.6`, one major behind the
+    latest stable `4.18.1` — standing-decision-1 exception, written blocker.**
+    `4.0.0` is not a renamed-API major like the others handled this phase
+    (`react-day-picker`, `lucide-react`, `recharts`); confirmed by reading
+    the shipped `.d.ts` of both versions in a scratch container that it is
+    a ground-up rewrite by the same maintainer (bvaughn/react-resizable-panels,
+    verified via `npm view ... repository.url` — not a hijacked/renamed
+    package) into a general docking/workspace library: `Panel`/`PanelGroup`/
+    `PanelResizeHandle` are gone entirely, replaced by a new `Group`/`Panel`/
+    `Separator`/`Grid`/`Workspace`/`Tab`/`Tabset` concept set with a
+    different props shape (`defaultLayout`, `orientation`, imperative
+    handles, etc.) and no 1:1 mapping. The only consumer in this repo,
+    `src/components/ui/resizable.tsx`, has **zero importers** (confirmed via
+    `grep -rln "ui/resizable" src`) — guess-porting a completely different
+    API on dead code with no runtime consumer to validate against, and no
+    test suite, would mean shipping an unverifiable rewrite, which the
+    honesty discipline in `CLAUDE.md` ("document the assumption instead of
+    guessing") rules out. Highest compatible version kept meanwhile: `3.0.6`
+    (last release still exposing the familiar `Panel`/`PanelGroup`/
+    `PanelResizeHandle` API this wrapper uses; peerDependencies confirm
+    React 16–19 support). Verified: `docker build --no-cache --target test`
+    and `docker compose build --no-cache app`, both exit 0 at `3.0.6`.
+    Owner: Phase 7 (`cleaner`) should resolve this by deleting
+    `resizable.tsx` as dead code (same disposition as `calendar.tsx`'s
+    react-day-picker-v8-era dead-code precedent would suggest, but confirm
+    with real tooling, not a grep guess) — at that point this debt item and
+    the `react-resizable-panels` dependency itself disappear together. If a
+    future phase instead decides to resurrect/use this wrapper, the v4
+    migration must be done then, with a real consumer to validate against.
 
 ## Not treated as debt
 
