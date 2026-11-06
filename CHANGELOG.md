@@ -130,4 +130,63 @@ before commit. Baseline/behavior contract: `docs/BASELINE.md` (Phase 5).
   16-19. Commit `046143f`. Verified with `--no-cache`: both builds →
   exit 0.
 
+- **build(deps):** bumped `@types/node` 22.5.5→26.6.6 (four majors) to
+  match the Node runtime the Dockerfile already pins
+  (`node:26.13.0-alpine3.24`). Commit `7dddd00`. Verified: both builds →
+  exit 0.
+- **build(deps):** bumped TypeScript 5.5.3→**6.0.3**, not the actual
+  latest stable `7.0.2` - documented standing-decision-1 exception,
+  `docs/TECHNICAL_DEBT.md` item 25. `typescript-eslint@8.72.1` (latest
+  stable) caps its `typescript` peer at `<6.1.0`; no released
+  `typescript-eslint` version supports TS7 yet. `6.0.3` is the highest
+  release inside that range and a real upgrade over `5.5.3`. Fixed two
+  real breaks surfaced by the bump: dropped the now-deprecated `baseUrl`
+  from `tsconfig.json`/`tsconfig.app.json` (TS5101 - `paths` already
+  resolves relative to each config file with no `baseUrl` set, same
+  result); switched `VoiceRecorder.tsx`'s `timerRef` from `NodeJS.Timeout`
+  (a browser-only component had no business depending on the Node global
+  namespace) to the cross-environment-safe
+  `ReturnType<typeof setTimeout>`. Commit `a44f4ae`. Verified with
+  `--no-cache`: both builds → exit 0.
+- **build(deps):** migrated Tailwind CSS v3.4.11→v4.3.4 (CSS-first
+  config) using the official `@tailwindcss/upgrade` codemod, then
+  finished by hand what it couldn't complete automatically (its
+  template-class-migration step crashed on `bun` not being present in
+  the scratch container - checked afterward that this repo doesn't use
+  any utility class that changed name/meaning in v4, so nothing was
+  actually missed). `src/index.css`'s `@tailwind` directives became
+  `@import 'tailwindcss'` plus a `@theme`/`@custom-variant`/`@utility`/
+  `@plugin` block carrying everything `tailwind.config.ts`'s
+  `theme.extend`/`darkMode`/`plugins` used to define.
+  `postcss.config.js`'s `tailwindcss`+`autoprefixer` pair became
+  `@tailwindcss/postcss` (v4 bundles vendor-prefixing internally;
+  `autoprefixer` removed as a devDependency per the official migration
+  guide). `tailwind.config.ts` itself is now dead/inert - left in place,
+  Phase 7's call (`docs/TECHNICAL_DEBT.md` #12a). Commit `0e60554`.
+  Verified with `--no-cache`: both builds → exit 0; additionally
+  extracted the built runtime image's compiled CSS and confirmed the
+  migrated brand colors, sidebar colors, float keyframe/animation, and
+  the v4 border-color compatibility shim all compiled correctly.
+- **build(deps):** bumped React 18.3.1→19.3.1 and `@types/react`/
+  `@types/react-dom` 18.x→19.3.0 (major) - the framework bump, sequenced
+  deliberately last since every other direct dependency's latest stable
+  was already confirmed (via live peer-dependency queries made before
+  each earlier bump this phase) to support both React 18 and 19, so this
+  carries no compound peer-conflict risk. No source changes needed - `tsc
+  -b` and `vite build` both clean against the React 19 types. Commit
+  `c128386`. Verified with `--no-cache`: both builds → exit 0.
+- **chore(deps):** ran `npm outdated` against the fully-upgraded tree -
+  confirms only the two documented exceptions above
+  (`react-resizable-panels` capped at `3.0.6`, TypeScript capped at
+  `6.0.3`) remain behind latest; every other direct and transitive
+  dependency is current. Ran `npm audit` - 12 moderate / 0 high / 0
+  critical findings (down from the Phase 2/5 baseline's 1 high), all
+  tracing to two upstream-unfixed advisories (`minimatch` via `eslint`/
+  `typescript-eslint`, `postcss-selector-parser` via
+  `@tailwindcss/typography`) where both affected packages are already at
+  their own latest stable and the only `npm audit fix` path is `--force`,
+  which would downgrade both - not applied, since that's the wrong
+  direction under standing decision 1. Full analysis and re-check
+  instructions: `docs/TECHNICAL_DEBT.md` item 9.
+
 <!-- Further Phase 6 entries appended below as the upgrade proceeds. -->

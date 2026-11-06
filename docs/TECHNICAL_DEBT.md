@@ -73,9 +73,37 @@ without being carried to a concrete owner phase.
    Carried from Phase 2 (confirmed absence), elevated to P1 given the P0
    findings above that specifically need regression coverage. Owner:
    Phase 11.
-9. **`npm audit`: 1 high (`minimatch` ReDoS, dev-only) + 2 moderate
-   (`postcss-selector-parser` DoS via `@tailwindcss/typography`).** Carried
-   from Phase 2. Owner: Phase 6.
+9. ~~**`npm audit`: 1 high (`minimatch` ReDoS, dev-only) + 2 moderate
+   (`postcss-selector-parser` DoS via `@tailwindcss/typography`).**~~
+   **Investigated, Phase 6 - confirmed not fixable without a downgrade,
+   re-filed with evidence.** Re-ran `npm audit` on the fully-upgraded
+   tree (2026-11-06): now 12 moderate / 0 high / 0 critical findings
+   (severity dropped from the Phase 2 baseline's 1 high), all tracing to
+   the same two root advisories:
+   - `minimatch` `GHSA-g3hv-75wg-m249` (DoS via glob amplification,
+     `>=7.0.0 <11.0.1`) - pulled in transitively by `eslint`'s own
+     `@eslint/config-array` and by `@typescript-eslint/typescript-estree`.
+   - `postcss-selector-parser` `GHSA-rj75-hqrm-r3gf` (CPU exhaustion,
+     `<6.1.5`) - pulled in by `@tailwindcss/typography`'s bundled nested
+     copy (`@tailwindcss/typography/node_modules/postcss-selector-parser`).
+
+   Both `eslint` (`10.14.0`) and `@tailwindcss/typography` (`0.5.20`) are
+   already at their own latest stable (confirmed via `npm outdated` -
+   neither is listed) - there is no newer release of either that carries
+   a fixed transitive dependency yet; this is an upstream-unfixed gap, not
+   something this repo's code or config can migrate around. Confirmed via
+   `npm audit fix --dry-run`: the only fix path for either advisory is
+   `npm audit fix --force`, which would **downgrade** `eslint` to
+   `9.39.5` and `@tailwindcss/typography` to `0.5.4` - the wrong direction
+   under standing decision 1 ("latest stable, always"); not applied.
+   Both packages are dev-only (ESLint tooling; `@tailwindcss/typography`
+   is additionally confirmed unused in this repo, item 12a) - neither
+   ships into the `runtime` image, which only ever receives the built
+   `dist/` static output (`COPY --from=test .../dist /usr/share/nginx/html`
+   in the `Dockerfile`'s `runtime` stage - no `node_modules` of any kind
+   are copied). Owner: Phase 6 (future run) - re-check
+   `npm audit`/`npm outdated` next time either `eslint` or
+   `@tailwindcss/typography` cuts a new release.
 
 ## P2 — Moderate
 
