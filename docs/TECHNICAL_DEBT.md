@@ -66,7 +66,8 @@ without being carried to a concrete owner phase.
    **In progress, Phase 6** (one major at a time, each Docker-verified and
    committed separately — see `CHANGELOG.md` and the Phase 6 handoff for the
    running list). `react-resizable-panels` capped at `3.0.6`, not the latest
-   `4.18.1` — see item 24 below for why. Full table:
+   `4.18.1` — see item 24 below for why. TypeScript capped at `6.0.3`, not
+   the latest `7.0.2` — see item 25 below for why. Full table:
    `projects/info/deps/rengarenk-dizayn-cicekleri.md`.
 8. **Zero tests of any kind** for an app with a real auth/RBAC surface.
    Carried from Phase 2 (confirmed absence), elevated to P1 given the P0
@@ -175,6 +176,31 @@ without being carried to a concrete owner phase.
     the `react-resizable-panels` dependency itself disappear together. If a
     future phase instead decides to resurrect/use this wrapper, the v4
     migration must be done then, with a real consumer to validate against.
+
+25. **TypeScript capped at `6.0.3`, one major behind the latest stable
+    `7.0.2` — standing-decision-1 exception, written blocker.**
+    `typescript-eslint@8.72.1` (latest stable as of this phase, confirmed
+    via live registry query) declares `peerDependencies.typescript:
+    ">=4.8.4 <6.1.0"` — TypeScript 7.x is not yet supported by any released
+    `typescript-eslint` version. This is an upstream readiness gap, not a
+    conflict this repo's code can migrate around. `6.0.3` is the highest
+    TypeScript release still inside that accepted range (confirmed against
+    the full published version list) and is itself a real upgrade over the
+    prior pin (`5.5.3`) — not a no-op. Migrating to it surfaced two real,
+    fixed issues (not left as debt): `tsconfig.app.json`/`tsconfig.json`'s
+    `baseUrl` is deprecated as of TS 6.0 and removed outright in TS 7.0
+    (`TS5101`) — dropped it from both files since `paths` already resolves
+    relative to each config file's own directory with no `baseUrl` set,
+    identical behavior; and `VoiceRecorder.tsx`'s `timerRef` used
+    `NodeJS.Timeout` in a browser-only component (`MediaRecorder`,
+    `navigator.mediaDevices`) — switched to the cross-environment-safe
+    `ReturnType<typeof setTimeout>`, the standard fix for this class of
+    bug regardless of why the global `NodeJS` namespace stopped resolving.
+    Verified: `docker build --no-cache --target test` and `docker compose
+    build --no-cache app`, both exit 0 at `6.0.3`. Owner: Phase 6 should
+    retry TS 7.x once `typescript-eslint` publishes support for it (check
+    `npm view typescript-eslint peerDependencies` at that time) — no repo
+    code changes anticipated beyond what this entry already fixed.
 
 ## Not treated as debt
 
