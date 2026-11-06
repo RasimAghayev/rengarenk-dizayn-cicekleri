@@ -42,19 +42,16 @@ WORKDIR /app
 ############################################################
 FROM base AS deps
 COPY package.json package-lock.json ./
-# --legacy-peer-deps: verified pre-existing pitfall, not introduced here -
-# the lockfile (committed, 40+ real commits of history) pins
-# @vitejs/plugin-react-swc@3.7.1, whose own peerDependencies only accept
-# vite "^4 || ^5", while vite itself is pinned to 8.3.6. A plain `npm ci`
-# fails ERESOLVE on this real, pre-existing conflict (not previously
-# surfaced - Phase 2/3 never ran a clean install from empty node_modules).
-# This flag only relaxes npm's peer-dependency *validation*, matching
-# whatever lenient mode originally produced this exact committed lockfile -
-# it changes no package version. Flagged in docs/BASELINE.md for Phase 6 to
-# resolve properly (bump @vitejs/plugin-react-swc to latest 4.x, which
-# declares peer support for vite up to ^8).
+# Phase 6: real fix for the Phase 5 ERESOLVE workaround (see docs/BASELINE.md
+# finding #1 and CHANGELOG.md). The lockfile used to pin
+# @vitejs/plugin-react-swc@3.7.1 (peer "vite: ^4 || ^5") and
+# lovable-tagger@1.1.7 (peer "vite: ^5.0.0") against vite@8.3.6 - both
+# incompatible, masked by --legacy-peer-deps. Bumped to
+# @vitejs/plugin-react-swc@4.3.3 (peer "^4||^5||^6||^7||^8") and
+# lovable-tagger@1.3.5 (peer ">=5.0.0 <9.0.0"), both registry-confirmed to
+# support vite 8. A plain `npm ci` now succeeds with no peer override.
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --legacy-peer-deps
+    npm ci
 
 ############################################################
 # build - the production Vite bundle (npm run build, NOT build:dev - see
