@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { useUser } from '@/hooks/use-user';
-import { Loader2, Facebook, Mail } from 'lucide-react';
+import { Loader2, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
@@ -129,7 +129,18 @@ const LoginForm = () => {
             onClick={() => handleSocialLogin('facebook')}
             disabled={isSubmitting}
           >
-            <Facebook className="h-5 w-5 text-[#1877F2]" />
+            {/* lucide-react 1.x dropped brand/social icons (incl. Facebook) -
+                see CHANGELOG.md. Inline SVG, same pattern already used for
+                the Google button above; same size/color as the old lucide
+                icon (h-5 w-5, #1877F2). */}
+            <svg
+              className="h-5 w-5 text-[#1877F2]"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M22.675 0h-21.35c-.734 0-1.325.591-1.325 1.325v21.351c0 .733.591 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.312h3.587l-.467 3.622h-3.12v9.293h6.116c.733 0 1.324-.591 1.324-1.325v-21.35c0-.734-.591-1.325-1.325-1.325z" />
+            </svg>
             <span>Facebook</span>
           </Button>
         </div>

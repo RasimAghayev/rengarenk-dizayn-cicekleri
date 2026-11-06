@@ -132,19 +132,41 @@ is **not a finding about `App.tsx`'s content** - the crash is identical
 regardless of what the file contains (confirmed: it's the rule's `create()`
 that throws, before any AST-specific linting happens).
 
-**Decision:** `npm run lint` is deliberately **not** included in the
-Docker `test` gate right now (see the Dockerfile's `test` stage comment).
-Including a command that unconditionally crashes, for a tooling reason
-unrelated to any source change, would make every future `docker build .`
-permanently fail - defeating the purpose of a behavior-contract gate. The
-`test` stage instead gates on `npx tsc -b` (both `tsconfig.app.json` and
-`tsconfig.node.json` already set `noEmit: true`, so this is a real
-type-check, not a build artifact). The disabled `npm run lint` line is left
-commented in the Dockerfile with a pointer back here, to re-enable the
-moment Phase 6 resolves the eslint/typescript-eslint version matrix.
-**Owned by Phase 6** - already on its list as "`eslint-plugin-react-hooks`
-pinned to a prerelease RC" (`docs/TECHNICAL_DEBT.md` #6); this finding shows
-the problem is broader than that one package and should be checked first.
+**Decision (Phase 5):** `npm run lint` is deliberately **not** included in
+the Docker `test` gate right now (see the Dockerfile's `test` stage
+comment). Including a command that unconditionally crashes, for a tooling
+reason unrelated to any source change, would make every future `docker
+build .` permanently fail - defeating the purpose of a behavior-contract
+gate. The `test` stage instead gates on `npx tsc -b` (both
+`tsconfig.app.json` and `tsconfig.node.json` already set `noEmit: true`, so
+this is a real type-check, not a build artifact).
+
+**Update (Phase 6, resolved):** bumped `eslint` 9.39.5→10.14.0,
+`@eslint/js`→10.0.1, `typescript-eslint` 8.11.0→8.72.1,
+`eslint-plugin-react-hooks` 5.1.0-rc→7.1.1 (closing `docs/TECHNICAL_DEBT.md`
+#6, the prerelease pin), and `eslint-plugin-react-refresh`/`globals` to
+latest stable. `npm run lint` (`eslint .`) now runs to completion - no more
+`TypeError`/exit 2. Verified inside the freshly built image:
+```
+$ docker run --rm --entrypoint npm <build-stage image> run lint
+... eslint .
+✖ 75 problems (64 errors, 11 warnings)
+exit code: 1
+```
+This is a normal ESLint exit 1 (real findings), not a tool crash. The
+findings are pre-existing source-code issues newly surfaced by
+`eslint-plugin-react-hooks@7`'s new `react-hooks/set-state-in-effect` rule
+(most of the 64 errors - setState called synchronously inside `useEffect`
+in `CashRegister.tsx`, `use-mobile.tsx`, `use-user.ts`, and others) plus a
+handful of pre-existing `@typescript-eslint/no-explicit-any` and one
+`@typescript-eslint/no-require-imports` (`tailwind.config.ts`). None of this
+is a dependency-version problem - it is real application-source content,
+out of Phase 6's scope (R1: dependency versions only). **`npm run lint`
+remains out of the hard Docker `test` gate** - enabling it now would fail
+every future build for a source-content reason. `make lint` (already
+defined, non-blocking) is the way to see these findings today. New
+technical-debt item logged with full rule breakdown and owner phases in
+`docs/TECHNICAL_DEBT.md`.
 
 ### 3. `npm audit fix` cannot even run without `--legacy-peer-deps`
 

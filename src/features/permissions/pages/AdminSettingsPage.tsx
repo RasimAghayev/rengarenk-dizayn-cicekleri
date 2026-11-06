@@ -100,9 +100,18 @@ const notificationSettingsSchema = z.object({
   notifyOnFailedLogin: z.boolean().default(true),
 });
 
+// Each schema below has .default(...)/.optional() fields, so its input type
+// (pre-resolution, what defaultValues/reset accept) differs from its output
+// type (post-resolution, what the onSubmit handler receives - defaults
+// filled in, required). react-hook-form's 3-generic useForm form (added for
+// exactly this) takes TFieldValues = input, TTransformedValues = output.
+type GeneralSettingsInput = z.input<typeof generalSettingsSchema>;
 type GeneralSettingsValues = z.infer<typeof generalSettingsSchema>;
+type SecuritySettingsInput = z.input<typeof securitySettingsSchema>;
 type SecuritySettingsValues = z.infer<typeof securitySettingsSchema>;
+type EmailSettingsInput = z.input<typeof emailSettingsSchema>;
 type EmailSettingsValues = z.infer<typeof emailSettingsSchema>;
+type NotificationSettingsInput = z.input<typeof notificationSettingsSchema>;
 type NotificationSettingsValues = z.infer<typeof notificationSettingsSchema>;
 
 const AdminSettingsPage = () => {
@@ -110,7 +119,7 @@ const AdminSettingsPage = () => {
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
-  const generalForm = useForm<GeneralSettingsValues>({
+  const generalForm = useForm<GeneralSettingsInput, unknown, GeneralSettingsValues>({
     resolver: zodResolver(generalSettingsSchema),
     defaultValues: {
       siteName: "My Admin Dashboard",
@@ -123,7 +132,7 @@ const AdminSettingsPage = () => {
     },
   });
 
-  const securityForm = useForm<SecuritySettingsValues>({
+  const securityForm = useForm<SecuritySettingsInput, unknown, SecuritySettingsValues>({
     resolver: zodResolver(securitySettingsSchema),
     defaultValues: {
       maxLoginAttempts: 5,
@@ -136,7 +145,7 @@ const AdminSettingsPage = () => {
     },
   });
 
-  const emailForm = useForm<EmailSettingsValues>({
+  const emailForm = useForm<EmailSettingsInput, unknown, EmailSettingsValues>({
     resolver: zodResolver(emailSettingsSchema),
     defaultValues: {
       smtpServer: "smtp.example.com",
@@ -149,7 +158,7 @@ const AdminSettingsPage = () => {
     },
   });
 
-  const notificationForm = useForm<NotificationSettingsValues>({
+  const notificationForm = useForm<NotificationSettingsInput, unknown, NotificationSettingsValues>({
     resolver: zodResolver(notificationSettingsSchema),
     defaultValues: {
       enableEmailNotifications: true,

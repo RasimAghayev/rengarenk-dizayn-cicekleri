@@ -66,6 +66,12 @@ const productSchema = z.object({
   barcode: z.string().min(4, 'Barcode must be at least 4 characters'),
 });
 
+// z.coerce fields give the schema a different input type (unknown, before
+// coercion) than output type (number, after coercion). react-hook-form's
+// Resolver/useForm generics (3-generic form, introduced for exactly this
+// case) need both: TFieldValues = input (what defaultValues/reset accept),
+// TTransformedValues = output (what handleSubmit's callback receives).
+type ProductFormInput = z.input<typeof productSchema>;
 type ProductFormValues = z.infer<typeof productSchema>;
 
 const categories = ['Beverages', 'Bakery', 'Dairy', 'Produce', 'Meat', 'Snacks', 'Other'];
@@ -76,7 +82,7 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const form = useForm<ProductFormValues>({
+  const form = useForm<ProductFormInput, unknown, ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: '',
@@ -227,7 +233,13 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
                         <FormItem className="flex-1">
                           <FormLabel>Price</FormLabel>
                           <FormControl>
-                            <Input type="number" step="0.01" min="0" {...field} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              {...field}
+                              value={field.value as number | string}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -241,7 +253,13 @@ const InventoryManagement: React.FC<InventoryManagementProps> = ({ onSave }) => 
                         <FormItem className="flex-1">
                           <FormLabel>Stock Quantity</FormLabel>
                           <FormControl>
-                            <Input type="number" min="0" step="1" {...field} />
+                            <Input
+                              type="number"
+                              min="0"
+                              step="1"
+                              {...field}
+                              value={field.value as number | string}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
