@@ -50,9 +50,14 @@ without being carried to a concrete owner phase.
    `.env.example`; `.gitignore` doesn't cover `.env*`. Not rotation-worthy
    (RLS-gated, client-safe) but a convention gap. Carried from Phase 2.
    Owner: Phase 5 (`.env.example`) / Phase 9 (migrate `client.ts`).
-6. **`eslint-plugin-react-hooks` pinned to a prerelease RC build
-   (`5.1.0-rc-fb9a90fa48-20240614`), two majors behind the stable `7.1.1`.**
-   Carried from Phase 2. Owner: Phase 6.
+6. ~~**`eslint-plugin-react-hooks` pinned to a prerelease RC build
+   (`5.1.0-rc-fb9a90fa48-20240614`), two majors behind the stable `7.1.1`.**~~
+   **Resolved, Phase 6:** bumped to `7.1.1` stable (along with `eslint`
+   9.39.5→10.14.0, `@eslint/js`→10.0.1, `typescript-eslint` 8.11.0→8.72.1,
+   `eslint-plugin-react-refresh`→0.5.7, `globals`→17.14.0). This also fixed
+   the `npm run lint` tool-crash documented in `docs/BASELINE.md` finding
+   #2 (verified: `eslint .` now exits 1 with real findings instead of
+   exit 2 with a `TypeError`). See item 23 below for what that now exposes.
 7. **Multiple direct-dependency major-version gaps**: React 18→19,
    `lucide-react` 0.x→1.x, `recharts` 2.x→3.x, `sonner` 1.x→2.x,
    `tailwind-merge` 2.x→3.x, `react-day-picker` 8.x→10.x (×2 majors),
@@ -117,6 +122,26 @@ without being carried to a concrete owner phase.
     `brandGreen`/`brandWhite`) duplicate information already expressible via
     the existing shadcn CSS-variable palette — minor tidiness, not
     functional. Owner: Phase 7/8, low priority.
+23. **`npm run lint` now runs (item 6 above resolved) and reports 75 real,
+    pre-existing findings (64 errors, 11 warnings)** across application
+    source, previously hidden behind the ESLint tool crash. New finding,
+    this phase (Phase 6) — surfaced as a side effect of the dependency
+    bump, not introduced by it; no source files were edited to produce or
+    fix these. Breakdown by rule (`docker run --rm --entrypoint npm
+    <build-image> run lint`, full output in the Phase 6 handoff):
+    `@typescript-eslint/no-explicit-any` ×38, `react-hooks/set-state-in-effect`
+    ×9, `react-hooks/immutability` ×7, `react-refresh/only-export-components`
+    ×6 (warn), `react-hooks/exhaustive-deps` ×5, `react-hooks/purity` ×4,
+    `react-hooks/static-components` ×2, `@typescript-eslint/no-empty-object-type`
+    ×2, `@typescript-eslint/no-require-imports` ×1 (`tailwind.config.ts`).
+    `npm run lint` is deliberately left out of the Docker `test` hard gate
+    for this reason (see Dockerfile `test` stage comment) — `make lint`
+    surfaces it non-blocking. Owner: Phase 9 (quality tooling — decide
+    whether/how to re-enable `npm run lint` as a hard gate) for the
+    `no-explicit-any`/`no-require-imports`/`exhaustive-deps` class; Phase 8
+    (architecture/hooks correctness) for the `set-state-in-effect`/
+    `immutability`/`purity`/`static-components` class, several of which
+    land inside `CashRegister.tsx` (already item 14, the god-component).
 
 ## Not treated as debt
 

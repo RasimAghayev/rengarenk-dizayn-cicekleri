@@ -69,16 +69,20 @@ RUN npm run build
 # chain). No business-logic test suite exists to run yet - documented, not
 # faked - see docs/BASELINE.md.
 #
-# `npm run lint` is deliberately NOT in this gate right now: it crashes
-# (TypeError, exit 2 - not a lint finding) on a verified, pre-existing
-# ESLint 9.39.5 / @typescript-eslint 8.11.0 incompatibility in the
-# `no-unused-expressions` rule, unrelated to any source file's content.
-# Full repro + exact error: docs/BASELINE.md. Putting a currently-crashing
-# command in this hard gate would make every future `docker build .`
-# permanently fail for a tooling reason, not a behavior reason, which is
-# not what this stage is for. Phase 6 owns fixing the eslint/typescript-
-# eslint version matrix; re-add the line below once it's green:
-#   RUN npm run lint
+# `npm run lint` is deliberately still NOT in this gate. Phase 6 bumped
+# eslint 9.39.5->10.14.0, @eslint/js ->10.0.1, typescript-eslint
+# 8.11.0->8.72.1, eslint-plugin-react-hooks 5.1.0-rc->7.1.1, and
+# eslint-plugin-react-refresh/globals to their latest stable - this fixed
+# the version-matrix TypeError crash (exit 2) documented in docs/BASELINE.md
+# finding #2: the tool now runs to completion instead of crashing. It is
+# still excluded from this hard gate because it now surfaces real,
+# pre-existing findings in application source (75 problems: 64 errors + 11
+# warnings - mostly eslint-plugin-react-hooks@7's new `set-state-in-effect`
+# rule plus some `no-explicit-any`/`no-require-imports`), none of which
+# Phase 6 (dependency versions only, R1) is scoped to fix. Turning this on
+# now would fail every future `docker build .` for a source-content reason,
+# which belongs to Phase 7/8/9, not Phase 6. See docs/TECHNICAL_DEBT.md for
+# the itemized list and owners; `make lint` already runs this non-blocking.
 ############################################################
 FROM build AS test
 RUN npx tsc -b
