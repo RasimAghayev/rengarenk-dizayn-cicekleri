@@ -12,20 +12,22 @@ reproduced in full here) and its handoff
 git -C projects/repos/rengarenk-dizayn-cicekleri log --oneline | wc -l   → 113
 git log -1 --format="%H %s"                                              → 4a07fe2d6a778b867a97dcd11e905a2cd6c43b9e "build(deps): bump the npm_and_yarn group across 1 directory with 9 updates (#57)"
 ```
+
 HEAD matches Phase 2's recorded commit exactly — working tree unchanged
 since Phase 2 ran.
 
 ```
 git shortlog -sn --all
 ```
-| Author | Commits |
-|---|---|
-| `gpt-engineer-app[bot]` | 67 |
-| `renovate[bot]` | 30 |
-| `dependabot[bot]` | 9 |
-| Rasim Aghayev | 5 |
-| `deepsource-autofix[bot]` | 5 |
-| `deepsource-io[bot]` | 1 |
+
+| Author                    | Commits |
+| ------------------------- | ------- |
+| `gpt-engineer-app[bot]`   | 67      |
+| `renovate[bot]`           | 30      |
+| `dependabot[bot]`         | 9       |
+| Rasim Aghayev             | 5       |
+| `deepsource-autofix[bot]` | 5       |
+| `deepsource-io[bot]`      | 1       |
 
 **113 total — 108 bot-authored (95.6%), 5 human-authored.** This is an
 almost entirely AI/bot-generated repository, consistent with its Lovable.dev
@@ -34,6 +36,7 @@ origin and the dependency-bot activity Phase 2 already found.
 ```
 git branch -a
 ```
+
 Only `main` plus 4 remote `deepsource-transform-*` branches. Matches Phase
 2's `gh pr list` result of exactly 4 open PRs (#18/#21/#22/#24), confirming
 no new discrepancy beyond the one Phase 2 already flagged against the Phase
@@ -42,12 +45,14 @@ no new discrepancy beyond the one Phase 2 already flagged against the Phase
 ```
 git log --follow --oneline -- supabase/migrations/create_categories_and_products.sql
 ```
+
 → 1 commit ever (`e4b6fde`). This migration file has never been updated
 since its creation.
 
 ```
 git log --follow --oneline -- src/integrations/supabase/types.ts | head -5
 ```
+
 → reveals 3+ separate commits with messages matching "Run SQL migration" /
 "Apply Supabase schema changes" that updated the generated client types
 without any corresponding `.sql` file landing in `supabase/migrations/` in
@@ -58,6 +63,7 @@ from the types file alone.
 ```
 git log origin/main..origin/deepsource-transform-7a71e8ae --oneline | head -5
 ```
+
 → confirms the branch carries only the expected single Prettier/StandardJS
 formatting commit, nothing else. Spot-checked one of the four; the other
 three follow the same DeepSource bot pattern per Phase 2's PR listing.
@@ -82,6 +88,7 @@ path arguments unless disabled:
 MSYS_NO_PATHCONV=1 docker run --rm -v "$(pwd):/repo:ro" zricethezav/gitleaks:latest \
   detect --source=/repo --no-git -v
 ```
+
 **Working tree:** exit non-zero (gitleaks' convention when findings exist),
 **1 finding** — rule `jwt`, `src/integrations/supabase/client.ts:6`. This is
 the Supabase anon/publishable key Phase 2 already identified; confirmed
@@ -94,10 +101,12 @@ file:line only, per CLAUDE.md's redaction rule.
 MSYS_NO_PATHCONV=1 docker run --rm -v "$(pwd):/repo:ro" zricethezav/gitleaks:latest \
   detect --source=/repo --log-opts="--all" -v
 ```
+
 **Full history:** 111 commits scanned (gitleaks' own count; close to the
 113 `git log` total, the small difference consistent with gitleaks'
 diff-based commit traversal rather than a discrepancy worth chasing),
 **2 findings** — same key, in 2 distinct commits:
+
 - `c52d92a9...` — author `deepsource-autofix[bot]`, 2025-05-25
 - `d3d71e22...` — author `gpt-engineer-app[bot]`, 2025-05-14
 

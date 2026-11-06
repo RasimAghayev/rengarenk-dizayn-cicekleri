@@ -19,7 +19,7 @@ without being carried to a concrete owner phase.
 2. **Dev-mode auth bypass reachable from a real build script.**
    `ProtectedRoute`'s `isDev = import.meta.env.DEV` check grants access
    unconditionally when true; `package.json`'s `"build:dev": "vite build
-   --mode development"` produces exactly that build. A second instance
+--mode development"` produces exactly that build. A second instance
    exists in `AdminLayout.tsx` (dev-only loading skip);
    `src/hooks/use-user.ts`'s `createAdminUser()` creates a real
    `admin@example.com`/`adminpassword` account against the live Supabase
@@ -29,7 +29,7 @@ without being carried to a concrete owner phase.
    both enums exist only in the auto-generated `src/integrations/supabase/types.ts`,
    not in `supabase/migrations/` (which has exactly one file, covering 2
    tables, and itself references the undefined `has_permission`). `git log
-   --follow` on `types.ts` proves schema changes were applied directly
+--follow` on `types.ts` proves schema changes were applied directly
    against the live project outside version control. No reviewable RLS
    coverage, no backup/rollback story, for most of this app's database.
    Carried forward from Phase 2's narrower observation, confirmed and
@@ -131,4 +131,4 @@ without being carried to a concrete owner phase.
   live schema's versioned portion and are not debt.
 - **Supabase's own anon-key client-exposure design** — the hardcoded key
   itself is not debt (it's meant to be public); only its hardcoded-in-source
-  *location* (vs. an env var) and the missing `.env.example` are.
+  _location_ (vs. an env var) and the missing `.env.example` are.

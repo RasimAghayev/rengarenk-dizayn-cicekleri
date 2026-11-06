@@ -25,12 +25,13 @@ Single `BrowserRouter` route table. Public routes: `/`, `/login`,
 
 ```tsx
 const isDev = import.meta.env.DEV;
-const hasAccess = isDev || (user && user.user_metadata?.role === 'admin');
+const hasAccess = isDev || (user && user.user_metadata?.role === "admin");
 ```
 
 This is the single authorization gate for every admin-facing route in the
 app. It has two defects, detailed in `REPOSITORY_AUDIT.md` and
 `TECHNICAL_DEBT.md`:
+
 1. `isDev` is a Vite build-time flag, true whenever the app is built with
    `--mode development` (i.e. the `"build:dev"` npm script) — a bypass that
    can ship in a built artifact, not just `vite dev`.
@@ -43,21 +44,21 @@ places, not one.
 
 ## Pages / feature inventory — real vs. mock, stated explicitly
 
-| Surface | Location | Backend reality |
-|---|---|---|
-| Marketing landing page | `src/pages/Index.tsx` | Static content, no backend. |
-| Login / Register | `src/features/auth/` | **Real** — `supabase.auth.signInWithPassword`/`signUp`, OAuth (Google/Facebook), `onAuthStateChange`. Register form includes a role-selection dropdown (see Auth below — this is the P0 finding). |
-| Cash register (POS) | `src/components/CashRegister.tsx`, `src/components/cash/`, `src/features/cash/services/cashService.ts` | Mixed — `cashService.ts` attempts a real Supabase query with a mock-data fallback; `mockData.ts` supplies generic placeholder products. 380-line `CashRegister.tsx` mixes cart state, pricing math, and rendering in one component (SRP candidate, Phase 8). |
-| Super admin dashboard | `src/features/permissions/pages/SuperAdminPage.tsx` | **Real** — live Supabase-backed dashboard stats, one of two genuinely real admin screens. |
-| Product permissions management | `src/features/permissions/components/ProductPermissionsManagement.tsx` | **Real** — full Supabase CRUD example (create/read/update/delete against the permissions tables). The other genuinely real admin screen. |
-| Categories / Products / Orders / Reports / Users / Roles pages | `src/features/permissions/components/{CategoriesPage,ProductsPage,OrdersPage,ReportsPage,UsersPage,RolesPage}.tsx` | **Mock only** — 100% hardcoded in-memory data, simulated loading delays, `console.log`-only mutations. Zero Supabase calls in any of the six. |
-| Admin settings | `src/features/permissions/components/AdminSettingsPage.tsx` | Mixed — some tabs real-ish (local state), Database/Appearance tabs are literal "Coming Soon" placeholders. |
-| Onboarding wizard | `src/features/onboarding/pages/StepByStepOnboarding.tsx`, `CompanySettings.tsx`, `InventoryManagement.tsx` | **Mock only** — wizard shell with `console.log`-only persistence; no Supabase calls despite being framed as account setup. |
-| Global dashboard | `src/features/global/pages/GlobalDashboard.tsx` | **Mock only** — demo SaaS dashboard with fabricated stats. |
-| AI assistant | `src/features/ai/pages/AIAssistantPage.tsx` | **Fake** — hardcoded canned Azerbaijani responses, no real model/backend call. |
-| QR code scanner | `src/features/global/components/QRCodeScanner.tsx` | **Half-real** — genuine `getUserMedia` camera access, but `simulateQRScan()` returns a random mock URL instead of decoding anything. |
-| Voice recorder | `src/features/global/components/VoiceRecorder.tsx` | **Half-real** — genuine `MediaRecorder` recording, but no real transcription/voice-command backend despite UI copy implying one. |
-| Global settings | `src/features/global/hooks/useGlobalSettings.ts` | **Real**, but trivial — plain `localStorage`-backed hook, no Supabase. |
+| Surface                                                        | Location                                                                                                           | Backend reality                                                                                                                                                                                                                                              |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Marketing landing page                                         | `src/pages/Index.tsx`                                                                                              | Static content, no backend.                                                                                                                                                                                                                                  |
+| Login / Register                                               | `src/features/auth/`                                                                                               | **Real** — `supabase.auth.signInWithPassword`/`signUp`, OAuth (Google/Facebook), `onAuthStateChange`. Register form includes a role-selection dropdown (see Auth below — this is the P0 finding).                                                            |
+| Cash register (POS)                                            | `src/components/CashRegister.tsx`, `src/components/cash/`, `src/features/cash/services/cashService.ts`             | Mixed — `cashService.ts` attempts a real Supabase query with a mock-data fallback; `mockData.ts` supplies generic placeholder products. 380-line `CashRegister.tsx` mixes cart state, pricing math, and rendering in one component (SRP candidate, Phase 8). |
+| Super admin dashboard                                          | `src/features/permissions/pages/SuperAdminPage.tsx`                                                                | **Real** — live Supabase-backed dashboard stats, one of two genuinely real admin screens.                                                                                                                                                                    |
+| Product permissions management                                 | `src/features/permissions/components/ProductPermissionsManagement.tsx`                                             | **Real** — full Supabase CRUD example (create/read/update/delete against the permissions tables). The other genuinely real admin screen.                                                                                                                     |
+| Categories / Products / Orders / Reports / Users / Roles pages | `src/features/permissions/components/{CategoriesPage,ProductsPage,OrdersPage,ReportsPage,UsersPage,RolesPage}.tsx` | **Mock only** — 100% hardcoded in-memory data, simulated loading delays, `console.log`-only mutations. Zero Supabase calls in any of the six.                                                                                                                |
+| Admin settings                                                 | `src/features/permissions/components/AdminSettingsPage.tsx`                                                        | Mixed — some tabs real-ish (local state), Database/Appearance tabs are literal "Coming Soon" placeholders.                                                                                                                                                   |
+| Onboarding wizard                                              | `src/features/onboarding/pages/StepByStepOnboarding.tsx`, `CompanySettings.tsx`, `InventoryManagement.tsx`         | **Mock only** — wizard shell with `console.log`-only persistence; no Supabase calls despite being framed as account setup.                                                                                                                                   |
+| Global dashboard                                               | `src/features/global/pages/GlobalDashboard.tsx`                                                                    | **Mock only** — demo SaaS dashboard with fabricated stats.                                                                                                                                                                                                   |
+| AI assistant                                                   | `src/features/ai/pages/AIAssistantPage.tsx`                                                                        | **Fake** — hardcoded canned Azerbaijani responses, no real model/backend call.                                                                                                                                                                               |
+| QR code scanner                                                | `src/features/global/components/QRCodeScanner.tsx`                                                                 | **Half-real** — genuine `getUserMedia` camera access, but `simulateQRScan()` returns a random mock URL instead of decoding anything.                                                                                                                         |
+| Voice recorder                                                 | `src/features/global/components/VoiceRecorder.tsx`                                                                 | **Half-real** — genuine `MediaRecorder` recording, but no real transcription/voice-command backend despite UI copy implying one.                                                                                                                             |
+| Global settings                                                | `src/features/global/hooks/useGlobalSettings.ts`                                                                   | **Real**, but trivial — plain `localStorage`-backed hook, no Supabase.                                                                                                                                                                                       |
 
 ## Auth (Supabase)
 
@@ -72,9 +73,11 @@ project** — not a local mock. `LoginForm.tsx` surfaces this as a visible
 `RegisterForm.tsx` (`src/features/auth/components/`) presents a role
 dropdown including "Administrator," whose selected value is passed straight
 into:
+
 ```ts
-supabase.auth.signUp({ email, password, options: { data: { role } } })
+supabase.auth.signUp({ email, password, options: { data: { role } } });
 ```
+
 landing in `user.user_metadata.role` — the exact field `ProtectedRoute`/
 `AdminLayout` trust for admin access. **Any visitor can self-register as
 admin.** This is the top P0 finding of this audit; full detail and remediation
@@ -86,6 +89,7 @@ direction are in `REPOSITORY_AUDIT.md` and the per-repo Phase 9 plan.
 `[db]`/`[studio]` sections, Supabase CLI/Postgres version unconfirmed).
 `supabase/migrations/` contains exactly **one** file,
 `create_categories_and_products.sql`, which:
+
 - Creates `categories` and `products` tables, seeds sample rows.
 - Enables `ROW LEVEL SECURITY` on both, with public-read policies and
   write policies gated on `has_permission('edit_inventory')`.
@@ -97,17 +101,17 @@ Supabase CLI/dashboard integration, header says "do not edit directly")
 reveals the actual live schema is far larger:
 
 | Live table (from `types.ts`) | In a versioned migration? |
-|---|---|
-| `categories` | Yes |
-| `products` | Yes |
-| `product_permissions` | **No** |
-| `product_role_assignments` | **No** |
-| `product_role_permissions` | **No** |
-| `product_roles` | **No** |
-| `profiles` | **No** |
-| `role_permissions` | **No** |
-| `user_permissions` | **No** |
-| `user_product_roles` | **No** |
+| ---------------------------- | ------------------------- |
+| `categories`                 | Yes                       |
+| `products`                   | Yes                       |
+| `product_permissions`        | **No**                    |
+| `product_role_assignments`   | **No**                    |
+| `product_role_permissions`   | **No**                    |
+| `product_roles`              | **No**                    |
+| `profiles`                   | **No**                    |
+| `role_permissions`           | **No**                    |
+| `user_permissions`           | **No**                    |
+| `user_product_roles`         | **No**                    |
 
 Plus 2 RPC functions (`has_permission`, `has_product_permission`) and 2
 enums (`app_role`: admin/staff/client/company; `permission_type`: 11 values)
