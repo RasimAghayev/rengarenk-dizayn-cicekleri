@@ -1,0 +1,17 @@
+.git
+.idea
+.vscode
+.github
+
+node_modules
+dist
+dist-ssr
+
+.env
+.env.*
+!.env.example
+
+*.md
+docs
+
+bun.lockb

@@ -1,0 +1,18 @@
+# Reserved port block for this repo: 20070-20079 (projects/info/state/ports.md).
+# Unique project name so parallel agents/containers from other repos never collide (R4).
+name: rengarenk-dizayn-cicekleri-p5
+
+services:
+  app:
+    build:
+      context: .
+      target: runtime
+    image: rengarenk-dizayn-cicekleri:runtime
+    ports:
+      - "${HOST_PORT:-20070}:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "--spider", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
