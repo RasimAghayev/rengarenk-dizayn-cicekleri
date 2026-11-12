@@ -7,11 +7,11 @@ against a known baseline instead of guessing whether a failure is new.
 
 ## make verify — RED (pre-existing baseline)
 
-| Command | Result | Notes |
-|---|---|---|
-| `docker build --target test -t rengarenk-dizayn-cicekleri:test .` (= `make test`) | exit 1 (expected) | `npm ci` ERESOLVE: `typescript@7.0.2` vs `typescript-eslint@8.72.x` peerDependency `typescript >=4.8.4 <6.1.0`. Same failure on plain `npm ci` and `npm audit fix`. |
-| `make verify` (= `make test` + `make build`) | RED — same pre-existing failure | Not caused by P10/P11; P10's CI pipeline (PR #79) is implemented but cannot go green until this is resolved. |
-| `docker build .` (default target = `runtime`) | exit 0 | Unaffected: the `deps` stage's `npm ci` is only reached via `--target deps`/`--target test`. See docs/BASELINE.md findings #1/#3 for history. |
+| Command                                                                           | Result                          | Notes                                                                                                                                                               |
+| --------------------------------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docker build --target test -t rengarenk-dizayn-cicekleri:test .` (= `make test`) | exit 1 (expected)               | `npm ci` ERESOLVE: `typescript@7.0.2` vs `typescript-eslint@8.72.x` peerDependency `typescript >=4.8.4 <6.1.0`. Same failure on plain `npm ci` and `npm audit fix`. |
+| `make verify` (= `make test` + `make build`)                                      | RED — same pre-existing failure | Not caused by P10/P11; P10's CI pipeline (PR #79) is implemented but cannot go green until this is resolved.                                                        |
+| `docker build .` (default target = `runtime`)                                     | exit 0                          | Unaffected: the `deps` stage's `npm ci` is only reached via `--target deps`/`--target test`. See docs/BASELINE.md findings #1/#3 for history.                       |
 
 ## Root cause
 
@@ -24,6 +24,7 @@ Phase 6/upgrader: re-pin `typescript` to `^6.0.x` (the cap this repo already doc
 ## Phase 10 (CI/CD) — open, not merged
 
 PR #79: https://github.com/RasimAghayev/rengarenk-dizayn-cicekleri/pull/79
+
 - Adds `.github/workflows/ci.yml` (lint → typecheck in Docker `test` stage → build → secret scan; SHA-pinned actions, per-job `timeout-minutes`, concurrency with cancel-in-progress, fork PRs get no secrets, full image scan nightly only, publish gated to tags), `.gitleaks.toml`, `docs/TEST_REPORT.md`.
 - Status: open, not merged — blocked on the green build above, not on the pipeline itself.
 - `make lint`/`make format`-equivalent: lint continues-on-error (informational) in CI until the 75 pre-existing ESLint findings (docs/TECHNICAL_DEBT.md item 23) are triaged by Phase 7/8/9.
