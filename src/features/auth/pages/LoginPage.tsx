@@ -1,9 +1,8 @@
-
-import React, { useEffect } from 'react';
-import LoginForm from '../components/LoginForm';
-import MainLayout from '@/layouts/MainLayout';
-import { Link, useNavigate } from 'react-router-dom';
-import { useUser } from '@/hooks/use-user';
+import React, { useEffect } from "react";
+import LoginForm from "../components/LoginForm";
+import MainLayout from "@/layouts/MainLayout";
+import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "@/hooks/use-user";
 
 const LoginPage = () => {
   const { user } = useUser();
@@ -12,7 +11,7 @@ const LoginPage = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate("/");
     }
   }, [user, navigate]);
 
@@ -23,13 +22,16 @@ const LoginPage = () => {
           <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
           <p className="text-muted-foreground">Please login to your account</p>
         </div>
-        
+
         <LoginForm />
-        
+
         <div className="mt-6 text-center space-y-4">
           <p className="text-muted-foreground">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-primary font-medium hover:underline">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-primary font-medium hover:underline"
+            >
               Register
             </Link>
           </p>

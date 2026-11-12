@@ -1,13 +1,12 @@
-
-import { useState, useEffect } from 'react';
-import { useToast } from './use-toast';
-import { Database } from '@/integrations/supabase/types';
+import { useState, useEffect } from "react";
+import { useToast } from "./use-toast";
+import { Database } from "@/integrations/supabase/types";
 
 // Import the supabase client directly instead of recreating it
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "@/integrations/supabase/client";
 
-export type UserRole = 'admin' | 'staff' | 'client' | 'company';
-export type PermissionType = Database['public']['Enums']['permission_type'];
+export type UserRole = "admin" | "staff" | "client" | "company";
+export type PermissionType = Database["public"]["Enums"]["permission_type"];
 
 interface UserMetadata {
   name?: string;
@@ -54,7 +53,9 @@ export function useUser() {
     setLoading(true);
 
     // First set up the auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, currentSession) => {
       setSession(currentSession as Session | null);
       setUser(currentSession?.user as User | null);
       setLoading(false);
@@ -96,7 +97,7 @@ export function useUser() {
         title: "Signed in successfully",
         description: "Welcome back!",
       });
-      
+
       setLoading(false);
       return { data, error: null };
     } catch (error: any) {
@@ -111,7 +112,11 @@ export function useUser() {
   };
 
   // Sign up with email and password
-  const signUp = async (email: string, password: string, metadata: UserMetadata = {}) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    metadata: UserMetadata = {},
+  ) => {
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -136,7 +141,7 @@ export function useUser() {
         title: "Sign up successful",
         description: "Please check your email for verification.",
       });
-      
+
       setLoading(false);
       return { data, error: null };
     } catch (error: any) {
@@ -164,7 +169,7 @@ export function useUser() {
         setLoading(false);
         return { error };
       }
-      
+
       // The onAuthStateChange event will update our state
       setLoading(false);
       return { error: null };
@@ -180,13 +185,15 @@ export function useUser() {
   };
 
   // Check if user has a specific permission
-  const hasPermission = async (permission: PermissionType): Promise<boolean> => {
+  const hasPermission = async (
+    permission: PermissionType,
+  ): Promise<boolean> => {
     if (!user) return false;
 
     try {
-      const { data, error } = await supabase.rpc('has_permission', {
+      const { data, error } = await supabase.rpc("has_permission", {
         _user_id: user.id,
-        _permission: permission
+        _permission: permission,
       });
 
       if (error) {
