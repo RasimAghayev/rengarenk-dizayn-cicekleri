@@ -49,7 +49,7 @@ COPY package.json package-lock.json ./
 # incompatible, masked by --legacy-peer-deps. Bumped to
 # @vitejs/plugin-react-swc@4.3.3 (peer "^4||^5||^6||^7||^8") and
 # lovable-tagger@1.3.5 (peer ">=5.0.0 <9.0.0"), both registry-confirmed to
-# support vite 8. A plain `npm ci` now succeeds with no peer override.
+# TypeScript pinned to a version compatible with typescript-eslint peer range.
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
 
@@ -58,6 +58,10 @@ RUN --mount=type=cache,target=/root/.npm \
 # header). Fails the whole build if the SPA doesn't compile.
 ############################################################
 FROM deps AS build
+ARG VITE_SUPABASE_URL=https://placeholder.supabase.co
+ARG VITE_SUPABASE_ANON_KEY=placeholder-anon-key
+ENV VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+ENV VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
 COPY . .
 RUN npm run build
 
