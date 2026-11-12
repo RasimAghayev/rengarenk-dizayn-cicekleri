@@ -25,20 +25,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [notifications] = useState(3); // Example notification count
+  const [notifications] = useState(3);
   const [contentLoading, setContentLoading] = useState(true);
-
-  // Debug log for troubleshooting
-  useEffect(() => {
-    console.log("AdminLayout - Auth state:", { user, userLoading });
-  }, [user, userLoading]);
 
   // Initial auth check
   useEffect(() => {
     const checkAuth = async () => {
       if (!userLoading) {
         if (!user) {
-          console.log("AdminLayout - No authenticated user");
           toast({
             variant: 'destructive',
             title: 'Authentication required',
@@ -48,11 +42,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           return;
         }
 
-        // For demonstration purposes, we're using mock user metadata
-        // In a real app, you would check this on the server-side or from Supabase claims
         const userRole = user.user_metadata?.role || 'user';
-        console.log("AdminLayout - User role:", userRole);
-        
+
         if (userRole !== 'admin') {
           toast({
             variant: 'destructive',
@@ -63,8 +54,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           return;
         }
 
-        // If we reach here, user is authenticated and authorized
-        console.log("AdminLayout - Access granted");
         setContentLoading(false);
       }
     };
@@ -90,17 +79,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     }
   };
 
-  // Development bypass for easy testing (comment this out in production)
-  useEffect(() => {
-    // Only in development mode, bypass auth check after a delay
-    if (import.meta.env.DEV) {
-      const timer = setTimeout(() => {
-        setContentLoading(false);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
   // Show loading state while checking user authentication
   if (userLoading || contentLoading) {
     return (
@@ -111,9 +89,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     );
   }
 
-  // For development purposes, we'll allow access even without authentication
-  const isDev = import.meta.env.DEV;
-  if (!user && !isDev) {
+  if (!user) {
     return null;
   }
 

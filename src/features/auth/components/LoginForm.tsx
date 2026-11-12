@@ -45,7 +45,6 @@ const LoginForm = () => {
         navigate('/');
       }
     } catch (error: any) {
-      console.error('Login error:', error);
       toast({
         title: "Login failed",
         description: error.message || "Please check your credentials and try again",
@@ -66,9 +65,8 @@ const LoginForm = () => {
       
       // Get the current URL origin
       const origin = window.location.origin;
-      console.log(`Current origin: ${origin}`);
-      
-      const { data, error } = await supabase.auth.signInWithOAuth({
+
+      const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: origin,
@@ -82,12 +80,9 @@ const LoginForm = () => {
       if (error) {
         throw error;
       }
-
-      console.log(`${provider} auth initiated:`, data);
       // Social login initiated successfully
       // The user will be redirected to the provider's authentication page
     } catch (error: any) {
-      console.error(`${provider} login error:`, error);
       toast({
         title: `${provider} login failed`,
         description: error.message || "An unexpected error occurred",

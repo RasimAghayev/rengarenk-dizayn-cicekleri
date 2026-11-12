@@ -41,24 +41,20 @@ export function useUser() {
     try {
       const { data, error } = await supabase.auth.getSession();
       if (error) {
-        console.error('Error getting session:', error.message);
         return null;
       }
       return data.session;
-    } catch (error) {
-      console.error('Unexpected error getting session:', error);
+    } catch {
       return null;
     }
   };
 
   // This effect will run once when the component mounts to set the initial user state
   useEffect(() => {
-    console.log("useUser hook initializing");
     setLoading(true);
-    
+
     // First set up the auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
-      console.log("Auth state changed:", event, currentSession?.user?.id ? "(user authenticated)" : "(no user)");
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
       setSession(currentSession as Session | null);
       setUser(currentSession?.user as User | null);
       setLoading(false);
@@ -66,7 +62,6 @@ export function useUser() {
 
     // Then check if there's an existing session
     getSession().then((currentSession) => {
-      console.log("Initial session check:", currentSession?.user?.id ? "(user authenticated)" : "(no user)");
       setSession(currentSession as Session | null);
       setUser(currentSession?.user as User | null);
       setLoading(false);
@@ -119,7 +114,6 @@ export function useUser() {
   const signUp = async (email: string, password: string, metadata: UserMetadata = {}) => {
     setLoading(true);
     try {
-      console.log("Signing up with metadata:", metadata);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -129,7 +123,6 @@ export function useUser() {
       });
 
       if (error) {
-        console.error("Sign up error:", error);
         toast({
           title: "Sign up failed",
           description: error.message,
@@ -147,7 +140,6 @@ export function useUser() {
       setLoading(false);
       return { data, error: null };
     } catch (error: any) {
-      console.error("Unexpected sign up error:", error);
       toast({
         title: "Sign up failed",
         description: error.message || "An unexpected error occurred",
@@ -190,75 +182,20 @@ export function useUser() {
   // Check if user has a specific permission
   const hasPermission = async (permission: PermissionType): Promise<boolean> => {
     if (!user) return false;
-    
+
     try {
       const { data, error } = await supabase.rpc('has_permission', {
         _user_id: user.id,
         _permission: permission
       });
-      
+
       if (error) {
-        console.error('Error checking permission:', error.message);
         return false;
       }
-      
+
       return data || false;
-    } catch (error) {
-      console.error('Unexpected error checking permission:', error);
+    } catch {
       return false;
-    }
-  };
-
-  // Create a sample admin user for development
-  const createAdminUser = async () => {
-    if (!import.meta.env.DEV) {
-      console.warn("createAdminUser is only for development mode");
-      return;
-    }
-
-    const email = 'admin@example.com';
-    const password = 'adminpassword';
-    
-    try {
-      // Check if user already exists
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (!error && data.user) {
-        toast({
-          title: "Dev admin exists",
-          description: `Use email: ${email} | password: ${password}`,
-        });
-        return;
-      }
-      
-      // Create admin user if it doesn't exist
-      const { error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            role: 'admin',
-            first_name: 'Admin',
-            last_name: 'User',
-          }
-        }
-      });
-      
-      if (signUpError) {
-        console.error("Error creating admin user:", signUpError);
-        return;
-      }
-      
-      toast({
-        title: "Dev admin created",
-        description: `Use email: ${email} | password: ${password}`,
-      });
-      
-    } catch (error) {
-      console.error("Error in createAdminUser:", error);
     }
   };
 
@@ -270,6 +207,5 @@ export function useUser() {
     signUp,
     signOut,
     hasPermission,
-    createAdminUser,
   };
 }

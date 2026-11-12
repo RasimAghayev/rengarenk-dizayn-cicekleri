@@ -44,14 +44,11 @@ const LoadingFallback = () => (
 
 // Protected route component to guard admin routes
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading, signOut } = useUser();
+  const { user, loading } = useUser();
 
-  // Debug log to help troubleshooting
   useEffect(() => {
-    console.log("Protected route - Auth state:", { user, loading });
-    // Check if session is expired and attempt reauth if needed
     if (!user && !loading) {
-      console.log("No authenticated user found");
+      // no-op: unauthenticated access is handled below
     }
   }, [user, loading]);
 
@@ -59,18 +56,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <LoadingFallback />;
   }
 
-  // Allow access in dev environment for testing when no auth is setup
-  const isDev = import.meta.env.DEV;
-
-  // Use direct access for demo purposes or check if user exists and is admin
-  const hasAccess = isDev || (user && user.user_metadata?.role === "admin");
+  const hasAccess = user?.user_metadata?.role === "admin";
 
   if (!hasAccess) {
-    console.log("Access denied - Redirecting to login");
     return <Navigate to="/login" replace />;
   }
 
-  console.log("Access granted to protected route");
   return <>{children}</>;
 };
 

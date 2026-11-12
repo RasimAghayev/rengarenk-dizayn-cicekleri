@@ -2,7 +2,7 @@ SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
 IMAGE  ?= rengarenk-dizayn-cicekleri
-export COMPOSE_PROJECT_NAME := rengarenk-dizayn-cicekleri-p5
+export COMPOSE_PROJECT_NAME := rengarenk-dizayn-cicekleri-p9
 export HOST_PORT ?= 20070
 COMPOSE := docker compose
 

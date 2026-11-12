@@ -30,10 +30,6 @@ const RegisterForm = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleRoleChange = (value: UserRole) => {
-    setFormData({ ...formData, role: value });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -56,7 +52,7 @@ const RegisterForm = () => {
         {
           first_name: formData.firstName,
           last_name: formData.lastName,
-          role: formData.role,
+          role: 'client',
         }
       );
 
@@ -184,7 +180,7 @@ const RegisterForm = () => {
             <Label htmlFor="role">Account Type</Label>
             <Select 
               value={formData.role} 
-              onValueChange={handleRoleChange as (value: string) => void}
+              onValueChange={(value) => setFormData({ ...formData, role: value as UserRole })}
               disabled={isLoading}
             >
               <SelectTrigger>
@@ -194,7 +190,6 @@ const RegisterForm = () => {
                 <SelectItem value="client">Client</SelectItem>
                 <SelectItem value="staff">Staff Member</SelectItem>
                 <SelectItem value="company">Company Owner</SelectItem>
-                <SelectItem value="admin">Administrator</SelectItem>
               </SelectContent>
             </Select>
           </div>

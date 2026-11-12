@@ -1,12 +1,15 @@
 # Reserved port block for this repo: 20070-20079 (projects/info/state/ports.md).
 # Unique project name so parallel agents/containers from other repos never collide (R4).
-name: rengarenk-dizayn-cicekleri-p5
+name: rengarenk-dizayn-cicekleri-p9
 
 services:
   app:
     build:
       context: .
       target: runtime
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-https://placeholder.supabase.co}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:-placeholder-anon-key}
     image: rengarenk-dizayn-cicekleri:runtime
     ports:
       - "${HOST_PORT:-20070}:8080"
