@@ -6,22 +6,22 @@ Report date: 2026-11-12
 
 ## Verification evidence
 
-| Command | Result |
-|---|---|
-| `docker build --target test -t rengarenk-dizayn-cicekleri:test .` (the `make test` step: `npm ci` + `vite build` + `npx tsc -b`) | exit 0 — green base |
-| `docker compose build app` (the `make build` step) | exit 0 — green base |
-| `make verify` (= `make test` + `make build`) at this base | exit 0 — green base |
-| `find . -iname "*.test.*" -o -iname "*.spec.*" --not -path "*/node_modules/*" --not -path "*/.git/*"` | 0 results — no test files |
+| Command                                                                                                                          | Result                    |
+| -------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `docker build --target test -t rengarenk-dizayn-cicekleri:test .` (the `make test` step: `npm ci` + `vite build` + `npx tsc -b`) | exit 0 — green base       |
+| `docker compose build app` (the `make build` step)                                                                               | exit 0 — green base       |
+| `make verify` (= `make test` + `make build`) at this base                                                                        | exit 0 — green base       |
+| `find . -iname "*.test.*" -o -iname "*.spec.*" --not -path "*/node_modules/*" --not -path "*/.git/*"`                            | 0 results — no test files |
 
 ## Test case results
 
-| ID | Module | Scenario | Result | Reason |
-|---|---|---|---|---|
-| `TC_BUILD_SMOKE_001` | build | `vite build` produces a non-empty `dist/index.html` | PASS | executed via `docker build --target test` exit 0 (vite build ran as part of the test stage) |
-| `TC_AUTH_REGISTER_001` | auth | registration must not grant `admin` role | NOT RUN | no test runner installed (runner gated by standing decision 3) |
-| `TC_AUTH_PROTECTEDROUTE_001` | auth | `ProtectedRoute`/`AdminLayout` authorization, no `DEV` bypass | NOT RUN | no test runner installed |
-| `TC_SUPERADMIN_SMOKE_001` | SuperAdminPage | backend-wired smoke test | NOT RUN | no test runner installed |
-| `TC_PRODUCTPERMS_SMOKE_001` | ProductPermissionsManagement | backend-wired smoke test | NOT RUN | no test runner installed |
+| ID                           | Module                       | Scenario                                                      | Result  | Reason                                                                                      |
+| ---------------------------- | ---------------------------- | ------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------- |
+| `TC_BUILD_SMOKE_001`         | build                        | `vite build` produces a non-empty `dist/index.html`           | PASS    | executed via `docker build --target test` exit 0 (vite build ran as part of the test stage) |
+| `TC_AUTH_REGISTER_001`       | auth                         | registration must not grant `admin` role                      | NOT RUN | no test runner installed (runner gated by standing decision 3)                              |
+| `TC_AUTH_PROTECTEDROUTE_001` | auth                         | `ProtectedRoute`/`AdminLayout` authorization, no `DEV` bypass | NOT RUN | no test runner installed                                                                    |
+| `TC_SUPERADMIN_SMOKE_001`    | SuperAdminPage               | backend-wired smoke test                                      | NOT RUN | no test runner installed                                                                    |
+| `TC_PRODUCTPERMS_SMOKE_001`  | ProductPermissionsManagement | backend-wired smoke test                                      | NOT RUN | no test runner installed                                                                    |
 
 ## Coverage
 
