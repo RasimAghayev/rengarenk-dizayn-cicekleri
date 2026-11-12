@@ -1,11 +1,11 @@
-import React from 'react';
-import CategoriesSection from './cash/CategoriesSection';
-import ProductsSection from './cash/ProductsSection';
-import CartSection from './cash/CartSection';
-import { useCashRegister } from '@/hooks/useCashRegister';
+import React from "react";
+import CategoriesSection from "./cash/CategoriesSection";
+import ProductsSection from "./cash/ProductsSection";
+import CartSection from "./cash/CartSection";
+import { useCashRegister } from "@/hooks/useCashRegister";
 
 interface CashRegisterProps {
-  viewMode: 'all' | 'categories' | 'products' | 'cart';
+  viewMode: "all" | "categories" | "products" | "cart";
 }
 
 const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
@@ -37,7 +37,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     productInfoData,
   } = useCashRegister();
 
-  if (viewMode === 'categories') {
+  if (viewMode === "categories") {
     return (
       <CategoriesSection
         categories={categories}
@@ -48,7 +48,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     );
   }
 
-  if (viewMode === 'products') {
+  if (viewMode === "products") {
     return (
       <ProductsSection
         searchQuery={searchQuery}
@@ -63,7 +63,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({ viewMode }) => {
     );
   }
 
-  if (viewMode === 'cart') {
+  if (viewMode === "cart") {
     return (
       <CartSection
         cart={cart}

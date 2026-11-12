@@ -6,11 +6,11 @@ Makefile/Dockerfile exists in this repo; see Phase 5 gap).
 
 ## Verification signature (pre-Phase 7)
 
-| Command | Exit code | Notes |
-|---|---|---|
-| `npm run build` | 0 | Vite production build succeeds |
-| `npx tsc --noEmit -p tsconfig.app.json` | 0 | 0 TypeScript errors, no error files |
-| `npm run lint` | 1 | Pre-existing eslint/@typescript-eslint version incompatibility (`no-unused-expressions` rule load failure), unrelated to Phase 7; unchanged by Phase 7 |
+| Command                                 | Exit code | Notes                                                                                                                                                  |
+| --------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run build`                         | 0         | Vite production build succeeds                                                                                                                         |
+| `npx tsc --noEmit -p tsconfig.app.json` | 0         | 0 TypeScript errors, no error files                                                                                                                    |
+| `npm run lint`                          | 1         | Pre-existing eslint/@typescript-eslint version incompatibility (`no-unused-expressions` rule load failure), unrelated to Phase 7; unchanged by Phase 7 |
 
 - TS error count: 0; TS error file list: none.
 - Test suites: none (no test framework installed); test count: 0.
@@ -20,11 +20,11 @@ Makefile/Dockerfile exists in this repo; see Phase 5 gap).
 
 Tooling cross-validation (all run, exit codes recorded):
 
-| Tool | Exit code | Outcome |
-|---|---|---|
-| `npx knip` | non-zero | Flagged 29 unused files, 19 unused deps, 1 unused devDep |
-| `npx ts-prune` | 0 | No unused exports reported |
-| `npx depcheck` | non-zero | Flagged 4 unused devDeps; `@tailwindcss/typography` confirmed unused; `autoprefixer`/`postcss`/`typescript` are build-pipeline config-only (kept — depcheck false positives) |
+| Tool           | Exit code | Outcome                                                                                                                                                                      |
+| -------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npx knip`     | non-zero  | Flagged 29 unused files, 19 unused deps, 1 unused devDep                                                                                                                     |
+| `npx ts-prune` | 0         | No unused exports reported                                                                                                                                                   |
+| `npx depcheck` | non-zero  | Flagged 4 unused devDeps; `@tailwindcss/typography` confirmed unused; `autoprefixer`/`postcss`/`typescript` are build-pipeline config-only (kept — depcheck false positives) |
 
 Manual verification (grep over `src/`) confirmed every knip-flagged package and file had zero import sites, except the live ones deliberately kept below.
 
@@ -49,11 +49,11 @@ Manual verification (grep over `src/`) confirmed every knip-flagged package and 
 
 ### Post-Phase 7 verification signature
 
-| Command | Exit code | Delta vs pre-Phase 7 |
-|---|---|---|
-| `npm run build` | 0 | unchanged (still passes) |
-| `npx tsc --noEmit -p tsconfig.app.json` | 0 | unchanged (0 errors) |
-| `npm run lint` | 1 | unchanged (pre-existing eslint incompatibility) |
+| Command                                 | Exit code | Delta vs pre-Phase 7                            |
+| --------------------------------------- | --------- | ----------------------------------------------- |
+| `npm run build`                         | 0         | unchanged (still passes)                        |
+| `npx tsc --noEmit -p tsconfig.app.json` | 0         | unchanged (0 errors)                            |
+| `npm run lint`                          | 1         | unchanged (pre-existing eslint incompatibility) |
 
 No regression introduced by Phase 7. Build output shrank (removed unused UI CSS/JS), but no error-count or suite-list change.
 
