@@ -1,0 +1,22 @@
+# gitleaks allowlist for `rengarenk-dizayn-cicekleri`.
+#
+# Entries here are intentionally narrow and path-based only - no secret
+# values are ever recorded (CLAUDE.md: secrets are never logged/pasted).
+#
+# The Supabase anon/publishable key in src/integrations/supabase/client.ts
+# is client-safe by Supabase's own design (JWT payload role == "anon", RLS
+# is the real access boundary) and is explicitly not rotation-worthy
+# (docs/REPOSITORY_AUDIT.md secret-scan section, docs/TECHNICAL_DEBT.md
+# item 5). It is flagged by gitleaks' `jwt` rule only because of its shape.
+# It is allowlisted by PATH here so the CI secret-scan job remains a real
+# gate for any NEW secret, while the known-safe key is excluded.
+#
+# The hardcoded key itself is a Phase 5/Phase 9 convention gap
+# (hardcoded-in-source vs. env var), tracked in docs/TECHNICAL_DEBT.md #5;
+# Phase 9 will migrate src/integrations/supabase/client.ts to read from
+# VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY (placeholders reserved in
+# .env.example). At that point this allowlist entry can be removed.
+
+[[allowlist]]
+  description = "Supabase anon/publishable key - client-safe (role == anon), RLS-gated, not a secret; hardcoded pending Phase 9 env-var migration (docs/TECHNICAL_DEBT.md #5)"
+  path = "src/integrations/supabase/client.ts"
