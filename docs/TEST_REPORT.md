@@ -13,19 +13,19 @@ nightly schedule only, not on every PR. Publish is gated to tags.
 
 ## Jobs (in order)
 
-| Job | Gate | Trigger | Notes |
-|-----|------|---------|-------|
-| lint | non-blocking (continue-on-error) | push + PR | npm run lint; informational while 75 pre-existing findings exist (docs/TECHNICAL_DEBT.md #23, Phase 8/9 item) |
-| typecheck | HARD | push + PR | docker build --target test (npx tsc -b); the make verify test portion |
-| build | HARD (needs typecheck) | push + PR | docker compose build app (runtime image); mirrors make build |
-| secret-scan | HARD | push + PR | gitleaks (SHA-pinned); .gitleaks.toml allowlists only the known-safe Supabase anon key |
-| security | reported only | nightly schedule | docker scout cves on runtime image, best-effort (|| true) |
-| publish | validated only | tags only | no registry credentials configured yet; no image pushed |
+| Job         | Gate                             | Trigger          | Notes                                                                                                         |
+| ----------- | -------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| lint        | non-blocking (continue-on-error) | push + PR        | npm run lint; informational while 75 pre-existing findings exist (docs/TECHNICAL_DEBT.md #23, Phase 8/9 item) |
+| typecheck   | HARD                             | push + PR        | docker build --target test (npx tsc -b); the make verify test portion                                         |
+| build       | HARD (needs typecheck)           | push + PR        | docker compose build app (runtime image); mirrors make build                                                  |
+| secret-scan | HARD                             | push + PR        | gitleaks (SHA-pinned); .gitleaks.toml allowlists only the known-safe Supabase anon key                        |
+| security    | reported only                    | nightly schedule | docker scout cves on runtime image, best-effort (                                                             |     | true) |
+| publish     | validated only                   | tags only        | no registry credentials configured yet; no image pushed                                                       |
 
 ## Measured ground truth (local Docker, worktree phase-10/ci-cd, commit 9c7ef09)
 
-| Command | Result |
-|---------|--------|
+| Command                                                         | Result                                     |
+| --------------------------------------------------------------- | ------------------------------------------ |
 | docker build --target test -t rengarenk-dizayn-cicekleri:test . | FAILED ~6.5s - npm ci ERESOLVE (see below) |
 
 ## Current state: red, pre-existing, not a P10 regression
