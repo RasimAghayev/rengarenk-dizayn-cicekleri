@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "Dockerfile"
+      - "docker-compose.yml"
+      - "Makefile"
+      - ".github/workflows/ci.yml"
+      - ".gitleaks.toml"
+      - ".env.example"
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: rengarenk-dizayn-cicekleri
+  COMPOSE_PROJECT_NAME: rengarenk-dizayn-cicekleri-p10
+
+jobs:
+  # Cheap checks first, in parallel (CI/CD runner-time standard).
+  # Lint is intentionally non-blocking: npm ci currently fails on main
+  # (typescript 7.0.2 vs typescript-eslint peer "<6.1.0", Dependabot PR #75 -
+  # Phase 6 to re-pin typescript to ^6.0.x). Even when install succeeds,
+  # npm run lint reports 75 pre-existing findings (docs/TECHNICAL_DEBT.md #23)
+  # owned by Phase 8/9 quality tooling. The hard gate is the Docker test
+  # stage (typecheck job below).
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  # Tests in Docker: the `test` stage runs `npx tsc -b` and its failure fails
+  # the whole image build (see Dockerfile / docs/BASELINE.md). This is the
+  # behavior-contract gate (`make verify` = test + build).
+  typecheck:
+    name: typecheck (Docker test stage)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: docker build --target test -t ${{ env.IMAGE }}:test .
+
+  # Build the runtime image once (reuses the test stage's output via the
+  # FROM chain), mirroring `make build` / `make verify`.
+  build:
+    name: build (runtime image)
+    needs: [typecheck]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: docker compose build app
+
+  # Secret scan on every PR/push (gitleaks, SHA-pinned). Fails on any leak
+  # not covered by the .gitleaks.toml allowlist (the known-safe Supabase anon
+  # key). Fork PRs receive no secrets (none are used by this job).
+  secret-scan:
+    name: secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e
+
+  # Full/slow scans run nightly (schedule), not on every PR, per the
+  # CI/CD runner-time standard. Best-effort so a scanner outage doesn't fail
+  # the nightly run; findings are reviewed in the run logs.
+  security:
+    name: dependency + image security scan (nightly)
+    if: github.event_name == "schedule"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: docker build --target runtime -t ${{ env.IMAGE }}:runtime .
+      - run: docker scout cves ${{ env.IMAGE }}:runtime || true
+
+  # Publish only on a tag, from a protected branch. No container registry
+  # credentials are configured yet, so no image is pushed here; add repository
+  # secrets + OIDC when a registry target is ready.
+  publish:
+    name: publish (tag only)
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: |
+          echo "Tag ${GITHUB_REF_NAME} detected; runtime image built and validated in the build job."
+          echo "Publishing to a container registry requires registry credentials (repository secrets + OIDC);"
+          echo "add them when a registry target is configured. No image is pushed from this job."
