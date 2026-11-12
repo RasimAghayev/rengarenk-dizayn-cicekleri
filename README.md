@@ -1,75 +1,52 @@
-# Welcome to your Lovable project
-![Views](https://hits.sh/github.com/RasimAghayev/rengarenk-dizayn-cicekleri.svg?label=views&color=0e75b6)
+# rengarenk-dizayn-cicekleri
 
+Vite + React + TypeScript SPA with [shadcn-ui](https://ui.shadcn.com) and Tailwind CSS, backed by a hosted [Supabase](https://supabase.com) project. The production bundle is served by nginx inside Docker; there is no backend process of this repo's own to run locally.
 
-## Project info
+## Tech stack
 
-**URL**: https://lovable.dev/projects/2e280ca3-6a69-49a5-a74a-7e3ad57813db
+- Vite, React 19, TypeScript
+- shadcn-ui, Tailwind CSS
+- @tanstack/react-query, react-hook-form, zod, recharts, sonner, lucide-react
+- Supabase JS client (hosted project — URL/anon key are client-safe by Supabase's own design; see docs/TECHNICAL_DEBT.md item 5)
 
-## How can I edit this code?
+## Local development (Docker-first)
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/2e280ca3-6a69-49a5-a74a-7e3ad57813db) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Everything builds, tests, and runs in containers per this repo's workflow:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# 1. Clone
+git clone https://github.com/RasimAghayev/rengarenk-dizayn-cicekleri.git
+cd rengarenk-dizayn-cicekleri
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 2. Baseline behavior-contract gate: test stage (tsc type-check + vite build)
+#    then the runtime image build.
+make verify
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+# 3. Start the stack (runs verify first)
+make up
+# app: http://localhost:20070/  (health: /healthz)
 ```
 
-**Edit a file directly in GitHub**
+- `make test` — Docker `test` stage only (TypeScript project-reference type-check across `tsconfig.app.json` + `tsconfig.node.json`; `noEmit: true` so it is a real type-check, not an artifact build).
+- `make build` — runtime image (`docker compose build app`); structurally re-runs the `test` stage, so no runtime image exists whose tests didn't pass.
+- `make lint` — `npm run lint` inside the test-stage image (non-blocking; surfaces pre-existing ESLint findings, see docs/TECHNICAL_DEBT.md item 23).
+- `make down` / `make logs` / `make shell` — stop the stack, follow logs, open a shell in the runtime image.
+- `make clean` — removes local build output; containers/images only with `CONFIRM=1` (never deletes user data).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Environment: copy `.env.example` to `.env` and fill in placeholders. `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` are reserved names Phase 9 will wire into `src/integrations/supabase/client.ts` (currently hardcoded — see docs/TECHNICAL_DEBT.md item 5). No real values in `.env.example` ever.
 
-**Use GitHub Codespaces**
+## CI status / known baseline (read before merging)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Phase 10 added the GitHub Actions CI pipeline (lint → typecheck in the Docker `test` stage → build → secret scan; SHA-pinned actions, `timeout-minutes` on every job, full image scan nightly only, publish gated to tags) as **PR #79 — open, not merged**.
+- `make verify` is **RED — pre-existing baseline, not a regression**: `npm ci` fails ERESOLVE because `main` carries `typescript@^7.0.2` (Dependabot PR #75) while `typescript-eslint@^8.72.x` requires `typescript >=4.8.4 <6.1.0`. This is a dependency-version conflict owned by **Phase 6/upgrader** (re-pin `typescript` to `^6.0.x`, or upgrade `typescript-eslint` once it supports TS 7.x), out of scope for docs-only phases.
+- Until Phase 6 restores a green build, CI cannot go green and PR #79 stays open. Documented in `docs/CI_BASELINE.md`; not hidden, not blamed on any later phase.
 
-## What technologies are used for this project?
+No behavior was changed by any docs-only commit; `make verify`'s exit code matches the P10 baseline recorded in `docs/CI_BASELINE.md`.
 
-This project is built with:
+## How to contribute
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+See [CONTRIBUTING.md](CONTRIBUTING.md). Branches: `phase-<n>/<topic>`. Conventional commits. No AI attribution in commits or PRs (no `Co-Authored-By` / `Claude-Session` trailers).
 
-## How can I deploy this project?
+## Deploy
 
-Simply open [Lovable](https://lovable.dev/projects/2e280ca3-6a69-49a5-a74a-7e3ad57813db) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Publish via Lovable (Project > Settings > Domains > Connect Domain) or push to `main` — the CI pipeline publishes only on tags (no registry credentials configured yet).
