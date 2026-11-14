@@ -2,7 +2,7 @@ SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
 IMAGE  ?= rengarenk-dizayn-cicekleri
-export COMPOSE_PROJECT_NAME := rengarenk-dizayn-cicekleri-p9
+export COMPOSE_PROJECT_NAME := rengarenk-p11
 export HOST_PORT ?= 20070
 COMPOSE := docker compose
 
@@ -10,8 +10,8 @@ COMPOSE := docker compose
 
 help:
 	@echo "make build    - build the runtime image (nginx + static bundle; requires the test stage to pass)"
-	@echo "make test     - run the test stage only (ESLint + TypeScript project build/typecheck - no unit-test suite exists yet, see docs/BASELINE.md)"
-	@echo "make verify   - test + build: the baseline behavior-contract gate"
+	@echo "make test     - run the test stage: vitest suite (65 pass + 1 expected fail) + TypeScript project build/typecheck"
+	@echo "make verify   - test + build: the behavior-contract gate"
 	@echo "make up       - verify, then start the stack (docker compose up -d)"
 	@echo "make run      - up, then follow logs"
 	@echo "make down     - stop and remove the stack"

@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f95db51f3ba0c4d549a0e97c94c5292d24edfc6c # v3.10.0
+
+      - name: Run test stage (vitest suite + TypeScript type-check)
+        run: |
+          docker build --target test -t rengarenk-p11:test .
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f95db51f3ba0c4d549a0e97c94c5292d24edfc6c # v3.10.0
+
+      - name: Build runtime image (docker compose build app)
+        run: |
+          COMPOSE_PROJECT_NAME=rengarenk-p11 docker compose build app

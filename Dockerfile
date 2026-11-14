@@ -21,11 +21,18 @@
 # `ProtectedRoute`/`AdminLayout` (see docs/TECHNICAL_DEBT.md P0 #2). No
 # future edit to this Dockerfile should switch that script.
 #
-# No unit/integration test suite exists in this repo yet (zero test files,
-# no test runner configured - see docs/BASELINE.md). The `test` stage below
-# gates on a real, already-available static check (the TypeScript project-
-# reference build/type-check) rather than a fabricated test-runner pass.
-# This is documented as a real gap for Phase 11, not hidden.
+# No unit/integration test suite existed in this repo until Phase 11
+# (tests/ added, vitest 5.1.0 + jsdom + RTL, 66 cases = 65 pass + 1 expected
+# fail - see docs/TESTING_STRATEGY.md and docs/TEST_REPORT.md). The `test`
+# stage below now runs that suite (`npm run test` = `vitest run --config
+# tests/vitest.config.ts`) in addition to the TypeScript project-reference
+# build/type-check. A failure in either step fails the whole image build
+# (see header note on the FROM chain). The expected-fail case
+# (`TC_CASH_STOCK_004`, `it.fails`) is a documented production defect
+# (R8, not fixed) and exits 0 by design, so the stage stays green until the
+# defect is fixed and the `it.fails` wrapper is removed.
+#
+# `npm run lint` is deliberately still NOT in this gate (see below).
 
 ############################################################
 # base - pinned exact version + digest, shared by every stage
@@ -89,7 +96,7 @@ RUN npm run build
 # the itemized list and owners; `make lint` already runs this non-blocking.
 ############################################################
 FROM build AS test
-RUN npx tsc -b
+RUN npm run test && npx tsc -b
 
 ############################################################
 # runtime - nginx (unprivileged image: already non-root uid 101, exec-form
